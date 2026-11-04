@@ -1,9 +1,16 @@
 {
+ "id": "./",
  "name": "Echo Garden",
  "short_name": "Echo Garden",
+ "description": "Raise and play with little Echos in a living 3D garden.",
  "start_url": "./index.html",
  "scope": "./",
  "display": "fullscreen",
+ "display_override": [
+  "fullscreen",
+  "standalone"
+ ],
+ "prefer_related_applications": false,
  "orientation": "landscape",
  "background_color": "#140f1c",
  "theme_color": "#140f1c",

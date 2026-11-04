@@ -11,7 +11,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
-<title>Echo Garden v0.7.2</title>
+<title>Echo Garden v0.7.3</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <style>
 [hidden]{display:none!important}
@@ -6213,6 +6213,42 @@ function tzBind(){ const m=$('#mini'); if(!m||m.__tz) return; m.__tz=1;
 { const _cm=closeMini; closeMini=function(){ tzReset(); const h=$('#tzHint'); if(h) h.hidden=true; return _cm.apply(this,arguments); }; }
 COMFORT_OPTS.push(['advButtons','Adventure buttons','Show on-screen arrows and a jump button in Adventures instead of touch gestures.']);
 /* =========================================================
+   INSTALL HELPER (v0.7.3)
+   Shows the right "put it on your home screen" route for each browser,
+   only on the hosted app and only when it isn't installed already.
+   - Chrome / Edge on Android and desktop: one-tap Install button
+   - Samsung Internet: its installs can trip a false Play Protect warning,
+     so offer "Open in Chrome" instead
+   - iPhone / iPad Safari: Share → Add to Home Screen instructions
+   - iPhone in another browser: open in Safari first
+   ========================================================= */
+const INST={evt:null,shown:false};
+function hostedApp(){ return /^https?:/.test(location.protocol)&&!/claude\.(ai|site)|claudeusercontent/.test(location.host); }
+function installedApp(){ try{ return navigator.standalone===true||matchMedia('(display-mode: fullscreen)').matches||matchMedia('(display-mode: standalone)').matches; }catch(e){ return false; } }
+function installKind(){ const ua=navigator.userAgent||''; const ios=/iPhone|iPad|iPod/.test(ua)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+  if(ios) return /CriOS|FxiOS|EdgiOS|OPiOS/.test(ua)?'ios-other':'ios';
+  if(/SamsungBrowser/.test(ua)) return 'samsung'; if(/Android/.test(ua)&&/Firefox/.test(ua)) return 'firefox'; if(INST.evt) return 'prompt'; if(/Android/.test(ua)) return 'android'; return 'desktop'; }
+window.addEventListener('beforeinstallprompt',ev=>{ ev.preventDefault(); INST.evt=ev; try{ if(UI.panel==='settings') refreshPanel(); }catch(e){} });
+window.addEventListener('appinstalled',()=>{ INST.evt=null; try{ toast('Echo Garden is on your home screen','good'); }catch(e){} });
+function chromeIntent(){ const u=location.href.replace(/^https?:\/\//,''); return `intent://${u}#Intent;scheme=https;package=com.android.chrome;end`; }
+function installHelpHTML(){ const k=installKind();
+  if(k==='prompt') return `<p>Install Echo Garden as an app. It opens full-screen and works offline.</p><div class="row"><button class="btn pri" data-install>Install app</button></div>`;
+  if(k==='samsung') return `<p>Samsung Internet sometimes shows a "built for an older version of Android" warning when installing web apps. It's a false alarm, but installing through Chrome avoids it.</p><div class="row"><a class="btn pri" href="${chromeIntent()}">Open in Chrome</a></div><p class="note">Then tap Chrome's ⋮ menu → Install app. Or stay here and use the menu → Add page to → Home screen, and tap "Install anyway" if the warning appears.</p>`;
+  if(k==='ios') return `<p>On iPhone and iPad: tap the <b>Share</b> button (square with an arrow; it may be under <b>⋯</b>), then <b>Add to Home Screen</b>, then <b>Add</b>. Keep "Open as Web App" switched on.</p>`;
+  if(k==='ios-other') return `<p>On iPhone and iPad, apps can only be added to the home screen from <b>Safari</b>. Copy this link, open it in Safari, then tap Share → Add to Home Screen.</p><div class="row"><button class="btn pri" data-copylink>Copy link</button></div>`;
+  if(k==='firefox') return `<p>In Firefox: tap the <b>⋮</b> menu, then <b>Install</b> (or <b>Add to Home screen</b>). For full-screen play, Chrome works best.</p><div class="row"><a class="btn" href="${chromeIntent()}">Open in Chrome</a></div>`;
+  if(k==='android') return `<p>Tap your browser's <b>⋮</b> menu, then <b>Install app</b> or <b>Add to Home screen</b>. If neither appears, open this link in Chrome.</p><div class="row"><a class="btn" href="${chromeIntent()}">Open in Chrome</a></div>`;
+  return `<p>In Chrome or Edge, click the install icon at the right of the address bar, or use the browser menu → Install Echo Garden.</p>`; }
+function showInstallCard(){ if(!$('#modal').hidden) return; showModal(`<div class="reveal"><div class="rv-eyebrow">Play it like an app</div><h2>Add Echo Garden to your home screen</h2>${installHelpHTML()}<div class="row"><button class="btn" data-close>Not now</button></div></div>`); }
+document.addEventListener('click',ev=>{ if(ev.target.closest('[data-install]')&&INST.evt){ ev.stopPropagation(); INST.evt.prompt(); INST.evt.userChoice.finally(()=>{ INST.evt=null; closeModal(); try{ refreshPanel(); }catch(e){} }); return; }
+  if(ev.target.closest('[data-copylink]')){ ev.stopPropagation(); try{ navigator.clipboard.writeText(location.href).then(()=>toast('Link copied. Paste it into Safari.','good')); }catch(e){ toast(location.href); } return; }
+  if(ev.target.closest('[data-installhelp]')){ ev.stopPropagation(); closePanel(); showInstallCard(); } },true);
+// Settings > Save gets an install row
+{ const _sr=PANELS.settings.render; PANELS.settings.render=function(tab){ let h=_sr.apply(this,arguments); if(tab==='save'&&hostedApp()&&!installedApp()) h=`<div class="li"><div class="tx"><b>Add to home screen</b><span>Play full-screen and offline, like an app.</span></div><button class="btn sm pri" data-installhelp>How</button></div>`+h; return h; }; }
+// offer it once, a little after the first chapter, on the hosted site in a browser tab
+setInterval(()=>{ try{ if(INST.shown||!S||!hostedApp()||installedApp()) return; if(S.installAsked||!S.seenIntro||(S.tut!=null&&S.tut<99)) return; if(SCENE||CINE||CARE||HANDS||MG||UI.panel||!$('#modal').hidden) return;
+    if(!(S.story&&S.story.ch>=1)) return; INST.shown=true; S.installAsked=1; saveGame(); showInstallCard(); }catch(e){} },4000);
+/* =========================================================
    AUDIO — procedural music, ambience and creature voices
    (reverb bus, chord pads, bells, spatial voices)
    ========================================================= */
@@ -6399,7 +6435,7 @@ function setupInstall(){ try{ if(!/^https?:/.test(location.protocol)||/claude\.(
 /* =========================================================
    DIAGNOSTICS — performance readout, error capture, problem report
    ========================================================= */
-const GAME_VERSION='0.7.2';
+const GAME_VERSION='0.7.3';
 const DIAG={errors:[],trail:[],fps:[],show:false,acc:0,n:0,el:null,minFps:999};
 window.addEventListener('error',ev=>{ DIAG.errors.push(`${new Date().toLocaleTimeString()} ${ev.message} @${(ev.filename||'').split('/').pop()}:${ev.lineno}`); if(DIAG.errors.length>15) DIAG.errors.shift(); });
 window.addEventListener('unhandledrejection',ev=>{ DIAG.errors.push(`${new Date().toLocaleTimeString()} promise: ${ev.reason&&ev.reason.message||ev.reason}`); if(DIAG.errors.length>15) DIAG.errors.shift(); });
