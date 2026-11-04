@@ -11,7 +11,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
-<title>Echo Garden v0.8.0</title>
+<title>Echo Garden v0.8.1</title>
 <style>
 [hidden]{display:none!important}
 
@@ -3060,7 +3060,7 @@ function renderProfile(tab){
 function dexCell(key){ if(!key) return '<div class="dx blank"></div>'; const got=!!S.dex[key]; return `<button class="dx ${got?'':'un'}" data-dex="${key}" aria-label="${got?esc(FORMS[key].name):'Undiscovered'}"><img data-fk="${key}" alt=""></button>`; }
 function renderDex(tab){
   const n=Object.keys(S.dex).length;
-  let h=`<div class="row" style="flex-wrap:nowrap;margin-bottom:8px"><div class="prog" style="flex:1"><i style="width:${n/97*100}%"></i></div><b style="font-variant-numeric:tabular-nums">${n} / 97</b></div>`;
+  let h=`<div class="row" style="flex-wrap:nowrap;margin-bottom:8px"><div class="prog" style="flex:1"><i style="width:${n/FORM_ORDER.length*100}%"></i></div><b style="font-variant-numeric:tabular-nums">${n} / ${FORM_ORDER.length}</b></div>`;
   const cols=['normal',...STATS];
   if(tab==='young'){
     h+=`<div class="sec">Baby <small>1 form</small></div><div class="dexrow"><span class="lab">All</span>${dexCell('baby')}<div></div><div></div><div></div><div></div><div></div></div>`;
@@ -6514,6 +6514,13 @@ const STARTER_INV={apple:6,sunpear:2,seed_apple:2,seed_dashberry:1,ess_speed:1,e
 { const _sg=seedNewGame; seedNewGame=function(){ const r=_sg.apply(this,arguments); if(S) S.inv080=1; return r; }; }
 /* ---------- what's new: shown once after each update ---------- */
 const CHANGELOG={
+  '0.8.1':[
+    ['🌗','Alignment you can see','Hero Echos glow bright with a halo. Dark Echos turn shadowy with vivid glowing accents and a thorned crescent. Neutral Echos keep their true colours.'],
+    ['🎨','Stat colours and tips','Hands, feet, ears and tails carry colour, and adults show their second stat in their markings. Prime forms look extra special.'],
+    ['💫','Mood orbs','The mark above an Echo’s head now shows how it feels: it pulses when happy, droops when sad and spins when excited.'],
+    ['👑','Three legendary forms','Seraph, Nightfiend and Aeon are a rare third evolution for exceptional adults. Check the Echodex to see what each needs.'],
+    ['🐍','Remove animal traits','A Moulting Snake sheds an Echo’s animal traits, or Dr. Wren in the Kindergarten can remove them for Sparks.'],
+    ['🥚','Little touches','Babies now hint at which way they’re leaning, and happy Echos waddle and sit down to clap.']],
   '0.8.0':[
     ['🛍️','A new Shop','Featured goods change every 4 hours, so grab what you like. A travelling merchant visits daily, and Basics are always in stock.'],
     ['🎩','Dress-up','Glasses and neckwear to wear with hats, plus lots of new toys and furniture. Rarer items cost more.'],
@@ -6884,6 +6891,118 @@ function showPlotClear(i){ const c=plotCost(); const can=S.sparks>=c;
 // markers follow each garden's own lock state (garden switches, clearing)
 { const _se=syncEntities; syncEntities=function(){ try{ if(S&&MESH.plot) for(const [i,m] of MESH.plot){ if(!!m.userData.rubbish!==plotLocked(i)){ ents.remove(m); MESH.plot.delete(i); } } }catch(e){} return _se.apply(this,arguments); }; }
 /* =========================================================
+   ECHOS 2.0 (v0.8.1)
+   1 alignment skins: Hero bright pastel + halo, Neutral true colour + orb,
+     Dark near-black skin with bright stat-coloured accents + thorned crescent
+   2 coloured tips (hands, feet, ears, tail) that carry the second stat on adults
+   3 Prime forms exaggerate their stat; animal parts take the Echo's colours
+   4 mood orb: the head mark reacts to how the Echo feels
+   5 babies show which way they lean
+   6 waddle walk and a sit-and-clap idle
+   7 three legendary forms: Seraph (Hero), Nightfiend (Dark), Aeon (Neutral, reborn)
+   8 Moulting Snake and the doctor can remove animal traits
+   ========================================================= */
+/* ---------- 7a. legendary forms ---------- */
+addForm({key:'S-hero',stage:'adult',align:'hero',primary:null,secondary:null,special:'seraph',name:'Seraph',req:'A Hero adult with every stat at level 30 or more and a strong bond (70+) with you.'});
+addForm({key:'S-dark',stage:'adult',align:'dark',primary:null,secondary:null,special:'fiend',name:'Nightfiend',req:'A Dark adult with every stat at level 30 or more and a strong bond (70+) with you.'});
+addForm({key:'S-neutral',stage:'adult',align:'neutral',primary:null,secondary:null,special:'aeon',name:'Aeon',req:'A Neutral adult that has been reborn at least once, with every stat at level 35 or more.'});
+const SPECIAL_KEY={hero:'S-hero',dark:'S-dark',neutral:'S-neutral'};
+function specialReady(e){ const f=FORMS[e.form]; if(!f||f.stage!=='adult'||f.special) return false; const lv=Math.min(...STATS.map(s=>e.stats[s].lv));
+  if(f.align==='hero') return lv>=30&&e.bond>=70; if(f.align==='dark') return lv>=30&&e.bond>=70; return lv>=35&&(e.reincarnations||0)>=1; }
+{ const _er=evoReady; evoReady=function(e){ if(_er.apply(this,arguments)) return true; return specialReady(e); }; }
+{ const _nf=nextFormKey; nextFormKey=function(e){ const f=FORMS[e.form]; if(f&&f.stage==='adult'&&!f.special) return SPECIAL_KEY[f.align]; return _nf.apply(this,arguments); }; }
+{ const _ce=completeEvolution; completeEvolution=function(e){ const was=FORMS[e.form]; const r=_ce.apply(this,arguments); const now=FORMS[e.form]; if(now&&now.special&&was!==now){ setTimeout(()=>toast(`${e.name} became a legendary ${now.name}!`,'gold'),600); } return r; }; }
+/* ---------- 1. palettes ---------- */
+{ const _ao=appearanceOf; appearanceOf=function(e){ const a=_ao.apply(this,arguments); const f=FORMS[e.form]; if(f&&f.special){ a.special=f.special; if(f.special==='aeon') a.crystal=true; } if(e.genes&&e.genes.colored) a.colored=1; return a; }; }
+{ const _af=appearanceOfForm; appearanceOfForm=function(k){ const a=_af.apply(this,arguments); if(FORMS[k]&&FORMS[k].special){ a.special=FORMS[k].special; if(a.special==='aeon') a.crystal=true; } return a; }; }
+palette=function(app){ const a=app.align, stg=app.stage, h=app.hue, s0=app.sat, l0=app.light, h2=app.hue2!=null?app.hue2:null;
+  if(app.special==='seraph') return {body:'#fff6e6',belly:'#ffffff',tip:'#ffd36a',accent:'#ffe9a0',eye:'#3f7fd8',glow:'#ffe9a0'};
+  if(app.special==='fiend') return {body:'#1c0c14',belly:'#3a0f1c',tip:'#ff2a44',accent:'#ff3a50',eye:'#ff3048',glow:'#ff2a44'};
+  if(app.special==='aeon') return {body:'#bfe8ff',belly:'#e8f8ff',tip:'#9f8cff',accent:'#7ff0ff',eye:'#3a2aa8',glow:'#9ff4ff'};
+  const sh=h2!=null?h2:h; let body,belly,tip,accent,eye,glow;
+  if(stg==='baby'){ const L=app.alignLean||0; body=colHSL(h,s0-(L>0?L*.15:0),l0+(L>0?L*.1:L*.26)); belly=colHSL(h,s0-.15,Math.min(.92,l0+.18+(L<0?L*.2:0)));
+    tip=L>.25?colHSL(45,.85,.68+(1-L)*.08):L<-.25?colHSL(h,.9,.5):colHSL(h,s0+.05,l0-.1); accent=colHSL(h,s0+.1,Math.min(.9,l0+.1)); eye='#2a1f1a'; glow=accent; }
+  else if(a==='hero'){ const l=app.colored?Math.min(.88,l0+.14):.7; body=colHSL(h,app.colored?s0:.78,l); belly=colHSL(stg==='adult'&&h2!=null?h2:h,.5,Math.min(.94,l+.1));
+    tip=stg==='adult'&&app.primary?colHSL(sh,.78,.68):colHSL(45,.9,.68); accent='#ffe08a'; eye='#2f6fb3'; glow='#fff0b0'; }
+  else if(a==='dark'){ const l=app.colored?Math.max(.08,l0*.28):.1; body=colHSL(h,app.colored?Math.min(.55,s0):.5,l); belly=colHSL(stg==='adult'&&h2!=null?h2:h,.6,l+.08);
+    tip=colHSL(stg==='adult'&&app.primary?sh:h,.95,.56); accent=colHSL(h,.95,.6); eye=colHSL(h,.95,.62); glow=accent; }
+  else { const l=app.colored?l0:.6; body=colHSL(h,app.colored?s0:.6,l); belly=colHSL(stg==='adult'&&h2!=null?h2:h,.45,Math.min(.9,l+.18));
+    tip=stg==='adult'&&app.primary?colHSL(sh,.7,.55):colHSL(h+28,.7,Math.min(.82,l+.14)); accent=app.primary?STAT[app.primary].color:colHSL(h,.7,.7); eye='#2a1f1a'; glow=accent; }
+  return {body,belly,tip,accent,eye,glow}; };
+// bigger, rounder heads while young
+PLAN.base.head=.6;
+/* ---------- 2-5, 7b. extra parts after the base build ---------- */
+const GHOST_MAT={}; function ghostMat(c,o){ const k=c+'|'+o; return GHOST_MAT[k]||(GHOST_MAT[k]=new THREE.MeshBasicMaterial({color:c,transparent:true,opacity:o,depthWrite:false})); }
+let CRESCENT_GEO=null; function crescentGeo(){ return CRESCENT_GEO||(CRESCENT_GEO=new THREE.TorusGeometry(.24,.06,8,22,Math.PI*1.35)); }
+{ const _be=buildEcho; buildEcho=function(app,opts){ const root=_be.apply(this,arguments); try{ decorateEcho(root,app); }catch(e){ console.warn(e); } return root; }; }
+function decorateEcho(root,app){ const P=palette(app), parts=root.userData.parts, stg=app.stage, a=app.align, head=parts.head, orb=parts.orb, sp=app.special;
+  const mTip=bodyMat(P.tip,app), mGlow=mat(P.glow,{emissive:P.glow,emissiveIntensity:.85,roughness:.3});
+  // animal parts take the Echo's colours
+  const RECOL={'7fbf6a':P.tip,'e6dcc4':P.belly,'c9b08a':P.tip,'ffe9a8':a==='dark'?P.accent:P.belly};
+  root.traverse(o=>{ if(o.isMesh&&o.material&&o.material.color&&!o.material.transparent){ const hx=o.material.color.getHexString(); if(RECOL[hx]) o.material=mat(RECOL[hx]); } });
+  // ear tips
+  const earType=app.parts.ears||(app.primary==='agility'&&stg!=='baby'?'long':'nub'); const k=stg==='baby'?0:stg==='teen'?.6:1;
+  if(parts.ears) for(const g of parts.ears){ if(earType==='long'){ const L=.75+k*.35; g.add(mesh(GEO.sph,mTip,[.15,L*.18,.1],[0,L*.95,0])); } else if(earType==='nub') g.add(mesh(GEO.sph,mTip,[.14,.11,.11],[0,.28,0])); else if(earType==='round') g.add(mesh(GEO.sph,mTip,[.16,.1,.1],[0,.3,0])); }
+  if(sp==='fiend'||(app.primary===app.secondary&&app.primary==='agility'&&stg==='adult')) for(const g of parts.ears||[]) g.scale.y*=1.3;
+  // head mark: Hero halo, Dark thorned crescent, Neutral orb (babies show a hint of their lean)
+  const mark=new THREE.Group(); orb.add(mark); parts.mark=mark;
+  const hideOrb=()=>{ for(const c of orb.children) if(c!==mark) c.visible=false; };
+  const halo=(sc,m)=>{ const t=mesh(GEO.tor,m,[sc,sc,sc*1.3],[0,0,0],[Math.PI/2,0,0]); t.castShadow=false; mark.add(t); return t; };
+  const crescent=(m,thorn)=>{ const c=new THREE.Mesh(crescentGeo(),m); c.rotation.z=Math.PI*.82; mark.add(c); for(let i=0;i<3;i++){ const ang=Math.PI*(.95+i*.32); mark.add(mesh(GEO.cone,thorn,[.035,.13,.035],[Math.cos(ang+Math.PI*.82)*.3,Math.sin(ang+Math.PI*.82)*.3,0],[0,0,ang+Math.PI*.82-Math.PI/2])); } };
+  if(sp==='seraph'){ hideOrb(); halo(.3,mGlow); halo(.42,ghostMat('#fff3c0',.55)).position.y=.08; }
+  else if(sp==='fiend'){ hideOrb(); crescent(mat('#0e060a'),mat('#ff2a44',{emissive:'#ff2a44',emissiveIntensity:.9})); }
+  else if(sp==='aeon'){ hideOrb(); const core=mesh(GEO.oct,mat('#ffffff',{emissive:'#9ff4ff',emissiveIntensity:1}),[.14,.2,.14]); mark.add(core); halo(.3,ghostMat('#b8a8ff',.6)); }
+  else if(stg!=='baby'&&a==='hero'){ hideOrb(); halo(.3,mGlow); }
+  else if(stg!=='baby'&&a==='dark'){ hideOrb(); crescent(mat(colHSL(app.hue,.5,.12)),mat(P.accent,{emissive:P.accent,emissiveIntensity:.9})); }
+  else if(stg==='baby'){ const L=app.alignLean||0; if(L>=.3) halo(.26,ghostMat('#ffe9a0',Math.min(.75,L*.8))); else if(L<=-.3){ const c=new THREE.Mesh(crescentGeo(),ghostMat(colHSL(app.hue,.9,.55),Math.min(.75,-L*.8))); c.rotation.z=Math.PI*.82; c.scale.setScalar(.8); mark.add(c); } }
+  // Prime forms: the stat's signature, exaggerated
+  if(stg==='adult'&&app.primary&&app.primary===app.secondary&&!sp){ const p=app.primary, acc=mat(STAT[p].color,{emissive:STAT[p].color,emissiveIntensity:.25});
+    if(p==='speed'){ head.add(mesh(GEO.cone,acc,[.08,.5,.18],[0,.5,-.75],[-2.2,0,0])); for(const sx of [-1,1]) head.add(mesh(GEO.cone,acc,[.06,.36,.12],[sx*.3,.55,-.6],[-2,0,sx*.35])); }
+    if(p==='focus'){ head.add(mesh(GEO.oct,mat(STAT.focus.color,{emissive:STAT.focus.color,emissiveIntensity:.9}),[.13,.17,.06],[0,.38,.86])); }
+    if(p==='endurance'){ for(let i=0;i<5;i++){ const ang=(i-2)*.38; parts.pose.add(mesh(GEO.cone,acc,[.06,.16,.06],[Math.sin(ang)*.34,parts.body.position.y+.2+Math.cos(i)*.04,-.36-Math.cos(ang)*.05],[-1.1,0,ang])); } }
+    if(p==='power'){ for(const sx of [-1,1]) head.add(mesh(GEO.cone,acc,[.12,.42,.12],[sx*.56,1.02,.0],[-.5,0,sx*-.75])); for(const g of parts.arms) for(let i=0;i<2;i++) g.add(mesh(GEO.tor,acc,[.12,.12,.12],[0,-.15-i*.1,0],[Math.PI/2,0,0])); }
+  }
+  // legendary bodies
+  if(sp==='seraph'&&parts.wings){ for(const g of parts.wings) g.scale.multiplyScalar(1.5); for(const sx of [-1,1]){ const g=new THREE.Group(); g.position.set(sx*.16,parts.body.position.y+.12,-.3); for(let f=0;f<4;f++){ g.add(mesh(GEO.sph,mat(f===3?'#ffd36a':'#ffffff',{roughness:.8}),[.08,.36-f*.06,.035],[sx*(.12+f*.1),.18-f*.04,0],[0,sx*-.4,sx*(.5+f*.25)])); } parts.pose.add(g); parts.wings.push(g); } }
+  if(sp==='fiend'){ for(const sx of [-1,1]){ const hn=new THREE.Group(); hn.position.set(sx*.4,.75,.05); hn.rotation.z=sx*-.6; hn.add(mesh(GEO.cone,mat('#120a0e'),[.1,.36,.1],[0,.16,0])); hn.add(mesh(GEO.cone,mat('#ff2a44',{emissive:'#ff2a44',emissiveIntensity:.6}),[.05,.16,.05],[sx*-.05,.38,0],[0,0,sx*.5])); head.add(hn); }
+    if(parts.tail){ const t=parts.tail; t.add(mesh(GEO.cone,mat('#ff2a44',{emissive:'#ff2a44',emissiveIntensity:.6}),[.08,.12,.03],[0,0,-.12],[-Math.PI/2,0,0])); }
+    for(const g of parts.wings||[]){ g.scale.multiplyScalar(1.4); g.traverse(o=>{ if(o.isMesh) o.material=mat('#2a0a12',{side:THREE.DoubleSide}); }); } }
+  if(sp==='aeon'){ const ring=(r,rx,rz,c)=>{ const t=new THREE.Mesh(new THREE.TorusGeometry(r,.012,6,40),ghostMat(c,.7)); t.position.y=parts.body.position.y+.15; t.rotation.set(rx,0,rz); parts.pose.add(t); return t; };
+    parts.aeonRings=[ring(.62,1.2,.3,'#9ff4ff'),ring(.7,1.9,-.5,'#b8a8ff')]; const core=mesh(GEO.sph,mat('#ffffff',{emissive:'#7ff0ff',emissiveIntensity:1.1}),[.12,.12,.12],[0,parts.body.position.y,0]); core.castShadow=false; parts.pose.add(core); }
+}
+/* ---------- 4 + 6. mood orb, waddle, clap ---------- */
+const MOOD_UP=['happy','excited','affectionate','blissful','playful','giggle','yummy'], MOOD_DOWN=['sad','lonely','sick','tired','sleepy'];
+{ const _ae=animateEchoes; animateEchoes=function(dt){ const r=_ae.apply(this,arguments); for(const e of gardenEchoes()){ const m=MESH.echo.get(e.id); if(!m) continue; const p=m.parts, rt=rtOf(e), t=TIME+rt.phase;
+      const mk=p.mark, orb=p.orb; if(orb){ const em=e.emotion; let s=1, y=0, spin=0;
+        if(MOOD_UP.includes(em)){ s=1+Math.sin(t*6)*.12; if(em==='excited'||em==='playful') spin=dt*6; }
+        else if(MOOD_DOWN.includes(em)){ s=.82; y=-.14; } else if(em==='curious'||em==='confused'){ y=Math.sin(t*3)*.06; orb.rotation.z=Math.sin(t*2.4)*.35; } else if(em==='angry'||em==='huffy'){ orb.position.x=Math.sin(t*40)*.03; s=1.08; }
+        orb.scale.setScalar(orb.scale.x+(s-orb.scale.x)*Math.min(1,dt*6)); if(orb._by==null) orb._by=orb.position.y; orb.position.y+=((orb._by+y)-orb.position.y)*Math.min(1,dt*5); if(spin) orb.rotation.y+=spin; else orb.rotation.y*=Math.pow(.2,dt); if(!(em==='angry'||em==='huffy')) orb.position.x*=.8; }
+      if(p.aeonRings){ p.aeonRings[0].rotation.y+=dt*.8; p.aeonRings[1].rotation.y-=dt*.6; }
+      // waddle
+      const lp=m._lp||(m._lp={x:e.pos.x,z:e.pos.z}); const sp=Math.hypot(e.pos.x-lp.x,e.pos.z-lp.z)/Math.max(dt,1e-3); lp.x=e.pos.x; lp.z=e.pos.z;
+      if(sp>.4&&sp<9&&rt.state!=='swim'&&rt.state!=='fly'&&rt.state!=='held') p.pose.rotation.z=Math.sin(t*11)*.1*Math.min(1,sp/2); else if(rt.state!=='flip') p.pose.rotation.z*=Math.pow(.05,dt);
+      // sit and clap
+      if(rt.state==='clap'&&p.arms){ m.root.position.y-=.06; const c=Math.sin(t*15); p.arms[0].rotation.set(-1.25,0,-.9-c*.35); p.arms[1].rotation.set(-1.25,0,.9+c*.35); } }
+    return r; }; }
+{ const _de=decide; decide=function(e,rt){ if(onFeet(e)&&e.needs.happy>60&&e.needs.hunger>=40&&Math.random()<.045&&!(CARE&&CARE.id===e.id)){ rt.state='clap'; rt.timer=rand(2.4,3.6); return; } return _de.apply(this,arguments); }; }
+{ const _ue=updateEcho; updateEcho=function(e,dt){ const rt=rtOf(e); if(rt.state==='clap'){ rt.timer-=dt; rt.ang=Math.atan2(GUARD.x-e.pos.x,GUARD.z-e.pos.z); if(Math.random()<dt*2.5) fx('note',{x:e.pos.x,y:1.2,z:e.pos.z}); e.needs.happy=clamp(e.needs.happy+dt*.5,0,100); if(rt.timer<=0){ rt.state='idle'; rt.timer=1.5; } return; } return _ue.apply(this,arguments); }; }
+/* ---------- 8. removing animal traits ---------- */
+item('ani_shed',{name:'Moulting Snake',cat:'animal',price:0,shards:6,rar:'R',icon:{shape:'animal',c:'#9fd37a'},fx:{},desc:'Give it to an Echo and it sheds every animal trait it has picked up, back to its own shape.'});
+MERCH_POOL.push('ani_shed','ani_shed');
+function clearTraits(e){ const n=Object.keys(e.parts||{}).length; e.parts={}; syncEntities(); saveGame(); return n; }
+{ const _ai=applyItem; applyItem=function(e,id){ if(id==='ani_shed'){ const n=clearTraits(e); for(let i=0;i<10;i++) fx('spark',{x:e.pos.x,y:.8,z:e.pos.z},{vx:rand(-1,1),vz:rand(-1,1),vy:rand(.8,1.6),color:'#9fd37a',size:.26}); return n?`${e.name} shed ${n} animal trait${n>1?'s':''}`:`${e.name} has no animal traits to shed`; } return _ai.apply(this,arguments); }; }
+const TRAIT_FEE=500;
+{ const _rs=PANELS.school.render; PANELS.school.render=function(tab){ let h=_rs.apply(this,arguments); if(tab!=='doctor') return h; const e=getEcho(UI.schoolEcho); if(!e) return h; const n=Object.keys(e.parts||{}).length;
+    h+=`<div class="sec">Animal traits</div><div class="li"><div class="tx"><b>${n?`${n} animal trait${n>1?'s':''}`:'No animal traits'}</b><span>Dr. Wren can gently remove them for ✦ ${TRAIT_FEE}. A Moulting Snake does it for free.</span></div><button class="btn sm ${n&&S.sparks>=TRAIT_FEE?'pri':''}" data-unpart="${e.id}" ${n&&S.sparks>=TRAIT_FEE?'':'disabled'}>Remove ✦ ${TRAIT_FEE}</button></div>`; return h; }; }
+document.addEventListener('click',ev=>{ const b=ev.target.closest('[data-unpart]'); if(!b||!S) return; ev.stopPropagation(); const e=getEcho(+b.dataset.unpart)||getEcho(b.dataset.unpart); if(!e||S.sparks<TRAIT_FEE) return; S.sparks-=TRAIT_FEE; const n=clearTraits(e); SND.buy&&SND.buy(); toast(`${e.name} is back to its own shape (${n} trait${n>1?'s':''} removed)`,'good'); renderHUD(); refreshPanel(); },true);
+// a rare find at the end of an Adventure
+{ const _ea=endAdv; endAdv=function(full){ const M=MG; if(M&&!M.ended&&full&&Math.random()<.06){ M.loot=M.loot||{}; M.loot.ani_shed=(M.loot.ani_shed||0)+1; } return _ea.apply(this,arguments); }; }
+/* ---------- Echodex: legendary page ---------- */
+DEX_F.push(['legend','Legendary']);
+{ const _rd=renderDex; renderDex=function(tab){ if(tab!=='legend') return _rd.apply(this,arguments);
+    const n=Object.keys(S.dex).length; return `<div class="row" style="flex-wrap:nowrap;margin-bottom:8px"><div class="prog" style="flex:1"><i style="width:${n/FORM_ORDER.length*100}%"></i></div><b style="font-variant-numeric:tabular-nums">${n} / ${FORM_ORDER.length}</b></div>`
+      +`<div class="sec">Legendary <small>3 forms · a third evolution for exceptional adults</small></div><div class="dexrow"><span class="lab">Rare</span>${['S-hero','S-neutral','S-dark'].map(dexCell).join('')}<div></div><div></div><div></div></div><p class="note">Tap an entry for what it takes. Raise an adult's every stat and keep it close.</p>`; }; }
+/* =========================================================
    AUDIO — procedural music, ambience and creature voices
    (reverb bus, chord pads, bells, spatial voices)
    ========================================================= */
@@ -7130,7 +7249,7 @@ function updateBanner(){ if(document.getElementById('updBar')) return; const d=d
 /* =========================================================
    DIAGNOSTICS — performance readout, error capture, problem report
    ========================================================= */
-const GAME_VERSION='0.8.0';
+const GAME_VERSION='0.8.1';
 const DIAG={errors:[],trail:[],fps:[],show:false,acc:0,n:0,el:null,minFps:999};
 window.addEventListener('error',ev=>{ DIAG.errors.push(`${new Date().toLocaleTimeString()} ${ev.message} @${(ev.filename||'').split('/').pop()}:${ev.lineno}`); if(DIAG.errors.length>15) DIAG.errors.shift(); });
 window.addEventListener('unhandledrejection',ev=>{ DIAG.errors.push(`${new Date().toLocaleTimeString()} promise: ${ev.reason&&ev.reason.message||ev.reason}`); if(DIAG.errors.length>15) DIAG.errors.shift(); });
