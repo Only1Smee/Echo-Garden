@@ -6341,7 +6341,7 @@ setInterval(()=>{ try{ if(INST.shown||!S||!hostedApp()||installedApp()) return; 
    - each garden has a broken food bin to repair; teens and adults
      help themselves from it when hungry (babies still need you)
    ========================================================= */
-const TREE_TIER={apple:[1,4,1],sunpear:[.75,4,.9],honeyfig:[.6,3,.8],dashberry:[.5,3,.75],mindplum:[.5,3,.75],heartymelon:[.5,3,.75],brawnnut:[.5,3,.75],flitfig:[.5,3,.75],
+const TREE_TIER={apple:[.5,3,1],sunpear:[.45,3,.9],honeyfig:[.6,3,.8],dashberry:[.5,3,.75],mindplum:[.5,3,.75],heartymelon:[.5,3,.75],brawnnut:[.5,3,.75],flitfig:[.5,3,.75],
   halopeach:[.4,3,.7],shadeplum:[.4,3,.7],sparkcherry:[.4,2,.65],dreamgrape:[.4,2,.65],lifebloom:[.3,2,.6],starfruit:[.15,1,.45]};
 function tierOf(f){ return TREE_TIER[f]||[.5,3,.75]; }
 updateTrees=function(dt){ for(const t of S.trees){ const [rate,cap,grow]=tierOf(t.fruit);
@@ -6350,7 +6350,7 @@ updateTrees=function(dt){ for(const t of S.trees){ const [rate,cap,grow]=tierOf(
     else { t.water=Math.max(0,t.water-dt*.08); t.fruitT+=dt*SEASON_FRUIT[S.time.season]*(t.water>0?1:.4)*rate;
       const max=cap+(S.time.season===1&&cap>1?1:0);
       if(t.fruitT>40&&t.fruits<max){ t.fruitT=0; t.fruits++; }
-      if(t.fruits>0&&t.garden===S.garden&&Math.random()<dt/(55/Math.max(.4,rate))&&S.ground.filter(f=>f.garden===S.garden).length<10) dropFruit(t); } } };
+      if(t.fruits>0&&t.garden===S.garden&&Math.random()<dt/(55/Math.max(.4,rate))&&S.ground.filter(f=>f.garden===S.garden).length<6&&S.ground.filter(f=>f.garden===S.garden&&f.type===t.fruit).length<2) dropFruit(t); } } };
 // shop descriptions mention how fast each tree is
 for(const f in TREE_TIER){ const s=ITEMS['seed_'+f]; if(!s||s._tier) continue; s._tier=1; const r=TREE_TIER[f][0]; s.desc=(s.desc||'')+(r>=1?' Fast-growing, fruits often.':r>=.7?' Fruits fairly often.':r>=.45?' Fruits at a steady pace.':r>=.3?' Slow to fruit.':' Very slow and rare.'); }
 /* ---------- variety and favourites ---------- */
@@ -6442,7 +6442,7 @@ const BINTOAST={};
 function tipKey(){ return UI.panel+':'+UI.tab; }
 { const _rp=refreshPanel; refreshPanel=function(){ const r=_rp.apply(this,arguments); try{ const b=$('#panelBody'); if(!b) return r; const first=[...b.children].find(c=>c.classList&&c.classList.contains('note'));
       if(first&&!first.dataset.tip){ S.settings.tips=S.settings.tips||{}; if(S.settings.tips[tipKey()]){ first.remove(); } else { first.dataset.tip=1; first.classList.add('tipstrip'); first.insertAdjacentHTML('afterbegin','<span class="ti">i</span>'); first.insertAdjacentHTML('beforeend','<button class="tx-x" data-tipx aria-label="Hide tip">×</button>'); } }
-      b.classList.remove('fadein'); void b.offsetWidth; b.classList.add('fadein'); }catch(e){} return r; }; }
+      const tk=tipKey(); if(b._tk!==tk){ b._tk=tk; b.classList.remove('fadein'); void b.offsetWidth; b.classList.add('fadein'); } }catch(e){} return r; }; }
 document.addEventListener('click',ev=>{ const x=ev.target.closest('[data-tipx]'); if(x&&S){ ev.stopPropagation(); S.settings.tips=S.settings.tips||{}; S.settings.tips[tipKey()]=1; const n=x.closest('.tipstrip'); if(n){ n.classList.add('gone'); setTimeout(()=>n.remove(),220); } saveGame(); SND.ui&&SND.ui(); return; }
   if(ev.target.closest('[data-tab]')) SND.ui&&SND.ui(); },true);
 // settings > Save: bring tips back
@@ -6857,6 +6857,32 @@ const lvOf=(e,s)=>Math.min(e.stats[s].lv,60);
     for(const y of S.toys){ if(y.garden!==S.garden) continue; const m=MESH.toy.get(y.id); if(!m) continue;
       if(y.type==='duck'&&P){ y.da=(y.da??hashN(y.id)*6.28)+dt*.12; const rr=P.r*.45; const x=P.x+Math.cos(y.da)*rr, z=P.z+Math.sin(y.da)*rr; m.position.set(x,.04+Math.sin(TIME*2.4+y.da)*.03,z); m.rotation.y=-y.da; m.rotation.z=Math.sin(TIME*1.7)*.08; y.x=x; y.z=z; if(Math.random()<dt*.6) ripple(x,z); }
       const u=m.userData; if(u.spin) u.spin.rotation.z+=dt*6; if(u.jet) u.jet.scale.y=.3+Math.sin(TIME*9)*.05; if(u.bulbs){ const n=clamp(1.3-dayLight*1.4,.35,1); u.bulbs.forEach((b,i)=>{ b.scale.setScalar(.06*(.8+n*.5+Math.sin(TIME*3+i)*.15)); }); } } }catch(e){} return r; }; }
+
+/* ---------- 8. plots: start with 3, clear rubbish to open more ---------- */
+const PLOT_START=3, PLOT_COST=[600,1200,2000];
+function plotState(){ if(!S.plotsOpen) S.plotsOpen={}; let o=S.plotsOpen[S.garden]; if(!o){ o=[]; for(let i=0;i<PLOT_START;i++) o.push(i); for(const t of S.trees) if(t.garden===S.garden&&!o.includes(t.plot)) o.push(t.plot); S.plotsOpen[S.garden]=o; } return o; }
+function plotLocked(i){ return S&&!plotState().includes(i); }
+function plotCost(){ const n=(S.plotsCleared&&S.plotsCleared[S.garden])||0; return PLOT_COST[Math.min(PLOT_COST.length-1,n)]; }
+function buildRubbish(i){ const p=WORLD.plots[i]; const g=new THREE.Group(); g.position.set(p.x,0,p.z); const r=seeded(i*97+(S.garden||'').length*13);
+  const wood=mat('#7a5a3a',{tex:'bark'}), dark=mat('#4e3a2a'), stone=mat('#8e8a80',{tex:'rock'}), weed=mat('#5e8a3e',{tex:'mottle'});
+  for(let k=0;k<5;k++){ const a=r()*6.28, d=r()*.6; g.add(mesh(GEO.box,k%2?wood:dark,[.9+r()*.5,.08,.16],[Math.cos(a)*d,.32+k*.05,Math.sin(a)*d],[r()*.3,r()*3,r()*.4-.2])); }
+  for(let k=0;k<4;k++){ const a=r()*6.28, d=.3+r()*.5; g.add(mesh(GEO.ico,stone,[.18+r()*.14,.13+r()*.1,.18+r()*.12],[Math.cos(a)*d,.32,Math.sin(a)*d])); }
+  for(let k=0;k<7;k++){ const a=r()*6.28, d=.2+r()*.7; g.add(mesh(GEO.cone,weed,[.05,.3+r()*.3,.05],[Math.cos(a)*d,.42,Math.sin(a)*d],[r()*.5-.25,0,r()*.5-.25])); }
+  g.add(mesh(GEO.cyl,mat('#6a6a72',{metalness:.4,roughness:.5}),[.14,.22,.14],[.35,.4,-.25],[1.3,0,.3]));
+  const ring=new THREE.Mesh(new THREE.RingGeometry(1.0,1.12,40),new THREE.MeshBasicMaterial({color:0xb8b0a0,transparent:true,opacity:.35,depthWrite:false})); ring.rotation.x=-Math.PI/2; ring.position.y=.26; g.add(ring);
+  if(!buildRubbish.tex) buildRubbish.tex=canvasTex(128,128,x=>{ x.fillStyle='rgba(32,24,40,.88)'; x.beginPath(); x.arc(64,64,58,0,7); x.fill(); x.fillStyle='#f3c765'; x.font='bold 54px sans-serif'; x.textAlign='center'; x.textBaseline='middle'; x.fillText('✦',64,60); x.fillStyle='#fff'; x.font='bold 22px sans-serif'; x.fillText('CLEAR',64,100); });
+  const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:buildRubbish.tex,transparent:true,depthWrite:false})); sp.scale.setScalar(.7); sp.position.y=1.15; g.add(sp);
+  const hit=new THREE.Mesh(GEO.cyl,new THREE.MeshBasicMaterial({visible:false})); hit.scale.set(1.25,.6,1.25); hit.position.y=.3; g.add(hit);
+  g.userData={pick:{type:'plot',id:i},ring,sp,rubbish:true}; return g; }
+{ const _pm=plotMarker; plotMarker=function(i){ return plotLocked(i)?buildRubbish(i):_pm.apply(this,arguments); }; }
+function showPlotClear(i){ const c=plotCost(); const can=S.sparks>=c;
+  showModal(`<div class="reveal"><div class="rv-eyebrow">Overgrown plot</div><h2>Clear this plot?</h2><p>Old planks, rocks and weeds. Clear them away and you can plant another fruit tree here.</p><div class="row"><button class="btn" data-close>Not now</button><button class="btn pri" id="plotClear" ${can?'':'disabled'}>Clear for ✦ ${c}</button></div>${can?'':'<p class="note">Not enough Sparks yet.</p>'}</div>`);
+  const b=$('#plotClear'); if(b) b.onclick=()=>{ if(S.sparks<c) return; S.sparks-=c; plotState().push(i); S.plotsCleared=S.plotsCleared||{}; S.plotsCleared[S.garden]=(S.plotsCleared[S.garden]||0)+1; closeModal(); SND.buy&&SND.buy(); gesture('cheer',1.2); const p=WORLD.plots[i];
+    for(let k=0;k<16;k++) fx(k%2?'spark':'star',{x:p.x+rand(-.6,.6),y:.5,z:p.z+rand(-.6,.6)},{vy:1.4,size:.3}); const m=MESH.plot.get(i); if(m){ ents.remove(m); MESH.plot.delete(i); } syncEntities(); renderHUD(); saveGame(); toast('Plot cleared. Plant a seed here.','good'); }; }
+{ const _ar=arrive; arrive=function(P){ if(P.kind==='plot'&&plotLocked(P.id)){ UI.armed=null; showPlotClear(P.id); renderHUD(); return; } return _ar.apply(this,arguments); }; }
+{ const _ps=plantSeed; plantSeed=function(plot){ if(plotLocked(plot)){ toast('Clear the rubbish from this plot first','warn'); return; } return _ps.apply(this,arguments); }; }
+// markers follow each garden's own lock state (garden switches, clearing)
+{ const _se=syncEntities; syncEntities=function(){ try{ if(S&&MESH.plot) for(const [i,m] of MESH.plot){ if(!!m.userData.rubbish!==plotLocked(i)){ ents.remove(m); MESH.plot.delete(i); } } }catch(e){} return _se.apply(this,arguments); }; }
 /* =========================================================
    AUDIO — procedural music, ambience and creature voices
    (reverb bus, chord pads, bells, spatial voices)
@@ -6916,8 +6942,55 @@ const SND=(()=>{
       g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(vol,t+dur*.3); g.gain.linearRampToValueAtTime(vol*.8,t+dur*.75); g.gain.linearRampToValueAtTime(0,t+dur); o.connect(lp); lp.connect(g); g.connect(music); o.start(t); o.stop(t+dur+.05); } } }
   function bell(f,when,vol){ tone(f,1.8,'sine',vol,null,when,music,.005); tone(f*2.756,.7,'sine',vol*.22,null,when,music,.003); tone(f*5.4,.3,'sine',vol*.06,null,when,music,.002); }
   function mode(){ if(musicMode!=='garden') return musicMode; if(S.garden==='hero') return dayLight<.25?'night':'hero'; if(S.garden==='dark') return 'dark'; return dayLight<.25?'night':'garden'; }
+  /* ---------- garden grooves: mellow, swung and jazzy (warm keys, marimba, soft bass, light percussion) ---------- */
+  const GROOVE={
+    garden:{bpm:98,swing:.32,root:174.61,lead:'marimba',drums:1,walk:1,
+      prog:[[0,[4,7,11,14]],[9,[3,7,10,14]],[2,[3,7,10,14]],[7,[4,7,10,14]],[0,[4,7,11,14]],[5,[4,7,11,14]],[4,[3,7,10,14]],[7,[4,7,10,13]]]},
+    hero:{bpm:104,swing:.26,root:233.08,lead:'flute',drums:1,walk:1,
+      prog:[[0,[4,7,11,14]],[4,[3,7,10,14]],[5,[4,7,11,14]],[7,[5,7,10,14]],[9,[3,7,10,14]],[2,[3,7,10,14]],[5,[4,7,9,14]],[7,[4,7,10,14]]]},
+    night:{bpm:74,swing:.18,root:138.59,lead:'ep',drums:3,walk:0,
+      prog:[[0,[4,7,11,14]],[10,[3,7,10,14]],[5,[4,7,11,14]],[7,[4,7,10,14]],[0,[4,7,11,14]],[3,[4,7,11,14]],[2,[3,7,10,14]],[7,[5,7,10,14]]]},
+    dark:{bpm:84,swing:.22,root:220,lead:'marimbaLow',drums:2,walk:0,minor:1,
+      prog:[[0,[3,7,10,14]],[8,[4,7,11,14]],[5,[3,7,10,14]],[7,[4,7,10,13]],[0,[3,7,10,14]],[3,[4,7,11,14]],[10,[4,7,10,14]],[7,[4,7,10,13]]]}
+  };
+  const GR={mode:'',motifs:null};
+  function ep(f,w,d,v){ const t=ac.currentTime+Math.max(0,w); const c=ac.createOscillator(), mo=ac.createOscillator(), mg=ac.createGain(), g=ac.createGain(), lp=ac.createBiquadFilter();
+    c.type='sine'; c.frequency.value=f; mo.type='sine'; mo.frequency.value=f; mg.gain.setValueAtTime(f*1.4,t); mg.gain.exponentialRampToValueAtTime(f*.12,t+.35); mo.connect(mg); mg.connect(c.frequency);
+    lp.type='lowpass'; lp.frequency.value=2400; g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(v,t+.006); g.gain.exponentialRampToValueAtTime(v*.4,t+.22); g.gain.exponentialRampToValueAtTime(.0005,t+d);
+    c.connect(lp); lp.connect(g); g.connect(music); c.start(t); mo.start(t); c.stop(t+d+.05); mo.stop(t+d+.05); }
+  function marimba(f,w,v){ tone(f,.6,'sine',v,null,w,music,.003); tone(f*3.93,.07,'sine',v*.32,null,w,music,.001); tone(f*2,.22,'sine',v*.14,null,w,music,.002); }
+  function flute(f,w,d,v){ const t=ac.currentTime+Math.max(0,w); const o=ac.createOscillator(), lfo=ac.createOscillator(), lg=ac.createGain(), g=ac.createGain(); o.type='sine'; o.frequency.value=f; lfo.frequency.value=5.2; lg.gain.value=f*.006; lfo.connect(lg); lg.connect(o.frequency);
+    g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(v,t+.07); g.gain.setValueAtTime(v*.85,t+d*.7); g.gain.exponentialRampToValueAtTime(.0005,t+d); o.connect(g); g.connect(music); o.start(t); lfo.start(t); o.stop(t+d+.05); lfo.stop(t+d+.05);
+    tone(f*2,d*.6,'sine',v*.12,null,w,music,.05); noise(.08,f*3,v*.25,w,music,'bandpass'); }
+  function pbass(f,w,d,v){ tone(f,d,'triangle',v,null,w,music,.006); tone(f,d*.6,'sine',v*.7,null,w,music,.004); }
+  function grMotifs(m){ const r=seeded(m.length*7919+m.charCodeAt(0)*131); const rh=[[0,3,6,8,10],[2,4,7,10,12],[0,2,6,9,12,14],[0,4,6,10],[1,4,8,11,14]];
+    const mk=()=>{ const out=[]; let d=r()*4|0; for(let b=0;b<2;b++){ const R=rh[r()*rh.length|0]; for(const p of R){ if(b===1&&p>12&&r()<.5) continue; d=Math.max(0,Math.min(9,d+[-2,-1,-1,1,1,2,0][r()*7|0])); out.push({pos:b*16+p,deg:d,len:r()<.3?3:1.5}); } } return out; };
+    const A=mk(), B=mk(); const A2=A.map((n,i)=>i>=A.length-2?{...n,deg:Math.max(0,n.deg-1)}:n); const E=A.map((n,i)=>i===A.length-1?{...n,deg:0,len:4}:n); return [A,A2,B,E]; }
+  function grooveTick(m){ const C=GROOVE[m]; const T=60/C.bpm/4;
+    if(GR.mode!==m){ GR.mode=m; GR.motifs=grMotifs(m); step=0; nextT=Math.max(nextT,ac.currentTime+.05); }
+    const pent=C.minor?[0,3,5,7,10]:[0,2,4,7,9];
+    while(nextT<ac.currentTime+.5){ const s=step%16, bar=Math.floor(step/16)%8, [cr,ext]=C.prog[bar]; const sw=(s%2===1)?T*C.swing:0; const w=nextT-ac.currentTime+sw;
+      const R=C.root*Math.pow(2,cr/12); const nb=C.prog[(bar+1)%8][0];
+      // bass
+      if(C.walk){ if(s%4===0){ const k=s/4; const semis=[0,ext[0]>3?4:3,7,(nb-cr+12)%12-1][k]; pbass(C.root/2*Math.pow(2,(cr+semis)/12)/(cr+semis>9?2:1),w,T*3.4,.3); } }
+      else if(s===0||s===10) pbass(R/2/(cr>6?2:1),w,T*(s?5:9),.28);
+      // keys: syncopated comps, long pads at night
+      const comp=C.drums===3?[0]:(bar%2?[2,8,14]:[0,6,10]);
+      if(comp.includes(s)){ const d=C.drums===3?T*15:s===0?T*6:T*3.2; for(const e of ext) ep(R*Math.pow(2,e/12)/(cr>4?2:1),w+(e-ext[0])*.004,d,C.drums===3?.045:.038); }
+      // melody
+      const half=Math.floor(bar/2), mot=GR.motifs[half], pos=(bar%2)*16+s;
+      for(const n of mot) if(n.pos===pos){ const dg=n.deg, oct=Math.floor(dg/5); let f=C.root*2*Math.pow(2,(pent[dg%5]+oct*12)/12); if(C.lead==='marimbaLow') f/=2;
+        if(C.lead==='flute') flute(f,w,T*n.len*1.6,.075); else if(C.lead==='ep') ep(f*2,w,T*n.len*3,.06); else marimba(f,w,C.lead==='marimbaLow'?.11:.13); }
+      // little fill at the end of the loop
+      if(bar===7&&s>=12&&C.lead!=='flute'){ marimba(C.root*2*Math.pow(2,(pent[(s-12+1)%5]+12)/12),w,.06); }
+      // percussion
+      if(C.drums===1){ if(s===0||s===10) tone(105,.22,'sine',.42,42,w,music,.003); if(s===4||s===12) noise(.03,2600,.07,w,music,'bandpass'); noise(.025,7500,s%4===2?.035:.018,w,music,'highpass');
+        if(s===14&&bar%2===1){ tone(300,.12,'sine',.08,230,w,music,.002); tone(220,.14,'sine',.08,170,w+T,music,.002); } }
+      else if(C.drums===2){ if(s===0) tone(95,.28,'sine',.36,40,w,music,.003); if(s===12) noise(.03,2200,.06,w,music,'bandpass'); if(s%4===2) noise(.03,7000,.022,w,music,'highpass'); }
+      else if(C.drums===3){ if(s%4===2) noise(.04,6500,.012,w,music,'highpass'); }
+      nextT+=T; step++; } }
   function schedule(){
-    if(!ac||!S.settings.sound) return; const m=mode(); const C=MCFG[m]||MCFG.adv;
+    if(!ac||!S.settings.sound) return; const m=mode(); if(GROOVE[m]){ curMode=m; grooveTick(m); return; } GR.mode=''; const C=MCFG[m]||MCFG.adv;
     if(m!==curMode){ curMode=m; if(step%8!==0) step+=8-step%8; }
     while(nextT<ac.currentTime+.5){ const w=nextT-ac.currentTime; const i=step%8, bar=Math.floor(step/8)%4, ch=C.ch[bar];
       if(i===0) pad(C.root,ch,C.t*8.6,w,C.cut,C.soft?.022:C.lead?.018:.03);
@@ -6934,14 +7007,20 @@ const SND=(()=>{
   function birdPhrase(){ const base=rand(2300,3600), n=irand(3,6), pan=rand(-.9,.9); let w=0;
     for(let k=0;k<n;k++){ const f=base*rand(.85,1.25); tone(f,rand(.05,.11),'sine',.035,f*rand(1.1,1.5),w,amb,.005,pan); w+=rand(.07,.16); } }
   function crickets(){ const pan=rand(-.8,.8); for(let k=0;k<3;k++) tone(4300,.025,'square',.006,null,k*.045,amb,.002,pan); }
-  function owl(){ const pan=rand(-.6,.6); tone(390,.38,'sine',.06,340,0,amb,.06,pan); tone(370,.55,'sine',.06,320,.55,amb,.06,pan); }
+  // owls: a soft hoot-call with a breathy edge, sometimes answered from across the garden
+  function hoot(f,d,w,pan,v){ tone(f,d,'sine',v,f*.86,w,amb,.07,pan); tone(f*2,d*.6,'sine',v*.12,f*1.7,w,amb,.08,pan); noise(d*.7,f*2.2,v*.18,w,amb,'bandpass'); }
+  function owl(answer){ const pan=answer?rand(.3,.9)*(Math.random()<.5?-1:1):rand(-.6,.6), f=answer?rand(330,360):rand(370,410), v=answer?.035:.055;
+    if(Math.random()<.5){ hoot(f,.42,0,pan,v); hoot(f*.97,.3,.75,pan,v*.8); hoot(f*.98,.3,1.05,pan,v*.8); hoot(f*.95,.75,1.4,pan,v); }
+    else { hoot(f,.5,0,pan,v); hoot(f*.94,.8,.62,pan,v); }
+    if(!answer&&Math.random()<.45) setTimeout(()=>{ try{ if(dayLight<.25) owl(true); }catch(e){} },rand(2600,4200)); }
   function chime(){ const f=pick([880,1046,1318,1568]); bell(f,0,.04); }
   function tick(){
     if(!ac) return; schedule(); const now=ac.currentTime; const dt=Math.min(.2,now-lastAmb); lastAmb=now; if(!on()) return;
     const night=dayLight<.25, g=S.garden;
     if(!MG){
       const wt=weatherNow(); if(!night&&g!=='dark'&&wt!=='rain'&&wt!=='thunder'&&wt!=='snow'&&Math.random()<dt*.18) birdPhrase();
-      if(night&&g!=='dark'){ cricketT-=dt; if(cricketT<=0){ cricketT=rand(.45,.8); if(Math.random()<.8) crickets(); } if(Math.random()<dt*.012) owl(); }
+      if(night&&g!=='dark'){ cricketT-=dt; if(cricketT<=0){ cricketT=rand(.45,.8); if(Math.random()<.8) crickets(); } if(Math.random()<dt*.03) owl(); }
+      if(night&&g==='dark'&&Math.random()<dt*.016) owl(true);
       if(g==='dark'&&Math.random()<dt*.05) chime();
       if(g==='hero'&&Math.random()<dt*.04) bell(pick([1318,1568,1760,2093]),0,.025);
     }
@@ -7331,7 +7410,7 @@ function frame(){
   hudT+=dt; if(hudT>1){ hudT=0; renderHUD(); }
   popT+=dt; if(popT>.6){ popT=0; if(UI.popup&&!UI.tray) renderPopup(); }
   if(COOK&&UI.popup&&UI.popup.kind==='fire'){ cookPT+=dt; if(cookPT>.2){ cookPT=0; renderPopup(); } }
-  panT+=dt; if(panT>1){ panT=0; if(UI.panel==='school'||UI.panel==='shop') refreshPanel(); }
+  panT+=dt; if(panT>1){ panT=0; if(UI.panel==='school') refreshPanel(); }
   warnT+=dt; if(warnT>45){ warnT=0; const e=gardenEchoes().find(e=>e.needs.hunger<20||e.needs.health<35); if(e) toast(e.needs.health<35?`${e.name} looks unwell. Try the Doctor.`:`${e.name} is hungry`,'warn'); }
   saveT+=dt; if(saveT>12){ saveT=0; saveGame(); S.lastSave=Date.now(); }
 }
