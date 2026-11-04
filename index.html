@@ -12,7 +12,6 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <title>Echo Garden v0.7.3</title>
-<meta name="claude:viewport-fit-sides" content="cover">
 <style>
 [hidden]{display:none!important}
 
@@ -2422,7 +2421,7 @@ function resolve(pos,pad,swimmer){
 }
 function inPond(x,z){const p=WORLD.pond;return p&&Math.hypot(x-p.x,z-p.z)<p.r-.3}
 
-/* ---------- echo AI ---------- */
+/* ---------- echo behaviour ---------- */
 function moveSpeed(e){ const mb=mobility(e); let s=.9+Math.min(e.stats.speed.lv,60)*.045; if(mb==='newborn') return 0; if(mb==='crawl') s=.4; if(mb==='toddle') s=Math.min(s,.75); if(e.needs.health<35) s*=.6; if(e.needs.energy<20) s*=.7; return s; }
 function bestFriend(e){ let best=null,v=39; for(const id in e.rel){ if(e.rel[id]>v){ const o=getEcho(+id); if(o&&inGarden(o)){v=e.rel[id];best=o;} } } return best; }
 function nearestFruit(x,z){ let best=null,d=1e9; for(const f of S.ground){ if(f.garden!==S.garden) continue; const dd=Math.hypot(f.x-x,f.z-z); if(dd<d){d=dd;best=f;} } return best; }
@@ -6223,7 +6222,7 @@ COMFORT_OPTS.push(['advButtons','Adventure buttons','Show on-screen arrows and a
    - iPhone in another browser: open in Safari first
    ========================================================= */
 const INST={evt:null,shown:false};
-function hostedApp(){ return /^https?:/.test(location.protocol)&&!/claude\.(ai|site)|claudeusercontent/.test(location.host); }
+function hostedApp(){ return /^https?:/.test(location.protocol)&&window.self===window.top; }
 function installedApp(){ try{ return navigator.standalone===true||matchMedia('(display-mode: fullscreen)').matches||matchMedia('(display-mode: standalone)').matches; }catch(e){ return false; } }
 function installKind(){ const ua=navigator.userAgent||''; const ios=/iPhone|iPad|iPod/.test(ua)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
   if(ios) return /CriOS|FxiOS|EdgiOS|OPiOS/.test(ua)?'ios-other':'ios';
@@ -6429,7 +6428,7 @@ function renderDisplay(){ const q=S.settings.quality||'auto'; const cur=QUALITY[
 PANELS.more.tabs.splice(PANELS.more.tabs.findIndex(t=>t[0]==='sound')+1,0,['display','Graphics']);
 document.addEventListener('click',ev=>{ const b=ev.target.closest('[data-quality]'); if(b&&S) setQuality(b.dataset.quality); });
 // installable app: only when served over http(s) next to its manifest (the downloadable app folder)
-function setupInstall(){ try{ if(!/^https?:/.test(location.protocol)||/claude\.(ai|site)|claudeusercontent/.test(location.host)) return;
+function setupInstall(){ try{ if(!/^https?:/.test(location.protocol)||window.self!==window.top) return;
   fetch('manifest.webmanifest',{method:'HEAD',cache:'no-store'}).then(r=>{ if(!r.ok) return; if(!document.querySelector('link[rel="manifest"]')){ const l=document.createElement('link'); l.rel='manifest'; l.href='manifest.webmanifest'; document.head.appendChild(l); }
     if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{}); }).catch(()=>{}); }catch(e){} }
 /* =========================================================
@@ -6450,7 +6449,7 @@ function diagReport(){ const avg=DIAG.fps.length?DIAG.fps.reduce((a,b)=>a+b,0)/D
     `Graphics: ${S.settings.quality||'auto'} → ${QUALITY[qualityLevel()].label} · pixel ratio ${renderer&&renderer.getPixelRatio?renderer.getPixelRatio().toFixed(2):'?'}`,`Frame rate: avg ${avg.toFixed(1)} · low ${DIAG.minFps===999?'?':DIAG.minFps.toFixed(1)} · draws ${r?r.calls:'?'} · tris ${r?r.triangles:'?'}`,
     `Garden: ${S.garden} · Echos ${S.echoes.length} · toys ${S.toys.length} · runs ${S.stats.runs} · garden level ${S.glevel||1}`,`Mode: ${MG?MG.kind:CARE?'close-up':UI.panel||'garden'}`,
     `Recent actions:`,...DIAG.trail.slice(-12).map(t=>'  '+t),`Errors (${DIAG.errors.length}):`,...(DIAG.errors.length?DIAG.errors.map(t=>'  '+t):['  none'])].join('\n'); }
-function copyReport(){ const txt=diagReport(); const done=()=>toast('Problem report copied. Paste it into your message to Claude','good');
+function copyReport(){ const txt=diagReport(); const done=()=>toast('Problem report copied. Paste it wherever you report bugs.','good');
   if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(done).catch(()=>showReport(txt)); else showReport(txt); }
 function showReport(txt){ showModal(`<h2>Problem report</h2><p>Copy everything below and paste it into your message.</p><textarea class="report" readonly>${esc(txt)}</textarea><div class="row"><button class="btn pri" data-close>Done</button></div>`); const t=document.querySelector('#modal textarea'); if(t){ t.focus(); t.select(); } }
 // settings hooks: a switch in Graphics, a report button in Save
