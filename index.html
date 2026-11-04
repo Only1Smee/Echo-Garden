@@ -6507,9 +6507,9 @@ const CHANGELOG={
     ['⭐','Adventure rewards','Stars now earn a bigger finish bonus (up to ✦ 100). After 5 runs a day, rewards are halved.'],
     ['🥚','Eggs','Prices now range from common to very rare. New Shiny Egg, and any egg has a 1 in 100 chance to hatch shiny.']]};
 { const _sg2=seedNewGame; seedNewGame=function(){ const r=_sg2.apply(this,arguments); if(S) S.seenVersion=GAME_VERSION; return r; }; }
-function showWhatsNew(){ const v=GAME_VERSION, list=CHANGELOG[v]||[]; const bag=!!S._invNotice; delete S._invNotice; S.seenVersion=v; saveGame(); if(!list.length&&!bag) return;
+function showWhatsNew(){ const v=GAME_VERSION, list=CHANGELOG[v]||[]; const bag=!!S._invNotice; delete S._invNotice; S.seenVersion=v; saveGame(); if(!list.length) return;
   const rows=list.map(([ic,t,d])=>`<div class="wn-row"><span class="wn-ic">${ic}</span><div><b>${esc(t)}</b><span>${esc(d)}</span></div></div>`).join('');
-  showModal(`<div class="reveal whatsnew"><div class="rv-eyebrow">Updated to v${v}</div><h2>What's new</h2><div class="wn-list">${rows}</div>${bag?`<p class="note wn-bag">Because prices have changed, every bag has been reset to a starter pack. Your Echos, garden, furniture, worn hats, Sparks, Shards and story are all kept.</p>`:''}<div class="row"><button class="btn pri" data-close>Let's play</button></div></div>`); }
+  showModal(`<div class="reveal whatsnew"><div class="rv-eyebrow">Updated to v${v}</div><h2>What's new</h2><div class="wn-list">${rows}</div><div class="row"><button class="btn pri" data-close>Let's play</button></div></div>`); }
 setInterval(()=>{ try{ if(!S||S.seenVersion===GAME_VERSION) return; if(SCENE||CINE||MG||UI.panel||!$('#modal').hidden||(S.tut!=null&&S.tut<99)||!S.seenIntro) return; showWhatsNew(); }catch(e){} },2000);
 
 /* ---------- 2. earning ---------- */
