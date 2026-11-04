@@ -1441,79 +1441,77 @@ function buildEgg(type,obj){
   return g;
 }
 /* ---------- guardian ---------- */
-/* Guardians: hooded "warden" design. Soft eared hoods, mitten paws, wrapped paw boots and a
-   long lantern tail, so they read as their own species rather than spiky runners. */
+/* wolf faces: almond eyes set apart under heavy angled brows */
 function gShade(c,k){ const C=new THREE.Color(c); C.lerp(new THREE.Color(k<0?'#000000':'#ffffff'),Math.abs(k)); return '#'+C.getHexString(); }
-function drawWardenFace(x,G,o){ o=o||{}; x.clearRect(0,0,256,192); const L=G.look, md=o.mode, ink='#1a1420';
-  const rx=20, ry=L==='eclipse'?21:25;
-  for(const [ex,side] of [[88,-1],[168,1]]){ x.save(); x.translate(ex,98);
-    if(md==='closed'||md==='happy'){ x.strokeStyle=ink; x.lineWidth=7; x.lineCap='round'; x.beginPath();
-      if(md==='happy') x.arc(0,8,15,Math.PI*1.15,Math.PI*1.85); else { x.moveTo(-16,2); x.quadraticCurveTo(0,10,16,2); } x.stroke(); }
-    else { const p=o.pup||1;
-      x.fillStyle=ink; x.beginPath(); x.ellipse(0,0,rx+3,ry+3,0,0,7); x.fill();
-      x.save(); x.beginPath(); x.ellipse(0,0,rx,ry,0,0,7); x.clip();
-      const gr=x.createLinearGradient(0,-ry,0,ry); gr.addColorStop(0,gShade(G.eye,-.45)); gr.addColorStop(.5,G.eye); gr.addColorStop(1,gShade(G.eye,.4)); x.fillStyle=gr; x.fillRect(-rx,-ry,rx*2,ry*2);
-      x.fillStyle=ink; x.beginPath(); if(L==='eclipse') x.ellipse(0,2,4.5*p,14*p,0,0,7); else x.ellipse(0,2,9*p,11*p,0,0,7); x.fill();
-      x.fillStyle='rgba(255,255,255,.95)'; x.beginPath(); x.ellipse(-7,-9,6,7,-.3,0,7); x.fill(); x.beginPath(); x.ellipse(7,9,2.6,2.6,0,0,7); x.fill();
-      if(o.lid){ x.fillStyle=G.fur; x.fillRect(-rx-4,-ry-4,rx*2+8,2*ry*o.lid+4); }
-      x.restore();
-      if(o.lid){ x.strokeStyle=ink; x.lineWidth=5; x.lineCap='round'; const ly=-ry+2*ry*o.lid; x.beginPath(); x.moveTo(-rx-2,ly+side*1.5); x.lineTo(rx+2,ly-side*1.5); x.stroke(); } }
-    // short, soft brows that sit apart
-    const by=o.browY||0, bi=((o.brow||0)+(L==='eclipse'?.6:0))*6; x.strokeStyle=L==='vortex'?'#9aa6b8':gShade(G.hair,-.15); x.lineWidth=7; x.lineCap='round';
-    x.beginPath(); x.moveTo(side*15,-ry-13+by-bi*.3); x.quadraticCurveTo(0,-ry-19+by,-side*13,-ry-12+by+bi); x.stroke();
-    x.fillStyle='rgba(255,120,150,.26)'; x.beginPath(); x.ellipse(side*10,ry+12,12,5,0,0,7); x.fill();
+function drawWolfFace(x,G,o){ o=o||{}; x.clearRect(0,0,256,192); const L=G.look, md=o.mode, ink='#120e16', ry=L==='eclipse'?15:18, rx=24;
+  const browC=L==='vortex'?'#8a96aa':gShade(G.hair,-.2);
+  for(const [ex,side] of [[80,-1],[176,1]]){ x.save(); x.translate(ex,96);
+    const brow=(bi,by)=>{ x.fillStyle=browC; x.beginPath(); x.moveTo(side*34,-ry-12+by-bi*.4); x.lineTo(-side*22,-ry-2+by+bi); x.lineTo(-side*20,-ry-12+by+bi); x.lineTo(side*30,-ry-22+by-bi*.4); x.closePath(); x.fill(); };
+    if(md==='closed'||md==='happy'){ x.strokeStyle=ink; x.lineWidth=7; x.lineCap='round'; x.beginPath(); if(md==='happy') x.arc(0,10,18,Math.PI*1.18,Math.PI*1.82); else { x.moveTo(-20,2); x.quadraticCurveTo(0,10,20,2); } x.stroke(); brow(0,4); x.restore(); continue; }
+    const eye=()=>{ x.beginPath(); x.moveTo(-rx,0); x.quadraticCurveTo(-rx*.2,-ry*1.5,rx,side*-3); x.quadraticCurveTo(rx*.2,ry*1.25,-rx,0); x.closePath(); };
+    x.save(); if(side>0) x.scale(-1,1);
+    x.fillStyle='#ffffff'; eye(); x.fill(); x.save(); eye(); x.clip(); const p=o.pup||1;
+    x.fillStyle=G.eye; x.beginPath(); x.ellipse(2,1,15*Math.max(.85,p),15*Math.max(.85,p),0,0,7); x.fill();
+    x.fillStyle=ink; x.beginPath(); if(L==='eclipse') x.ellipse(2,1,3.5*p,12*p,0,0,7); else x.ellipse(2,1,6.5*p,8.5*p,0,0,7); x.fill();
+    x.fillStyle='#ffffff'; x.beginPath(); x.ellipse(-3,-5,4,4.5,0,0,7); x.fill();
+    if(o.lid){ x.fillStyle=G.fur; x.fillRect(-rx-4,-ry*1.6,rx*2+8,ry*1.6*o.lid*1.6+4); }
+    x.restore(); x.strokeStyle=ink; x.lineWidth=5; x.lineJoin='round'; eye(); x.stroke(); x.restore();
+    brow((o.brow||0)*7+(L==='eclipse'?4:2),o.browY||0);
     x.restore(); } }
-function drawGuardianFace(x,G,mode){ drawWardenFace(x,G,{mode}); }
+function drawGuardianFace(x,G,mode){ drawWolfFace(x,G,{mode}); }
 function buildGuardian(id){
   const G=GUARDIANS[id]; const g=new THREE.Group(); const L=G.look;
-  const fur=mat(G.fur), jacket=mat(G.jacket), pants=mat(G.pants), boot=mat(G.shoe), hair=mat(G.hair);
-  const light=mat(gShade(G.fur,L==='eclipse'?.25:.55)), hoodM=mat(G.jacket,{side:THREE.DoubleSide}), trim=mat(G.glow,{emissive:G.glow,emissiveIntensity:.55});
-  const glowM=new THREE.MeshBasicMaterial({color:G.glow}); const paw=L==='vortex'?mat(gShade(G.fur,-.08)):fur;
+  const fur=mat(G.fur), white=mat(L==='rift'?'#cdd6ee':L==='eclipse'?'#bcb2b2':G.muzzle), jacket=mat(G.jacket), pants=mat(G.pants), shoe=mat(G.shoe), hair=mat(G.hair);
+  const glowM=new THREE.MeshBasicMaterial({color:G.glow}); const glove=mat(L==='vortex'?gShade(G.fur,-.06):G.fur), claw=mat(L==='eclipse'?'#d8283a':'#efe9e0');
   const ud={};
+  // smooth limbs and torso (capsules + lathe) instead of stacked spheres
   if(!GEO.capThigh){ GEO.capThigh=new THREE.CapsuleGeometry(.135,.25,6,16); GEO.capShin=new THREE.CapsuleGeometry(.118,.27,6,16); GEO.capUpper=new THREE.CapsuleGeometry(.1,.2,6,14); GEO.capFore=new THREE.CapsuleGeometry(.09,.17,6,14);
     const pr=[[.001,-.02],[.2,0],[.27,.08],[.3,.2],[.275,.34],[.3,.48],[.34,.6],[.3,.7],[.2,.77],[.11,.8],[.001,.81]].map(([r,y])=>new THREE.Vector2(r,y)); GEO.torso=new THREE.LatheGeometry(pr,28); GEO.torso.computeVertexNormals(); }
-  if(!GEO.hoodCap){ GEO.hoodCap=new THREE.SphereGeometry(1,26,16,0,Math.PI*2,0,Math.PI*.62); GEO.hoodRim=new THREE.TorusGeometry(Math.sin(Math.PI*.62),.045,6,30); }
-  // legs: soft wrapped paw boots
+  // legs
   ud.legs=[]; ud.shins=[]; for(const sx of [-1,1]){ const lg=new THREE.Group(); lg.position.set(sx*.17,.95,0);
     lg.add(mesh(GEO.capThigh,pants,[1,1,1.08],[0,-.2,0])); const kn=new THREE.Group(); kn.position.y=-.42; lg.add(kn);
-    kn.add(mesh(GEO.capShin,pants,[1,1,1.06],[0,-.16,0]));
-    kn.add(mesh(GEO.cyl,jacket,[.135,.09,.135],[0,-.31,0])); kn.add(mesh(GEO.cyl,mat(gShade(G.jacket,-.25)),[.138,.025,.138],[0,-.27,0]));
-    kn.add(mesh(GEO.sph,boot,[.15,.12,.2],[0,-.43,.04])); for(const tx of [-.06,0,.06]) kn.add(mesh(GEO.sph,boot,[.05,.045,.05],[tx,-.45,.21]));
+    kn.add(mesh(GEO.capShin,pants,[1,1,1.06],[0,-.16,0])); 
+    kn.add(mesh(GEO.sph,shoe,[.15,.11,.24],[0,-.44,.06])); kn.add(mesh(GEO.cyl,shoe,[.13,.16,.13],[0,-.33,0])); kn.add(mesh(GEO.cyl,mat(gShade(G.shoe,.15)),[.14,.035,.14],[0,-.25,0])); const st=mesh(GEO.box,glowM,[.03,.1,.02],[0,-.35,.135]); st.castShadow=false; kn.add(st); for(const yy of [-.3,-.39]) kn.add(mesh(GEO.tor,mat('#6a4a30'),[.135,.135,.08],[0,yy,0],[Math.PI/2,0,0]));
     g.add(lg); ud.legs.push(lg); ud.shins.push(kn); }
   // torso
-  { const t=mesh(GEO.torso,jacket,[1,1,.8],[0,.9,0]); g.add(t); const ol=new THREE.Mesh(GEO.torso,OUTLINE_MAT); ol.scale.set(1.05,1.02,1.06); t.add(ol); }
+  { const t=mesh(GEO.torso,jacket,[1,1,.8],[0,.9,0]); g.add(t); if(!GEO._tol) GEO._tol=1; const ol=new THREE.Mesh(GEO.torso,OUTLINE_MAT); ol.scale.set(1.05,1.02,1.06); t.add(ol); }
   g.add(mesh(GEO.tor,mat('#1a1620'),[.3,.3,.4],[0,1.0,0],[Math.PI/2,0,0]));
-  g.add(mesh(GEO.box,mat(gShade(G.jacket,-.3)),[.1,.09,.04],[0,1.0,.3]));
-  if(L==='rift'){ // a short tunic, a long scarf and a glowing pendant
-    const tun=new THREE.Mesh(new THREE.CylinderGeometry(.31,.42,.42,18,1,true),mat(gShade(G.jacket,-.12),{side:THREE.DoubleSide})); tun.position.y=.86; tun.castShadow=true; g.add(tun); g.add(mesh(GEO.tor,trim,[.42,.42,.12],[0,.655,0],[Math.PI/2,0,0]));
-    const sc=mat(G.glow==='#3fe0ff'?'#36c8ee':G.glow,{roughness:.95}); g.add(mesh(GEO.tor,sc,[.25,.25,.42],[0,1.72,0],[Math.PI/2,0,0]));
-    for(const [x,len,rz] of [[-.07,.46,.12],[.07,.36,-.1]]){ const tl=mesh(GEO.box,sc,[.11,len,.035],[x,1.68-len/2,-.27],[.32,0,rz]); g.add(tl); }
-    const pend=mesh(GEO.oct,new THREE.MeshBasicMaterial({color:G.glow}),[.06,.085,.04],[0,1.5,.3]); pend.castShadow=false; g.add(pend); g.add(mesh(GEO.tor,mat('#c8d4e8',{metalness:.6,roughness:.3}),[.08,.08,.08],[0,1.5,.29]));
-    const pg=new THREE.Sprite(new THREE.SpriteMaterial({map:glowTex(),color:G.glow,transparent:true,opacity:.7,blending:THREE.AdditiveBlending,depthWrite:false})); pg.scale.setScalar(.4); pg.position.set(0,1.5,.32); g.add(pg); }
+  if(L==='rift'){ for(const sx of [-1,1]) g.add(mesh(GEO.cone,jacket,[.12,.36,.05],[sx*.17,1.6,.2],[.3,0,sx*.5]));
+    const pend=mesh(GEO.sph,new THREE.MeshBasicMaterial({color:G.glow}),[.075,.075,.05],[0,1.55,.29]); pend.castShadow=false; g.add(pend); g.add(mesh(GEO.tor,mat('#c8d4e8',{metalness:.6,roughness:.3}),[.1,.1,.1],[0,1.55,.28]));
+    const pg=new THREE.Sprite(new THREE.SpriteMaterial({map:glowTex(),color:G.glow,transparent:true,opacity:.8,blending:THREE.AdditiveBlending,depthWrite:false})); pg.scale.setScalar(.45); pg.position.set(0,1.55,.32); g.add(pg); }
   if(L==='vortex'){ const cloak=new THREE.Mesh(new THREE.CylinderGeometry(.34,.6,1.15,18,1,true,Math.PI*.15,Math.PI*1.7),mat(G.jacket,{side:THREE.DoubleSide})); cloak.position.set(0,1.18,-.04); cloak.rotation.y=Math.PI; cloak.castShadow=true; g.add(cloak);
+    g.add(mesh(GEO.half,mat(G.jacket,{side:THREE.DoubleSide}),[.32,.3,.3],[0,1.78,-.18],[-.6,0,0]));
     for(let k=0;k<2;k++) g.add(mesh(GEO.tor,mat('#16181e'),[.31,.31,.34],[0,1.25+k*.18,0],[Math.PI/2+.3*(k?1:-1),0,0]));
-    g.add(mesh(GEO.tor,mat(G.muzzle,{roughness:1}),[.26,.26,.6],[0,1.72,0],[Math.PI/2,0,0])); g.add(mesh(GEO.tor,trim,[.3,.3,.08],[0,1.66,0],[Math.PI/2,0,0])); }
-  if(L==='eclipse'){ const coat=new THREE.Mesh(new THREE.CylinderGeometry(.3,.46,.7,18,1,true),mat(G.jacket,{side:THREE.DoubleSide})); coat.position.y=.98; g.add(coat);
-    g.add(mesh(GEO.tor,mat('#141016'),[.25,.25,.45],[0,1.72,0],[Math.PI/2,0,0]));
-    for(const sx of [-1,1]) g.add(mesh(GEO.box,trim,[.035,.46,.02],[sx*.11,1.3,.255],[0,0,sx*.12]));
+ }
+  if(L==='eclipse'){ g.add(mesh(GEO.tor,mat('#141016'),[.24,.24,.5],[0,1.74,0],[Math.PI/2,0,0])); g.add(mesh(GEO.tor,mat(G.glow,{emissive:G.glow,emissiveIntensity:.6}),[.25,.25,.12],[0,1.66,0],[Math.PI/2,0,0]));
+    const coat=new THREE.Mesh(new THREE.CylinderGeometry(.3,.46,.7,18,1,true),mat(G.jacket,{side:THREE.DoubleSide})); coat.position.y=.98; g.add(coat);
+    for(const sx of [-1,1]) g.add(mesh(GEO.box,mat(G.glow,{emissive:G.glow,emissiveIntensity:.5}),[.04,.5,.02],[sx*.12,1.3,.255]));
     g.add(mesh(GEO.tor,mat('#c8c0c8',{metalness:.6,roughness:.3}),[.07,.07,.07],[0,1.02,.29])); }
-  // arms: sleeves and mitten paws
+  // outfit: ragged cape, scarf, belt gear and straps
+  { const leather=mat('#6a4a30',{roughness:.8}), metal=mat('#c8ccd4',{metalness:.7,roughness:.3});
+    const SC={rift:'#1e2a44',vortex:'#e6ecf4',eclipse:'#a01c28'}[L], CP={rift:'#161c2c',eclipse:'#7a141e'}[L];
+    if(CP){ const cg=new THREE.CylinderGeometry(.36,.62,1.02,22,3,true,Math.PI*.52,Math.PI*.96); const pa=cg.attributes.position;
+      for(let i=0;i<pa.count;i++){ const y=pa.getY(i); if(y<-.5) pa.setY(i,y+((i*7919)%13)/13*.3); else if(y<0) pa.setY(i,y+((i*104729)%7)/7*.06); } cg.computeVertexNormals();
+      const cape=new THREE.Mesh(cg,mat(CP,{side:THREE.DoubleSide,roughness:.95})); cape.position.set(0,1.22,-.04); cape.castShadow=true; g.add(cape); }
+    const scm=mat(SC,{roughness:.95}); g.add(mesh(GEO.tor,scm,[.28,.28,.55],[0,1.73,0],[Math.PI/2,0,0]));
+    for(const [x,len,rz] of [[.12,.36,-.25],[.2,.28,-.45]]) g.add(mesh(GEO.box,scm,[.11,len,.04],[x,1.66-len/2,.24],[-.12,0,rz]));
+    g.add(mesh(GEO.box,metal,[.11,.09,.04],[0,1.0,.3])); g.add(mesh(GEO.box,leather,[.12,.13,.09],[.24,.96,.17],[0,-.5,0])); g.add(mesh(GEO.box,leather,[.1,.11,.08],[-.25,.97,.14],[0,.6,0]));
+    if(L!=='vortex'){ const sx=L==='rift'?1:-1; g.add(mesh(GEO.box,leather,[.06,.82,.03],[0,1.36,.27],[0,0,sx*.62])); g.add(mesh(GEO.box,metal,[.07,.07,.035],[sx*.1,1.44,.285],[0,0,sx*.62])); }
+    if(L==='eclipse') g.add(mesh(GEO.oct,mat(G.glow,{emissive:G.glow,emissiveIntensity:.6}),[.06,.07,.02],[.15,1.5,.27])); }
+  // arms
   ud.arms=[]; ud.fores=[]; for(const sx of [-1,1]){ const ag=new THREE.Group(); ag.position.set(sx*.38,1.64,0);
     ag.add(mesh(GEO.sph,jacket,[.115,.115,.115],[0,-.01,0])); ag.add(mesh(GEO.capUpper,jacket,[1,1,1],[0,-.15,0])); const el=new THREE.Group(); el.position.y=-.3; ag.add(el);
-    el.add(mesh(GEO.capFore,jacket,[1,1,1],[0,-.11,0])); el.add(mesh(GEO.cyl,mat(gShade(G.jacket,-.25)),[.105,.05,.105],[0,-.22,0]));
-    el.add(mesh(GEO.sph,paw,[.11,.115,.1],[0,-.33,.01])); el.add(mesh(GEO.sph,paw,[.045,.06,.045],[sx*-.08,-.3,.05]));
-    g.add(ag); ud.arms.push(ag); ud.fores.push(el); }
+    el.add(mesh(GEO.capFore,jacket,[1,1,1],[0,-.11,0])); el.add(mesh(GEO.cyl,mat('#4a3424',{roughness:.85}),[.1,.12,.1],[0,-.17,0])); const wb=mesh(GEO.tor,glowM,[.115,.115,.14],[0,-.25,0],[Math.PI/2,0,0]); wb.castShadow=false; el.add(wb);
+    if(L!=='vortex') el.add(mesh(GEO.tor,mat('#16141a'),[.12,.12,.1],[0,-.17,0],[Math.PI/2,0,0]));
+    el.add(mesh(GEO.sph,glove,[.12,.13,.12],[0,-.36,.02])); for(const cx of [-.05,0,.05]) el.add(mesh(GEO.cone,claw,[.022,.07,.022],[cx,-.47,.08],[Math.PI*.85,0,0])); g.add(ag); ud.arms.push(ag); ud.fores.push(el); }
   ud.armL=ud.arms[0]; ud.armR=ud.arms[1];
   if(L==='vortex'){ const orb=new THREE.Group(); orb.position.set(0,-.38,.22); const core=mesh(GEO.sph,new THREE.MeshBasicMaterial({color:G.glow}),[.11,.11,.11]); core.castShadow=false; orb.add(core);
     const ring=new THREE.Mesh(new THREE.TorusGeometry(.2,.012,6,28),new THREE.MeshBasicMaterial({color:G.glow,transparent:true,opacity:.8})); orb.add(ring);
     const og=new THREE.Sprite(new THREE.SpriteMaterial({map:glowTex(),color:G.glow,transparent:true,opacity:.9,blending:THREE.AdditiveBlending,depthWrite:false})); og.scale.setScalar(.7); orb.add(og);
     ud.fores[1].add(orb); ud.orb=orb; ud.orbRing=ring; }
-  // lantern tail: long and fluffy with a glowing tip
-  const tail=new THREE.Group(); tail.position.set(0,1.0,-.24); const tm=mat(G.fur,{roughness:1}), ttm=mat(G.tailTip,{roughness:1});
-  const B=(a,b,c,t)=>(1-t)*(1-t)*a+2*(1-t)*t*b+t*t*c; const N=14; let tip=null;
-  for(let i=0;i<N;i++){ const t=i/(N-1); const y=B(0,-.05,.62,t), z=B(0,-.62,-.72,t); const r=.08+.15*Math.sin(Math.min(1,t*1.15)*Math.PI*.82); tail.add(mesh(GEO.sph,t>.82?ttm:tm,[r,r,r*1.1],[0,y,z])); tip=[y,z]; }
-  const lamp=mesh(GEO.sph,glowM,[.085,.085,.085],[0,tip[0]+.16,tip[1]+.02]); lamp.castShadow=false; tail.add(lamp);
-  const lg=new THREE.Sprite(new THREE.SpriteMaterial({map:glowTex(),color:G.glow,transparent:true,opacity:.85,blending:THREE.AdditiveBlending,depthWrite:false})); lg.scale.setScalar(.55); lg.position.copy(lamp.position); tail.add(lg);
+  // tail
+  const tail=new THREE.Group(); tail.position.set(0,1.02,-.24); const tm=mat(G.fur,{roughness:1}), ttm=mat(G.tailTip,{roughness:1});
+  const Bz=(a,b,c,t)=>(1-t)*(1-t)*a+2*(1-t)*t*b+t*t*c; for(let i=0;i<12;i++){ const t=i/11; const y=Bz(0,-.12,-.5,t), z=Bz(0,-.5,-.66,t); const r=.08+.17*Math.sin(Math.min(1,t*1.1)*Math.PI*.8); tail.add(mesh(GEO.sph,t>.8?ttm:tm,[r*.9,r*1.15,r],[0,y,z])); }
   g.add(tail); ud.tail=tail;
   // head
   const head=new THREE.Group(); head.position.set(0,2.02,0); g.add(head); ud.head=head;
@@ -1522,24 +1520,25 @@ function buildGuardian(id){
   ud.faceTex={open:ft}; for(const md of ['closed','happy']){ const c2=document.createElement('canvas'); c2.width=256; c2.height=192; drawGuardianFace(c2.getContext('2d'),G,md); const t2=new THREE.CanvasTexture(c2); if(THREE.SRGBColorSpace) t2.colorSpace=THREE.SRGBColorSpace; ud.faceTex[md]=t2; }
   const face=new THREE.Mesh(GEO.face,new THREE.MeshBasicMaterial({map:ft,transparent:true,depthWrite:false,polygonOffset:true,polygonOffsetFactor:-2,toneMapped:false})); face.renderOrder=2; skull.add(face); ud.faceMat=face.material; ud.faceMode='open';
   const ol=new THREE.Mesh(GEO.sph,OUTLINE_MAT); ol.scale.setScalar(1.045); skull.add(ol);
-  // small soft muzzle and nose
-  head.add(mesh(GEO.sph,light,[.15,.1,.12],[0,-.12,.24])); head.add(mesh(GEO.sph,mat('#2a1a22'),[.04,.03,.03],[0,-.07,.35]));
-  // the eared hood: covers the crown and back of the head, open at the face
-  const hood=new THREE.Group(); hood.position.set(0,.02,-.02); hood.rotation.x=-1.02; hood.scale.set(.385,.37,.37); head.add(hood);
-  hood.add(new THREE.Mesh(GEO.hoodCap,hoodM)); { const rim=new THREE.Mesh(GEO.hoodRim,mat(gShade(G.jacket,L==='eclipse'?.15:-.25))); rim.rotation.x=Math.PI/2; rim.position.y=Math.cos(Math.PI*.62); hood.add(rim); }
-  { const ho=new THREE.Mesh(GEO.hoodCap,OUTLINE_MAT); ho.scale.setScalar(1.05); hood.add(ho); }
-  for(const sx of [-1,1]){ const e=new THREE.Group(); e.position.set(sx*.17,.3,-.06); e.rotation.set(-.15,0,-sx*.28);
-    e.add(mesh(GEO.cone,hoodM,[.12,.34,.08],[0,.15,0])); e.add(mesh(GEO.cone,trim,[.065,.22,.03],[0,.13,.05]));
-    if(L==='eclipse') e.add(mesh(GEO.cone,trim,[.03,.12,.03],[0,.36,0])); head.add(e); }
-  // a few soft locks of hair under the hood
-  for(const [x,y,s] of [[-.12,.17,.07],[0,.2,.08],[.12,.17,.07]]) head.add(mesh(GEO.sph,hair,[s*1.2,s,s*.8],[x,y,.27]));
+  // wolf snout: fur bridge on top, pale jaw underneath, big dark nose
+  head.add(mesh(GEO.sph,fur,[.13,.1,.24],[0,-.03,.24])); head.add(mesh(GEO.sph,white,[.15,.1,.23],[0,-.11,.25])); head.add(mesh(GEO.sph,white,[.2,.12,.12],[0,-.15,.14]));
+  head.add(mesh(GEO.sph,mat('#141016',{roughness:.3}),[.065,.05,.05],[0,-.02,.48]));
+  for(const sx of [-1,1]){ const e=new THREE.Group(); e.position.set(sx*.19,.25,-.05); e.rotation.set(-.12,0,-sx*.2); e.add(mesh(GEO.cone,fur,[.14,.46,.09],[0,.2,0])); e.add(mesh(GEO.cone,mat(L==='eclipse'?'#3a2a30':gShade(G.fur,.45)),[.075,.3,.03],[0,.17,.055])); e.add(mesh(GEO.cone,hair,[.05,.14,.04],[0,.44,-.01])); head.add(e); }
+  // swept-back fur: broad flat tufts (not quills), cheek ruffs and a neck mane
+  const tuft=(m,x,y,z,rx,ry,rz,w,h)=>head.add(mesh(GEO.cone,m,[w,h,w*.45],[x,y,z],[rx,ry,rz]));
+  const alt=L==='eclipse'?mat(G.glow):hair;
+  tuft(hair,0,.27,.12,.35,0,0,.1,.22);
+  for(const [x,y,z,rz,h] of [[0,.24,-.12,0,.36],[.13,.2,-.16,-.35,.32],[-.13,.2,-.16,.35,.32],[0,.08,-.27,0,.32],[.18,.02,-.22,-.6,.26],[-.18,.02,-.22,.6,.26]]) tuft(x===0&&y<.1&&L==='eclipse'?alt:hair,x,y,z,-1.95,0,rz,.13,h);
+  for(const [x,y,z,rz,h] of [[.07,.29,0,-.2,.3],[-.07,.29,0,.2,.3],[.24,.12,-.12,-.9,.24],[-.24,.12,-.12,.9,.24],[.08,.14,-.26,-.2,.3],[-.08,.14,-.26,.2,.3]]) tuft(L==='eclipse'&&Math.abs(x)>.2?alt:hair,x,y,z,-1.7,0,rz,.11,h);
+  if(L==='vortex') for(const sx of [-1,1]) for(const [y,h] of [[.05,.34],[-.08,.3]]) tuft(hair,sx*.26,y,-.08,-.25,0,sx*2.75,.08,h);
+  for(const sx of [-1,1]) for(const [y,z,rz,h] of [[-.06,.06,1.85,.2],[-.15,.03,2.2,.18],[-.22,-.02,2.6,.15]]) tuft(L==='eclipse'&&y<-.2?alt:fur,sx*.27,y,z,0,0,sx*rz,.07,h);
+  for(let k=0;k<12;k++){ const a=k/12*Math.PI*2; const front=Math.cos(a)>.35; g.add(mesh(GEO.cone,front?white:(L==='eclipse'&&k%3===0?mat(G.glow):fur),[.085,.22,.05],[Math.sin(a)*.25,1.72,Math.cos(a)*.22],[Math.cos(a)*1.9,0,-Math.sin(a)*1.9])); }
   // energy aura at the feet
-  const aura=new THREE.Sprite(new THREE.SpriteMaterial({map:glowTex(),color:G.glow,transparent:true,opacity:.24,blending:THREE.AdditiveBlending,depthWrite:false})); aura.scale.set(1.5,.45,1); aura.position.y=.08; g.add(aura); ud.aura=aura;
+  const aura=new THREE.Sprite(new THREE.SpriteMaterial({map:glowTex(),color:G.glow,transparent:true,opacity:.28,blending:THREE.AdditiveBlending,depthWrite:false})); aura.scale.set(1.6,.5,1); aura.position.y=.08; g.add(aura); ud.aura=aura;
   const body=new THREE.Group(); body.position.y=.95; for(const c of [...g.children]){ if(ud.legs.includes(c)||c===aura) continue; g.remove(c); c.position.y-=.95; body.add(c); } g.add(body); ud.body=body;
   g.userData=ud; g.scale.setScalar(.95);
   return g;
 }
-
 const G_THUMB={};
 function guardianThumb(id){ if(G_THUMB[id]) return G_THUMB[id]; if(!thumbR) initThumbs(); const g=buildGuardian(id); g.rotation.y=-.35; thumbScene.add(g);
   thumbCam.position.set(0,1.5,5.6); thumbCam.lookAt(0,1.25,0); thumbR.render(thumbScene,thumbCam); const u=thumbR.domElement.toDataURL('image/png'); thumbScene.remove(g); return G_THUMB[id]=u; }
@@ -5964,11 +5963,11 @@ let TALK_T=0;
     return r; }; }
 /* ---------- 2. guardian expressions, mouths ---------- */
 const G_EXPR={annoyed:{lid:.42,brow:1},surprised:{pup:.62,browY:-9},sad:{lid:.18,brow:-1.1},think:{lid:.25,brow:.5,browY:-4}};
-function drawGFace(x,G,o){ drawWardenFace(x,G,o); }
+function drawGFace(x,G,o){ drawWolfFace(x,G,o); }
 { const _bg=buildGuardian; buildGuardian=function(id){ const g=_bg.apply(this,arguments); const ud=g.userData, G=GUARDIANS[id];
     if(ud.faceTex){ for(const k in G_EXPR){ const c=document.createElement('canvas'); c.width=256; c.height=192; drawGFace(c.getContext('2d'),G,G_EXPR[k]); const t=new THREE.CanvasTexture(c); if(THREE.SRGBColorSpace) t.colorSpace=THREE.SRGBColorSpace; ud.faceTex[k]=t; } }
     // a mouth that moves when they talk
-    const mouth=mesh(GEO.sph,mat('#2a1418'),[.05,.01,.02],[0,-.165,.39]); ud.head.add(mouth); ud.mouth=mouth;
+    const mouth=mesh(GEO.sph,mat('#2a1418'),[.08,.01,.03],[0,-.155,.44]); ud.head.add(mouth); ud.mouth=mouth;
     // cloth that sways
     ud.cloth=[]; g.traverse(o=>{ if(o.isMesh&&o.geometry&&o.geometry.type==='CylinderGeometry'&&o.geometry.parameters&&o.geometry.parameters.openEnded) ud.cloth.push({m:o,rx:o.rotation.x,sx:o.scale.x,sz:o.scale.z}); });
     rimify(g); return g; }; }
