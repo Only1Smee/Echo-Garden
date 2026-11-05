@@ -11,7 +11,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
-<title>Echo Garden v0.8.3</title>
+<title>Echo Garden v0.8.4</title>
 <style>
 [hidden]{display:none!important}
 
@@ -1811,11 +1811,11 @@ let dayLight=1;
 /* ---------- sky keys per garden (t: 0 midnight, .25 sunrise, .5 noon, .75 sunset) ---------- */
 const SKY={
   natural:[
-    {t:0,top:'#0c1224',mid:'#101a3a',low:'#1c2340',bot:'#26243f',fog:0x14172a,sunC:0x4a5a88,sunI:.12,hemiI:.3,star:1,fogD:.016},
-    {t:.22,top:'#1c4a8a',mid:'#4f86c8',low:'#e69a68',bot:'#ffcf94',fog:0x8fa8c8,sunC:0xffd4a8,sunI:1.1,hemiI:.75,star:.1,fogD:.011},
+    {t:0,top:'#0c1224',mid:'#101a3a',low:'#1c2340',bot:'#26243f',fog:0x1a2038,sunC:0x7a8ac8,sunI:.32,hemiI:.5,star:1,fogD:.014},
+    {t:.22,top:'#1c4a8a',mid:'#4f86c8',low:'#e69a68',bot:'#ffcf94',fog:0x8fa8c8,sunC:0xffd4a8,sunI:1.2,hemiI:.9,star:.1,fogD:.011},
     {t:.5,top:'#1c6fd6',mid:'#4fa0ec',low:'#bdeaf7',bot:'#f2fcf6',fog:0xcfe9fb,sunC:0xfff2dc,sunI:1.6,hemiI:1.15,star:0,fogD:.006},
-    {t:.76,top:'#2a2050',mid:'#5a3a72',low:'#e0824f',bot:'#f7b06a',fog:0x7a6a90,sunC:0xffbc8a,sunI:.85,hemiI:.6,star:.15,fogD:.012},
-    {t:1,top:'#0c1224',mid:'#101a3a',low:'#1c2340',bot:'#26243f',fog:0x14172a,sunC:0x4a5a88,sunI:.12,hemiI:.3,star:1,fogD:.016}],
+    {t:.76,top:'#2a2050',mid:'#5a3a72',low:'#e0824f',bot:'#f7b06a',fog:0x7a6a90,sunC:0xffbc8a,sunI:1,hemiI:.8,star:.15,fogD:.011},
+    {t:1,top:'#0c1224',mid:'#101a3a',low:'#1c2340',bot:'#26243f',fog:0x1a2038,sunC:0x7a8ac8,sunI:.32,hemiI:.5,star:1,fogD:.014}],
   hero:[
     {t:0,top:'#1a1f4a',mid:'#2f3a7a',low:'#6a5aa8',bot:'#9a8ac8',fog:0x4a4a8a,sunC:0x8a9ad8,sunI:.25,hemiI:.5,star:1,fogD:.008},
     {t:.22,top:'#5a8ad6',mid:'#a8c8f0',low:'#ffc8d8',bot:'#fff0e0',fog:0xf0d8e8,sunC:0xffe0d0,sunI:1.2,hemiI:.95,star:.1,fogD:.006},
@@ -1823,13 +1823,13 @@ const SKY={
     {t:.76,top:'#4a3a8a',mid:'#9a6ab0',low:'#ffa8a8',bot:'#ffd8b8',fog:0xd8b0c8,sunC:0xffc8b0,sunI:.95,hemiI:.75,star:.15,fogD:.007},
     {t:1,top:'#1a1f4a',mid:'#2f3a7a',low:'#6a5aa8',bot:'#9a8ac8',fog:0x4a4a8a,sunC:0x8a9ad8,sunI:.25,hemiI:.5,star:1,fogD:.008}],
   dark:[
-    {t:0,top:'#05030f',mid:'#0f0a24',low:'#24163f',bot:'#3a2050',fog:0x1a1030,sunC:0x6a4aa8,sunI:.2,hemiI:.35,star:1,fogD:.02},
+    {t:0,top:'#05030f',mid:'#0f0a24',low:'#24163f',bot:'#3a2050',fog:0x1a1030,sunC:0x7a5ab8,sunI:.3,hemiI:.48,star:1,fogD:.018},
     {t:.22,top:'#140c2e',mid:'#2e1c50',low:'#6a2f5a',bot:'#a8504a',fog:0x3a2244,sunC:0xd08a9a,sunI:.6,hemiI:.5,star:.6,fogD:.017},
     {t:.5,top:'#1c1238',mid:'#3a2460',low:'#8a3a6a',bot:'#d0705a',fog:0x4a2a50,sunC:0xe0a0c0,sunI:.8,hemiI:.6,star:.4,fogD:.015},
     {t:.76,top:'#140c2e',mid:'#2e1c50',low:'#7a2f50',bot:'#c05a4a',fog:0x3a2244,sunC:0xd0808a,sunI:.6,hemiI:.5,star:.6,fogD:.017},
-    {t:1,top:'#05030f',mid:'#0f0a24',low:'#24163f',bot:'#3a2050',fog:0x1a1030,sunC:0x6a4aa8,sunI:.2,hemiI:.35,star:1,fogD:.02}]
+    {t:1,top:'#05030f',mid:'#0f0a24',low:'#24163f',bot:'#3a2050',fog:0x1a1030,sunC:0x7a5ab8,sunI:.3,hemiI:.48,star:1,fogD:.018}]
 };
-const GROUND_COL={natural:['#2f4d3a','#3f6b47'],hero:['#9fd0b0','#c8ead2'],dark:['#2a2440','#3a3258']};
+const GROUND_COL={natural:['#4a7c50','#64a15e'],hero:['#9fd0b0','#c8ead2'],dark:['#2a2440','#3a3258']};
 const SEASON_TINT=[['#3f7a44',.12],[null,0],['#8a7a3a',.38],['#c9d6dc',.55]];
 const WEATHERS=['sun','mild','overcast','wind','rain','thunder','snow'];
 const WEATHER_NAME={sun:'Sunny',mild:'Mild',overcast:'Overcast',wind:'Windy',rain:'Rain',thunder:'Thunder',snow:'Snow'};
@@ -6613,12 +6613,15 @@ const STARTER_INV={apple:6,sunpear:2,seed_apple:2,seed_dashberry:1,ess_speed:1,e
 { const _sg=seedNewGame; seedNewGame=function(){ const r=_sg.apply(this,arguments); if(S) S.inv080=1; return r; }; }
 /* ---------- what's new: shown once after each update ---------- */
 const CHANGELOG={
-  '0.8.3':[
-    ['🏋️','Training, tidied up','Pick an Echo and a game from one screen, see each stat\'s level and your best grade, and watch your grade live while you play. Training is also in the Play menu now.'],
-    ['🎯','Clearer mini-games','Dash Pads light up when it\'s time to tap, the swim tells you to speed up or ease off, and the cameras show more of the action.'],
+  '0.8.4':[
     ['🪁','Sky Glide, rebuilt','Glide to a finish arch instead of racing a timer, chain rings for combos, ride updrafts and dodge storm clouds. Bosses now dive at you after a warning: charge up in a gold ring, then ram them. Runs always end properly now.'],
     ['👹','Trail Run bosses','Boss stages now have a boss in every mode. On the trail it runs ahead throwing boulders and logs. When it gets dazed, jump on it!'],
     ['🎨','Prettier adventures','Sky Glide has rolling hills, forests, beaches and moonlit ruins drifting past. Side Quests have proper scenery below the platforms, the Ruins are brighter, and sparks always face you.'],
+    ['🔥','Evening torch','Your Guardian now lights a torch from dusk till dawn and carries it around the garden. The grass is brighter and evenings and nights are easier to see.'],
+    ['🏋️','Training and menus tidied','If you missed 0.8.3: training fits on one screen with live grades, and Play and Garden open quick menus above the bar.']],
+  '0.8.3':[
+    ['🏋️','Training, tidied up','Pick an Echo and a game from one screen, see each stat\'s level and your best grade, and watch your grade live while you play. Training is also in the Play menu now.'],
+    ['🎯','Clearer mini-games','Dash Pads light up when it\'s time to tap, the swim tells you to speed up or ease off, and the cameras show more of the action.'],
     ['🧭','Quick menus','Play and Garden open a small menu above the bar instead of a full page, so you get where you\'re going in one tap.']],
   '0.8.2':[
     ['🪁','Sky Glide','A third Adventure mode. Hold to climb, let go to dive, and ride the wind gates.'],
@@ -7730,6 +7733,35 @@ function sideBackdrop(){ const A=ADV; if(!A||A.mode!=='side') return; const T=A.
   r.position.set(600,-.8,-10.2); A.scene.add(r); }
 { const _ss=startSide; startSide=function(){ const r=_ss.apply(this,arguments); try{ sideBackdrop(); }catch(e){ console.warn(e); } return r; }; }
 /* =========================================================
+   v0.8.3 — evening torch. From dusk until dawn (and always in the
+   Shadow Garden) the Guardian lights a torch and carries it in the
+   left hand, with a warm flickering glow that lights the garden
+   around it.
+   ========================================================= */
+const TORCH={light:null,k:0,flameM:null};
+function torchBuild(ud){ const t=new THREE.Group(); t.position.set(0,-.38,.07); t.rotation.x=-1.05; t.userData.base=1.35;
+  const wood=mat('#6a4428',{roughness:.9}), wrap=mat('#3a2a1e',{roughness:.95}), band=mat('#b8a070',{metalness:.5,roughness:.4});
+  t.add(mesh(GEO.cyl,wood,[.045,.62,.045],[0,.18,0])); t.add(mesh(GEO.cyl,wrap,[.07,.14,.07],[0,.5,0])); t.add(mesh(GEO.tor,band,[.075,.075,.06],[0,.44,0],[Math.PI/2,0,0]));
+  const fl=new THREE.Group(); fl.position.y=.6; t.add(fl);
+  const core=new THREE.Mesh(new THREE.ConeGeometry(.07,.24,8),new THREE.MeshBasicMaterial({color:'#ffd27a',transparent:true,opacity:.95})); core.position.y=.1; fl.add(core);
+  const outer=new THREE.Mesh(new THREE.ConeGeometry(.11,.34,8),new THREE.MeshBasicMaterial({color:'#ff7a2a',transparent:true,opacity:.6,depthWrite:false})); outer.position.y=.12; fl.add(outer);
+  const gl=new THREE.Sprite(new THREE.SpriteMaterial({map:glowTex(),color:'#ffb050',transparent:true,opacity:.85,blending:THREE.AdditiveBlending,depthWrite:false})); gl.scale.setScalar(1.6); gl.position.y=.12; fl.add(gl);
+  t.traverse(o=>{ o.castShadow=false; }); ud.fores[0].add(t); ud.torch={g:t,fl,core,outer,gl}; t.visible=false; }
+function torchWanted(){ if(MG||CINE) return false; if(S.garden==='dark') return true; const t=S.time.t; return t<.24||t>.74; }
+{ const _ag=animateGuardian; animateGuardian=function(dt){ const r=_ag.apply(this,arguments);
+    try{ if(!guardianMesh||typeof scene==='undefined') return r; const ud=guardianMesh.userData; if(!ud.fores) return r;
+      if(!TORCH.light){ TORCH.light=new THREE.PointLight(0xffa04a,0,14,1.2); scene.add(TORCH.light); }
+      if(!ud.torch) torchBuild(ud);
+      TORCH.k=clamp(TORCH.k+(torchWanted()?dt:-dt)*1.2,0,1); const k=TORCH.k, T=ud.torch;
+      T.g.visible=k>.02; if(T.g.visible){ const s=(.4+.6*k)*1.35; T.g.scale.setScalar(s);
+        const tt=TIME, f=.82+.1*Math.sin(tt*17)+.08*Math.sin(tt*29+1.3);
+        T.fl.scale.set(1,f*(.9+.1*Math.sin(tt*11)),1); T.outer.rotation.y=tt*3; T.gl.material.opacity=.7*f*k; T.gl.scale.setScalar(1.6*f);
+        // hold the torch up and forward
+        ud.arms[0].rotation.x=lerp(ud.arms[0].rotation.x,-.75,k*.8); ud.fores[0].rotation.x=lerp(ud.fores[0].rotation.x,-.5,k*.8);
+        T.fl.getWorldPosition(TORCH.light.position); TORCH.light.intensity=k*3.4*f; }
+      else TORCH.light.intensity=0;
+    }catch(e){} return r; }; }
+/* =========================================================
    AUDIO — procedural music, ambience and creature voices
    (reverb bus, chord pads, bells, spatial voices)
    ========================================================= */
@@ -7976,7 +8008,7 @@ function updateBanner(){ if(document.getElementById('updBar')) return; const d=d
 /* =========================================================
    DIAGNOSTICS — performance readout, error capture, problem report
    ========================================================= */
-const GAME_VERSION='0.8.3';
+const GAME_VERSION='0.8.4';
 const DIAG={errors:[],trail:[],fps:[],show:false,acc:0,n:0,el:null,minFps:999};
 window.addEventListener('error',ev=>{ DIAG.errors.push(`${new Date().toLocaleTimeString()} ${ev.message} @${(ev.filename||'').split('/').pop()}:${ev.lineno}`); if(DIAG.errors.length>15) DIAG.errors.shift(); });
 window.addEventListener('unhandledrejection',ev=>{ DIAG.errors.push(`${new Date().toLocaleTimeString()} promise: ${ev.reason&&ev.reason.message||ev.reason}`); if(DIAG.errors.length>15) DIAG.errors.shift(); });
