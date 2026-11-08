@@ -11,7 +11,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
-<title>Echo Garden v0.9.0</title>
+<title>Echo Garden v0.9.2</title>
 <style>
 [hidden]{display:none!important}
 
@@ -892,6 +892,22 @@ h1,h2,h3,.ph h2,.dk span,.pill b{font-family:var(--f-display);font-weight:900;le
 /* left-handed: game buttons on the left */
 #app.lefty #miniBtns{right:auto;left:max(14px,env(safe-area-inset-left,0px))}
 #app.lefty #foodBtn{right:auto!important;left:max(12px,env(safe-area-inset-left,0px))!important}
+
+/* v0.9.1 Decorate mode */
+#ui.deco #dock,#ui.deco #slotRail,#ui.deco #quest,#ui.deco #nextStep,#ui.deco #foodBtn,#ui.deco #foodBar,#ui.deco #coach,#ui.deco #camReset{display:none!important}
+#decoBar{position:absolute;left:50%;transform:translateX(-50%);bottom:calc(8px + env(safe-area-inset-bottom,0px));z-index:25;width:min(720px,calc(100% - 24px));max-height:52vh;overflow:auto;padding:8px 10px;border-radius:18px;background:var(--glass-2);border:1px solid rgba(255,244,224,.16);box-shadow:0 14px 36px rgba(0,0,0,.45);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);display:flex;flex-direction:column;gap:6px;animation:flyIn .22s cubic-bezier(.22,1,.36,1)}
+#decoBar .db-top{display:flex;align-items:baseline;gap:8px;padding:0 4px} #decoBar .db-top b{font-size:14px} #decoBar .db-top span{font-size:11px;color:var(--muted)} #decoBar .db-beauty{margin-left:auto;color:#ffd34a!important;font-weight:700}
+#decoBar .db-row{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.dbb{min-width:40px;height:38px;border-radius:12px;border:1px solid rgba(255,244,224,.16);background:rgba(255,255,255,.06);color:var(--text);font:inherit;font-size:16px;font-weight:800}
+.dbb.wide{flex:1 1 auto;font-size:12px;padding:0 10px} .dbb.on{background:rgba(243,199,101,.22);border-color:#f3c765;color:#ffe08a} .dbb.pri{background:linear-gradient(#ffe08a,#f3c765);color:#2a1a08;border-color:#f3c765} .dbb[disabled]{opacity:.4}
+#decoBar input[type=range]{flex:1 1 120px;accent-color:#f3c765}
+.db-paint{display:flex;flex-direction:column;gap:5px;padding:6px;border-radius:12px;background:rgba(0,0,0,.18)}
+.db-parts{display:flex;gap:5px;flex-wrap:wrap} .dbp{display:flex;align-items:center;gap:5px;height:30px;padding:0 10px;border-radius:999px;border:1px solid rgba(255,244,224,.16);background:rgba(255,255,255,.05);color:var(--text);font:inherit;font-size:11px;font-weight:700}
+.dbp.on{border-color:#f3c765;background:rgba(243,199,101,.18)} .dbp i{width:14px;height:14px;border-radius:50%;border:1px solid rgba(255,255,255,.4)}
+.db-sw{display:flex;align-items:center;gap:6px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}
+.db-sets{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none} .dbs{flex:0 0 auto;height:26px;padding:0 10px;border-radius:999px;border:1px solid rgba(255,244,224,.14);background:rgba(255,255,255,.04);color:var(--muted);font:inherit;font-size:11px;font-weight:700} .dbs.on{color:var(--text);border-color:#f3c765;background:rgba(243,199,101,.16)} .dbs.lk::after{content:' 🔒';font-size:9px} .db-styles{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:2px 0} .dbst{flex:0 0 auto;display:flex;flex-direction:column;align-items:flex-start;gap:1px;padding:6px 10px;border-radius:12px;border:1px solid rgba(255,244,224,.14);background:rgba(255,255,255,.04);color:var(--text);font:inherit;font-size:12px} .dbst span{font-size:10px;color:var(--muted)} .dbst.on{border-color:#f3c765;background:rgba(243,199,101,.16)} .dbst.lk b::after{content:' 🔒';font-size:9px}
+.pw{width:26px;height:26px;border-radius:50%;border:2px solid rgba(255,255,255,.25);background:var(--c);position:relative} .pw.on{border-color:#fff;box-shadow:0 0 0 2px #f3c765}
+.pw.lk{opacity:.55} .pw.lk::after{content:'🔒';position:absolute;inset:0;display:grid;place-items:center;font-size:10px}
 
 </style>
 <div id="app">
@@ -6590,6 +6606,18 @@ const STARTER_INV={apple:6,sunpear:2,seed_apple:2,seed_dashberry:1,ess_speed:1,e
 { const _sg=seedNewGame; seedNewGame=function(){ const r=_sg.apply(this,arguments); if(S) S.inv080=1; return r; }; }
 /* ---------- what's new: shown once after each update ---------- */
 const CHANGELOG={
+  '0.9.2':[
+    ['🏠','New styles','In Decorate, pick something and tap Style to change how it looks, not just its colour.'],
+    ['🪑','Benches','Log bench, garden bench, stone slab or white iron. The park bench toy can change too.'],
+    ['🔥','Campfire and plots','The campfire can have a stone, brick, log or iron fire pit ring. Tree plots can have wooden posts, a white picket fence, a stone wall or a little hedge.'],
+    ['🏫','Archway and Kindergarten','The archway comes in flowers, white marble, mossy stone or iron swirl. The Kindergarten can be a classic school, a thatched cottage, a log cabin or a little castle.'],
+    ['✦','Unlock once','Each style is unlocked once with Sparks and then works in every garden. Undo works on style changes too.']],
+  '0.9.1':[
+    ['🛠️','Decorate your garden','Garden → Decorate. Tap anything to pick it up, drag to move it, and turn it with the buttons or two fingers. Snap, Undo and Reset are there if you need them.'],
+    ['🌳','Move almost everything','Furniture, toys, the Toy Box, tree plots (planted trees come too), the campfire, benches, the archway and the Kindergarten. Each garden keeps its own layout. Ponds, waterfalls and fountains stay put.'],
+    ['🎨','Paint','Recolour furniture, benches, the campfire, plot borders, the archway and the Kindergarten. Eight free colours, plus Pastel, Woodland, Sunset, Midnight, Royal Gold and seasonal sets to unlock.'],
+    ['➕','More tree plots','Add up to three extra plots per garden from Decorate.'],
+    ['⭐','Garden beauty','A beauty rating in Decorate rises as you add furniture, variety, paint and grown trees. Echos come over to look when you change something.']],
   '0.9.0':[
     ['🐾','Echos with lives of their own','Morning stretches, evenings round the campfire, puddle jumping in the rain, snowball fights, shy Echos hiding, energetic ones zooming about, friends sharing fruit, and Echos bringing you a toy to play.'],
     ['🧭','A next-step card','When there\'s no story goal, a card shows the most useful thing to do next. Tap it to go there. First-time games show a slower demo.'],
@@ -8498,6 +8526,215 @@ function feelAdv(){ const M=MG, F=feel(); if(!M) return; if(M.lvS) M.lvS*=F.spd;
     return h.replace('<div class="list">',`<div class="list"><div class="li"><div class="tx"><b>Game feel</b><span>Relaxed: slower adventures, an extra heart, weaker bosses, wider timing in training. Tricky: the opposite.</span></div><div class="row" style="gap:4px">${Object.keys(FEEL).map(k=>`<button class="btn sm ${cur===k?'pri':''}" data-feel="${k}">${FEEL[k].lab}</button>`).join('')}</div></div>`); }; }
 document.addEventListener('click',ev=>{ const b=ev.target.closest('[data-feel]'); if(!b||!S) return; ev.stopPropagation(); S.settings.feel=b.dataset.feel; refreshPanel(); saveGame(); SND.ui&&SND.ui(); toast(`Game feel: ${FEEL[S.settings.feel].lab}`); },true);
 /* =========================================================
+   v0.9.1 — Decorate mode
+   Move and turn furniture, toys, the Toy Box, tree plots (trees come
+   along), the campfire and benches, the archway and the Kindergarten.
+   Paint furniture and buildings. Each garden keeps its own layout.
+   Ponds, waterfalls and fountains stay put (fishing and swimming need them).
+   ========================================================= */
+const DECO={on:false,sel:null,drag:null,undo:[],snap:false,camPrev:null,items:[],benchN:0,buildId:null,two:null};
+const PLOT_EXTRA_COST=[2500,4000,6000], PLOT_MAX=9;
+function layOf(g){ S.lay=S.lay||{}; return S.lay[g||S.garden]||(S.lay[g||S.garden]={}); }
+function layGet(key,def){ if(!S) return def; const L=layOf(DECO.buildId||S.garden); return L[key]?Object.assign({},def,L[key]):def; }
+/* ---------- builders read the saved layout ---------- */
+{ const _cw=clearWorld; clearWorld=function(){ const r=_cw.apply(this,arguments); try{ if(!S) return r; const L=layOf(DECO.buildId||S.garden); const base=PLOTS.map(p=>({x:p[0],z:p[1]}));
+      const src=L.plots&&L.plots.length>=base.length?L.plots:base; WORLD.plots=src.map(p=>({x:p.x,z:p.z,rot:p.rot||0})); }catch(e){ console.warn(e); } return r; }; }
+{ const _pb=buildPlotBed; buildPlotBed=function(p,i,id){ const r=_pb.apply(this,arguments); const g=world.children[world.children.length-1]; if(g){ if(p.rot) g.rotation.y=p.rot; DECO.items.push({kind:'plot',key:'plot'+i,i,obj:g,r:1.4,name:'Tree plot'}); } return r; }; }
+{ const _cf=campfire; campfire=function(x,z,sc){ const L=layGet('fire',{x,z,rot:0}); const g=_cf.call(this,L.x,L.z,sc); if(g){ g.rotation.y=L.rot||0; DECO.items.push({kind:'fire',key:'fire',obj:g,r:1.3,name:'Campfire',paint:true}); } return g; }; }
+{ const _bn=bench; bench=function(x,z,ry){ const key='bench'+(DECO.benchN++); const L=layGet(key,{x,z,rot:ry}); const r=_bn.call(this,L.x,L.z,L.rot); const g=world.children[world.children.length-1]; if(g) DECO.items.push({kind:'bench',key,obj:g,r:1,name:'Bench',paint:true}); return r; }; }
+{ const _ar=arch; arch=function(x,z,ry,hero,dark){ const L=layGet('arch',{x,z,rot:ry}); const r=_ar.call(this,L.x,L.z,L.rot,hero,dark); const g=world.children[world.children.length-1]; if(g) DECO.items.push({kind:'arch',key:'arch',obj:g,r:1.8,name:'Archway',paint:true}); return r; }; }
+{ const _sa=schoolAt; schoolAt=function(){ const A=_sa.apply(this,arguments); const L=layOf(DECO.buildId||S.garden).school; return L?Object.assign({},A,{x:L.x,z:L.z,rot:L.rot}):A; }; }
+schoolSpot=function(){ const A=schoolAt(); return {x:A.x,z:A.z}; };
+{ const _bg=buildGarden; buildGarden=function(id){ DECO.items=[]; DECO.benchN=0; DECO.buildId=id; let r; try{ r=_bg.apply(this,arguments); } finally{ DECO.buildId=null; }
+    try{ if(SCHOOL&&SCHOOL.mesh){ const A=schoolAt(); if(A.rot!=null){ SCHOOL.mesh.rotation.y=A.rot; } const f=SCHOOL.mesh.rotation.y; SCHOOL.x=A.x+Math.sin(f)*1.9*A.k; SCHOOL.z=A.z+Math.cos(f)*1.9*A.k; DECO.items.push({kind:'school',key:'school',obj:SCHOOL.mesh,r:1.7*A.k,name:'Kindergarten',paint:true}); }
+      for(const it of DECO.items) paintApply(it.obj,paintKey(it)); }catch(e){ console.warn('deco',e); } return r; }; }
+// toys and furniture keep their turn and paint
+{ const _se=syncEntities; syncEntities=function(){ const r=_se.apply(this,arguments); try{ for(const y of S.toys){ if(y.garden!==S.garden||y.type==='duck') continue; const m=MESH.toy.get(y.id); if(!m) continue; m.rotation.y=y.rot||0; if(m.userData._pk!==JSON.stringify((S.paint||{})['toy:'+y.id]||null)){ paintApply(m,'toy:'+y.id); } } }catch(e){} return r; }; }
+/* ---------- paint ---------- */
+const PAINT_FREE=['#ffffff','#f3e6cf','#a8764a','#8e8a84','#e0453a','#3f7fe0','#4f9e45','#ffcf4a'];
+const PAINT_SETS={pastel:{name:'Pastel',cols:['#ffc4dc','#bdf0d6','#d8c4ff','#bfe6ff','#ffd8b8'],cost:400,cur:'sparks'},woodland:{name:'Woodland',cols:['#5e8a3e','#6b4a2a','#8fbf5a','#c0392b','#b07a48'],cost:400,cur:'sparks'},
+  sunset:{name:'Sunset',cols:['#ff7a6a','#ffb347','#ff8fb4','#8a4a9a','#f3c765'],cost:600,cur:'sparks'},midnight:{name:'Midnight',cols:['#1f2a5a','#5a3f86','#1f6a6a','#22202a','#c8ccd6'],cost:8,cur:'shards'},
+  royal:{name:'Royal Gold',cols:['#e6b84a','#a01c28','#2a4ab8','#1f7a4a','#fff6e6'],cost:12,cur:'shards'}};
+const PAINT_SEASON={0:['Spring',['#ffb8d8','#c8f0a0','#fff2a8','#b8e0ff','#ffffff']],1:['Summer',['#4fc3ff','#ffd34a','#ff7f5a','#5fdc9c','#fff0d0']],2:['Autumn',['#d8742a','#9a3a1a','#e6a23a','#6b4a2a','#c8552a']],3:['Winter',['#e8f4ff','#9fc8e8','#c0392b','#2a6a4a','#d8d0e8']]};
+function paintOwned(set){ return set==='free'||(S.paintSets||{})[set]; }
+function paintKey(it){ if(!it) return null; if(it.kind==='toy') return 'toy:'+it.id; if(it.kind==='plot') return 'plots:'+S.garden; return it.key+':'+S.garden; }
+function paintParts(obj){ const cnt=new Map(); obj.traverse(o=>{ if(!o.isMesh||!o.material||Array.isArray(o.material)) return; const m=o.userData._origMat||o.material; if(!m.color||m.transparent) return; const glow=m.emissive&&(m.emissive.r+m.emissive.g+m.emissive.b)>.08&&m.emissiveIntensity>.3; if(glow||m.isMeshBasicMaterial) return; const h='#'+m.color.getHexString(); cnt.set(h,(cnt.get(h)||0)+1); });
+  return [...cnt.entries()].sort((a,b)=>b[1]-a[1]).slice(0,3).map(e=>e[0]); }
+function paintApply(obj,key){ if(!obj||!key) return; const P=(S.paint||{})[key]||{}; obj.userData._pk=JSON.stringify((S.paint||{})[key]||null);
+  obj.traverse(o=>{ if(!o.isMesh||!o.material||Array.isArray(o.material)) return; const orig=o.userData._origMat||o.material; const h=orig.color?'#'+orig.color.getHexString():null; const want=h&&P[h];
+    if(want){ if(!o.userData._origMat){ o.userData._origMat=orig; o.material=orig.clone(); } o.material.color.set(want); } else if(o.userData._origMat){ o.material=o.userData._origMat; delete o.userData._origMat; } }); }
+/* ---------- picking what can be edited ---------- */
+function decoItems(){ const out=DECO.items.slice(); for(const y of S.toys){ if(y.garden!==S.garden||y.tmp||y.type==='duck') continue; const m=MESH.toy.get(y.id); if(m) out.push({kind:'toy',id:y.id,obj:m,r:TOYS[y.type]&&TOYS[y.type].decor?1:.7,name:TOYS[y.type]?TOYS[y.type].name:'Item',paint:true}); } return out; }
+function decoHit(cx,cy){ const r=renderer.domElement.getBoundingClientRect(); ndc.set((cx-r.left)/r.width*2-1,-((cy-r.top)/r.height)*2+1); ray.setFromCamera(ndc,camera); let best=null,bd=1e9;
+  for(const it of decoItems()){ const h=ray.intersectObject(it.obj,true); if(h.length&&h[0].distance<bd){ bd=h[0].distance; best=it; } }
+  if(!best){ const g=decoGround(cx,cy); if(g){ for(const it of decoItems()){ const p=it.obj.position; const d=Math.hypot(p.x-g.x,p.z-g.z); if(d<it.r*.7&&d<bd){ bd=d; best=it; } } } } return best; }
+const DECO_PLANE=new THREE.Plane(new THREE.Vector3(0,1,0),0), DECO_V=new THREE.Vector3();
+function decoGround(cx,cy){ const r=renderer.domElement.getBoundingClientRect(); ndc.set((cx-r.left)/r.width*2-1,-((cy-r.top)/r.height)*2+1); ray.setFromCamera(ndc,camera); return ray.ray.intersectPlane(DECO_PLANE,DECO_V)?{x:DECO_V.x,z:DECO_V.z}:null; }
+function itemPos(it){ return {x:it.obj.position.x,z:it.obj.position.z}; }
+function decoValid(it,x,z){ const lim=(['plot','school','fire','bench'].includes(it.kind)?RAD+.3:RAD+1.5)-it.r*.5; if(Math.hypot(x,z)>lim) return false;
+  const P=WORLD.pond; if(P&&Math.hypot(P.x-x,P.z-z)<P.r+it.r*.8) return false;
+  const own=it._home||itemPos(it); const mine=k=>({plot:['sign'],fire:['fire'],bench:['bench'],arch:['arch'],school:['school'],toy:[]})[it.kind]||[];
+  for(const o of WORLD.obstacles){ if(mine().includes(o.kind)&&Math.hypot(o.x-own.x,o.z-own.z)<it.r+2.4) continue; if(['sign','post'].includes(o.kind)) continue; if(Math.hypot(o.x-x,o.z-z)<o.r+it.r*.7) return false; }
+  for(const o of decoItems()){ if(o===it||o.obj===it.obj) continue; const p=itemPos(o); if(Math.hypot(p.x-x,p.z-z)<(o.r+it.r)*.95) return false; }
+  if(it.kind!=='school'&&SCHOOL&&Math.hypot(SCHOOL.x-x,SCHOOL.z-z)<it.r+.9) return false; return true; }
+/* ---------- the footprint ring ---------- */
+let DECO_RING=null;
+function decoRing(it,ok){ if(!DECO_RING){ DECO_RING=new THREE.Mesh(new THREE.RingGeometry(.92,1,48),new THREE.MeshBasicMaterial({color:0x9fe8a8,transparent:true,opacity:.85,depthWrite:false,side:THREE.DoubleSide})); DECO_RING.rotation.x=-Math.PI/2; DECO_RING.renderOrder=5; scene.add(DECO_RING); }
+  if(!it){ DECO_RING.visible=false; return; } DECO_RING.visible=true; const p=itemPos(it); DECO_RING.position.set(p.x,.08,p.z); DECO_RING.scale.setScalar(it.r); DECO_RING.material.color.set(ok===false?'#ff6a5a':'#9fe8a8'); }
+/* ---------- entering and leaving ---------- */
+function decoOpen(sel){ if(MG||CINE) return; closePopup(); closePanel(); if(typeof closeFly==='function') closeFly(); if(CARE) closeCare(); DECO.on=true; DECO.undo=[]; DECO.camPrev={dist:CAM.dist,pol:CAM.pol,free:CAM.free}; CAM.auto=false; CAM.free=true; CAM.pol=.82; CAM.dist=Math.max(CAM.dist,22);
+  $('#ui').classList.add('deco'); decoBar(); if(sel) decoSelect(sel); else decoSelect(null); S.seenDeco=S.seenDeco||0; if(S.seenDeco<2){ S.seenDeco++; toast('Tap something to pick it up. Drag to move it.','good'); } SND.ui&&SND.ui(); }
+function decoClose(){ DECO.on=false; DECO.sel=null; DECO.drag=null; decoRing(null); $('#ui').classList.remove('deco'); const b=$('#decoBar'); if(b) b.remove(); if(DECO.camPrev){ CAM.pol=DECO.camPrev.pol; CAM.dist=DECO.camPrev.dist; } saveGame(); toast('Garden saved','good'); decoBeauty(true); }
+function decoSelect(it){ if(it!==DECO.sel) DECO.paintOpen=false; DECO.sel=it; if(it) it._home=itemPos(it); decoRing(it,true); decoBar(); }
+/* ---------- moving ---------- */
+function decoSnapshot(){ return JSON.stringify({lay:S.lay&&S.lay[S.garden]||null,toys:S.toys.filter(y=>y.garden===S.garden).map(y=>[y.id,y.x,y.z,y.rot||0]),paint:S.paint||{}}); }
+function decoPush(){ DECO.undo.push(decoSnapshot()); if(DECO.undo.length>30) DECO.undo.shift(); }
+function decoRestore(snap){ const d=JSON.parse(snap); S.lay=S.lay||{}; if(d.lay) S.lay[S.garden]=d.lay; else delete S.lay[S.garden]; for(const [id,x,z,rot] of d.toys){ const y=S.toys.find(q=>q.id===id); if(y){ y.x=x; y.z=z; y.rot=rot; const m=MESH.toy.get(id); if(m) m.position.set(x,0,z); } } S.paint=d.paint; decoRebuild(); }
+function decoRebuild(){ const keepSel=DECO.sel&&{kind:DECO.sel.kind,key:DECO.sel.key,id:DECO.sel.id}; buildGarden(S.garden); for(const [id,m] of MESH.plot){ ents.remove(m); MESH.plot.delete(id); } for(const [id,m] of MESH.tree) m.userData.key=''; syncEntities();
+  if(keepSel){ const it=decoItems().find(o=>o.kind===keepSel.kind&&(o.key===keepSel.key)&&(o.id===keepSel.id)); decoSelect(it||null); } }
+function decoMoveVisual(it,x,z){ it.obj.position.x=x; it.obj.position.z=z; if(it.kind==='plot'){ const pm=MESH.plot.get(it.i); if(pm) pm.position.set(x,0,z); for(const t of S.trees){ if(t.garden===S.garden&&t.plot===it.i){ const tm=MESH.tree.get(t.id); if(tm) tm.position.set(x,0,z); } } } }
+function decoCommit(it){ const p=itemPos(it), rot=it.obj.rotation.y; const L=layOf();
+  if(it.kind==='toy'){ const y=S.toys.find(q=>q.id===it.id); if(y){ y.x=p.x; y.z=p.z; y.rot=rot; } }
+  else if(it.kind==='plot'){ L.plots=WORLD.plots.map((q,i)=>i===it.i?{x:p.x,z:p.z,rot}:{x:q.x,z:q.z,rot:q.rot||0}); }
+  else L[it.key]={x:p.x,z:p.z,rot};
+  if(it.kind!=='toy') decoRebuild(); else { decoRing(it,true); syncEntities(); } decoNotice(p); saveGame(); }
+function decoNotice(p){ const near=gardenEchoes().filter(e=>!e.lesson&&onFeet(e)).sort((a,b)=>Math.hypot(a.pos.x-p.x,a.pos.z-p.z)-Math.hypot(b.pos.x-p.x,b.pos.z-p.z))[0]; if(!near||Math.random()<.4) return; const rt=rtOf(near); if(!['idle','walk','wander','explore'].includes(rt.state)) return; const a=Math.random()*6.28; rt.state='walk'; rt.tx=p.x+Math.cos(a)*1.6; rt.tz=p.z+Math.sin(a)*1.6; rt.timer=7; setTimeout(()=>{ try{ fx('q',{x:near.pos.x,y:1.2,z:near.pos.z},{vy:.6,size:.3}); }catch(e){} },2200); }
+document.addEventListener('pointerdown',ev=>{ if(!DECO.on||ev.target.id!=='gl') return; const ps=DECO.pts||(DECO.pts=new Map()); ps.set(ev.pointerId,{x:ev.clientX,y:ev.clientY});
+  if(ps.size===2&&DECO.sel){ const [a,b]=[...ps.values()]; DECO.two={a0:Math.atan2(b.y-a.y,b.x-a.x),r0:DECO.sel.obj.rotation.y}; DECO.drag=null; ev.stopPropagation(); return; }
+  const it=decoHit(ev.clientX,ev.clientY); if(!it){ return; } ev.stopPropagation(); ev.preventDefault(); if(DECO.sel!==it||!DECO.sel) decoSelect(it); const g=decoGround(ev.clientX,ev.clientY); const p=itemPos(it); DECO.drag={it,ox:g?p.x-g.x:0,oz:g?p.z-g.z:0,moved:false,id:ev.pointerId,sx:ev.clientX,sy:ev.clientY}; },true);
+document.addEventListener('pointermove',ev=>{ if(!DECO.on) return; const ps=DECO.pts; if(ps&&ps.has(ev.pointerId)) ps.set(ev.pointerId,{x:ev.clientX,y:ev.clientY});
+  if(DECO.two&&DECO.sel&&ps&&ps.size===2){ const [a,b]=[...ps.values()]; const ang=Math.atan2(b.y-a.y,b.x-a.x); DECO.sel.obj.rotation.y=DECO.two.r0-(ang-DECO.two.a0); ev.stopPropagation(); return; }
+  const D=DECO.drag; if(!D||D.id!==ev.pointerId) return; ev.stopPropagation(); if(!D.moved&&Math.hypot(ev.clientX-D.sx,ev.clientY-D.sy)<6) return; if(!D.moved){ D.moved=true; decoPush(); }
+  const g=decoGround(ev.clientX,ev.clientY); if(!g) return; let x=g.x+D.ox, z=g.z+D.oz; if(DECO.snap){ x=Math.round(x*2)/2; z=Math.round(z*2)/2; } D.ok=decoValid(D.it,x,z); decoMoveVisual(D.it,x,z); decoRing(D.it,D.ok); },true);
+document.addEventListener('pointerup',ev=>{ if(!DECO.on) return; const ps=DECO.pts; if(ps) ps.delete(ev.pointerId);
+  if(DECO.two){ if(!ps||ps.size<2){ const it=DECO.sel; DECO.two=null; if(it){ decoPush(); if(DECO.snap) it.obj.rotation.y=Math.round(it.obj.rotation.y/(Math.PI/4))*(Math.PI/4); decoCommit(it); } } ev.stopPropagation(); return; }
+  const D=DECO.drag; if(!D||D.id!==ev.pointerId) return; DECO.drag=null; ev.stopPropagation(); if(!D.moved) return;
+  if(D.ok===false){ const h=D.it._home; decoMoveVisual(D.it,h.x,h.z); DECO.undo.pop(); decoRing(D.it,true); toast('It doesn\'t fit there','warn'); SND.hit&&SND.hit(); return; }
+  D.it._home=itemPos(D.it); SND.pop&&SND.pop(); decoCommit(D.it); },true);
+{ const _ht=handleTap; handleTap=function(){ if(DECO.on) return; return _ht.apply(this,arguments); }; }
+/* ---------- the toolbar ---------- */
+function decoBar(){ let b=$('#decoBar'); if(!b){ b=document.createElement('div'); b.id='decoBar'; $('#ui').appendChild(b); }
+  const it=DECO.sel; const L=layOf(); const extra=Math.max(0,WORLD.plots.length-PLOTS.length); const cost=PLOT_EXTRA_COST[Math.min(extra,PLOT_EXTRA_COST.length-1)];
+  const canAway=it&&it.kind==='toy'; const rotDeg=it?Math.round(((it.obj.rotation.y*180/Math.PI)%360+360)%360):0;
+  b.innerHTML=`<div class="db-top"><b>${it?esc(it.name):'Decorate'}</b><span>${it?'Drag to move · two fingers to turn':'Tap anything to pick it up'}</span><span class="db-beauty">${decoBeauty()}</span></div>
+    ${it?`<div class="db-row"><button class="dbb" data-deco="left" aria-label="Turn left">↺</button><input type="range" min="0" max="359" value="${rotDeg}" data-deco-rot aria-label="Turn"><button class="dbb" data-deco="right" aria-label="Turn right">↻</button>${it.paint?`<button class="dbb wide ${DECO.paintOpen?'on':''}" data-deco="paint">🎨 Paint</button>`:''}${canAway?`<button class="dbb wide" data-deco="away">Put away</button>`:''}<button class="dbb wide" data-deco="done-sel">✓</button></div>`:''}
+    ${it&&DECO.paintOpen?decoPaintUI(it):''}
+    <div class="db-row"><button class="dbb wide" data-deco="undo" ${DECO.undo.length?'':'disabled'}>Undo</button><button class="dbb wide ${DECO.snap?'on':''}" data-deco="snap">Snap ${DECO.snap?'on':'off'}</button>${WORLD.plots.length<PLOT_MAX?`<button class="dbb wide" data-deco="plot">+ Plot ✦ ${cost}</button>`:''}<button class="dbb wide" data-deco="reset">Reset</button><button class="dbb pri wide" data-deco="done">Done</button></div>`; }
+function decoPaintUI(it){ const key=paintKey(it); const parts=paintParts(it.obj); const P=(S.paint||{})[key]||{}; DECO.part=parts.includes(DECO.part)?DECO.part:parts[0];
+  const names=['Main','Trim','Detail']; const seasonSet='season'+S.time.season; const season=PAINT_SEASON[S.time.season];
+  const sets=[['free','Free',PAINT_FREE]].concat(Object.entries(PAINT_SETS).map(([k,s])=>[k,s.name,s.cols]),[[seasonSet,season[0],season[1]]]); const cur=sets.find(x=>x[0]===DECO.pset)||sets[0]; DECO.pset=cur[0];
+  const own=paintOwned(cur[0]); const price=cur[0]==='free'?'':PAINT_SETS[cur[0]]?`${PAINT_SETS[cur[0]].cur==='sparks'?'✦':'◆'} ${PAINT_SETS[cur[0]].cost}`:'✦ 500';
+  return `<div class="db-paint"><div class="db-parts">${parts.map((h,i)=>`<button class="dbp ${DECO.part===h?'on':''}" data-part="${h}"><i style="background:${P[h]||h}"></i>${names[i]}</button>`).join('')}<button class="dbp" data-paint="reset">Original</button></div>
+    <div class="db-sets">${sets.map(([k,n])=>`<button class="dbs ${k===cur[0]?'on':''} ${paintOwned(k)?'':'lk'}" data-pset="${k}">${n}</button>`).join('')}</div>
+    <div class="db-sw">${cur[2].map(c=>`<button class="pw ${P[DECO.part]===c?'on':''} ${own?'':'lk'}" style="--c:${c}" data-paint="${c}" data-set="${cur[0]}" aria-label="Colour"></button>`).join('')}${own?'':`<button class="dbb wide" data-buyset="${cur[0]}">Unlock ${price}</button>`}</div></div>`; }
+function decoBuySet(set){ const s=PAINT_SETS[set]||(set.startsWith('season')?{name:PAINT_SEASON[+set.slice(6)][0]+' colours',cost:500,cur:'sparks'}:null); if(!s) return;
+  const have=s.cur==='sparks'?S.sparks:S.shards; confirmModal(`Buy ${s.name}?`,`Unlocks ${s.name.toLowerCase().includes('colours')?'these':'all five '+s.name} colours for every item in every garden.`,`Buy ${s.cur==='sparks'?'✦':'◆'} ${s.cost}`,()=>{ if(have<s.cost) return toast(`Not enough ${s.cur==='sparks'?'Sparks':'Shards'}`,'warn'); if(s.cur==='sparks') S.sparks-=s.cost; else S.shards-=s.cost; S.paintSets=S.paintSets||{}; S.paintSets[set]=1; SND.buy&&SND.buy(); renderHUD(); decoBar(); saveGame(); toast(`${s.name} unlocked`,'good'); }); }
+document.addEventListener('click',ev=>{ if(!DECO.on) return; const b=ev.target.closest('[data-deco],[data-paint],[data-part],[data-pset],[data-buyset]'); if(!b) return; ev.stopPropagation(); const a=b.dataset.deco, it=DECO.sel;
+  if(b.dataset.pset){ DECO.pset=b.dataset.pset; decoBar(); return; } if(b.dataset.buyset){ return decoBuySet(b.dataset.buyset); }
+  if(b.dataset.part){ DECO.part=b.dataset.part; decoBar(); return; }
+  if(b.dataset.paint){ if(!it) return; const key=paintKey(it); S.paint=S.paint||{}; if(b.dataset.paint==='reset'){ decoPush(); delete S.paint[key]; } else { const set=b.dataset.set; if(!paintOwned(set)) return decoBuySet(set); decoPush(); S.paint[key]=Object.assign({},S.paint[key]||{},{[DECO.part]:b.dataset.paint}); }
+    if(it.kind==='plot'){ for(const o of DECO.items) if(o.kind==='plot') paintApply(o.obj,key); } else paintApply(it.obj,key); SND.ui&&SND.ui(); decoBar(); saveGame(); return; }
+  if(a==='done') return decoClose();
+  if(a==='done-sel'){ DECO.paintOpen=false; return decoSelect(null); }
+  if(a==='left'||a==='right'){ if(!it) return; decoPush(); it.obj.rotation.y+=(a==='left'?1:-1)*Math.PI/4; if(DECO.snap) it.obj.rotation.y=Math.round(it.obj.rotation.y/(Math.PI/4))*(Math.PI/4); decoCommit(it); decoBar(); return; }
+  if(a==='paint'){ DECO.paintOpen=!DECO.paintOpen; decoBar(); return; }
+  if(a==='away'&&it&&it.kind==='toy'){ decoPush(); const y=S.toys.find(q=>q.id===it.id); if(y){ S.toys=S.toys.filter(q=>q!==y); if(TOYS[y.type]&&!TOYS[y.type].decor&&typeof ownsToyBox==='function'&&ownsToyBox()) (S.toybox=S.toybox||[]).push(y.type); else addInv(toyItemId(y.type)); syncEntities(); toast(`${TOYS[y.type].name} put away`,'good'); } decoSelect(null); saveGame(); return; }
+  if(a==='undo'){ const s=DECO.undo.pop(); if(s) decoRestore(s); decoBar(); return; }
+  if(a==='snap'){ DECO.snap=!DECO.snap; decoBar(); return; }
+  if(a==='reset'){ return confirmModal('Reset this garden\'s layout?','The plots, campfire, benches, archway and Kindergarten go back to where they started. Your furniture and toys stay where they are.','Reset',()=>{ decoPush(); const L=layOf(); for(const k of Object.keys(L)) delete L[k]; decoSelect(null); decoRebuild(); saveGame(); }); }
+  if(a==='plot'){ const extra=Math.max(0,WORLD.plots.length-PLOTS.length), cost=PLOT_EXTRA_COST[Math.min(extra,PLOT_EXTRA_COST.length-1)]; if(S.sparks<cost) return toast('Not enough Sparks','warn');
+    const g=decoGround(innerWidth/2,innerHeight*.45)||{x:0,z:0}; let spot=null; for(let r=0;r<10&&!spot;r+=.8) for(let k=0;k<16;k++){ const x=g.x+Math.cos(k/16*6.28)*r, z=g.z+Math.sin(k/16*6.28)*r; if(decoValid({kind:'plot',r:1.4,obj:{position:{x:99,z:99}},_home:{x:99,z:99}},x,z)){ spot={x,z}; break; } }
+    if(!spot) return toast('No room for another plot. Move some things first','warn');
+    return confirmModal('Add a tree plot?',`A new plot for another fruit tree. You can drag it wherever you like.`,`Add ✦ ${cost}`,()=>{ decoPush(); S.sparks-=cost; const L=layOf(); L.plots=WORLD.plots.map(q=>({x:q.x,z:q.z,rot:q.rot||0})).concat([{x:spot.x,z:spot.z,rot:0}]); plotState().push(L.plots.length-1); renderHUD(); decoRebuild(); const it2=decoItems().find(o=>o.kind==='plot'&&o.i===L.plots.length-1); decoSelect(it2||null); saveGame(); SND.buy&&SND.buy(); }); }
+},true);
+document.addEventListener('input',ev=>{ const r=ev.target.closest('[data-deco-rot]'); if(!r||!DECO.sel) return; DECO.sel.obj.rotation.y=(+r.value)*Math.PI/180; });
+document.addEventListener('change',ev=>{ const r=ev.target.closest('[data-deco-rot]'); if(!r||!DECO.sel) return; decoPush(); decoCommit(DECO.sel); });
+/* ---------- a simple beauty score ---------- */
+function decoBeauty(announce){ if(!S) return ''; const toys=S.toys.filter(y=>y.garden===S.garden&&!y.tmp); const decor=toys.filter(y=>TOYS[y.type]&&TOYS[y.type].decor); const kinds=new Set(toys.map(y=>y.type)).size; const painted=Object.keys(S.paint||{}).filter(k=>k.endsWith(':'+S.garden)||toys.some(y=>k==='toy:'+y.id)).length; const trees=S.trees.filter(t=>t.garden===S.garden&&t.stage>=2).length;
+  const score=Math.min(100,decor.length*6+kinds*4+painted*5+trees*4); const stars=score>=85?5:score>=60?4:score>=40?3:score>=20?2:1; if(announce&&stars>((S.beautyBest||{})[S.garden]||0)){ S.beautyBest=S.beautyBest||{}; S.beautyBest[S.garden]=stars; if(stars>=2) toast(`Garden beauty ${'★'.repeat(stars)}`,'gold'); }
+  return `Beauty ${'★'.repeat(stars)}${'☆'.repeat(5-stars)}`; }
+/* ---------- ways in ---------- */
+{ const _fl=FLY.care; FLY.care=function(){ const L=_fl.apply(this,arguments); L.splice(4,0,{act:'deco',ic:'dress',t:'Decorate',s:'Move, turn and paint'}); return L; }; }
+document.addEventListener('click',ev=>{ const a=ev.target.closest('[data-flyact="deco"]'); if(!a||!S) return; ev.stopPropagation(); closeFly(); decoOpen(); },true);
+// the item popup's Move opens Decorate with that item picked up
+{ const _pa=popupAction; popupAction=function(act,v){ const P=UI.popup; if(P&&P.kind==='toy'&&act==='toymove'){ const id=P.id; closePopup(); decoOpen(); const it=decoItems().find(o=>o.kind==='toy'&&o.id===id); if(it) decoSelect(it); return; }
+    if(P&&P.kind==='tree'&&act==='move'){ const t=S.trees.find(x=>x.id===P.id); closePopup(); decoOpen(); const it=t&&decoItems().find(o=>o.kind==='plot'&&o.i===t.plot); if(it) decoSelect(it); return; } return _pa.apply(this,arguments); }; }
+{ const _rp=renderPopup; renderPopup=function(){ const r=_rp.apply(this,arguments); try{ const P=UI.popup, el=$('#popup'); if(!P||!el) return r; if(P.kind==='toy'){ el.querySelectorAll('[data-act="toymove"]').forEach(b=>{ const s=b.querySelector('span')||b; if(s.textContent.trim()==='Move here') s.textContent='Move & turn'; }); }
+      if(P.kind==='tree'&&!el.querySelector('[data-act="move"]')){ const acts=el.querySelector('.pop-acts'); if(acts) acts.insertAdjacentHTML('beforeend',tile('move','back','Move tree')); } }catch(e){} return r; }; }
+// leaving the garden view closes Decorate
+{ const _om=openMini; openMini=function(){ if(DECO.on) decoClose(); return _om.apply(this,arguments); }; }
+{ const _sg=switchGarden; switchGarden=function(){ if(DECO.on) decoClose(); return _sg.apply(this,arguments); }; }
+/* =========================================================
+   v0.9.1 — style swaps in Decorate
+   Change the model, not just the colour: benches, the campfire,
+   plot borders, the archway and the Kindergarten each have styles.
+   The first style is free; the others unlock once for every garden.
+   ========================================================= */
+const STYLES={
+  bench:{log:['Log bench',0],garden:['Garden bench',300],stone:['Stone slab',400],white:['White iron',500]},
+  fire:{stone:['Stone ring',0],brick:['Brick ring',300],logs:['Log circle',300],pit:['Iron fire pit',500]},
+  plot:{posts:['Wooden posts',0],picket:['White picket',400],stone:['Stone wall',400],hedge:['Little hedge',500]},
+  arch:{wood:['Flower arch',0],white:['White marble',600],stone:['Mossy stone',500],iron:['Iron swirl',500]},
+  school:{classic:['Classic',0],cottage:['Thatched cottage',800],cabin:['Log cabin',800],castle:['Little castle',1200]}};
+function styleKind(it){ if(!it) return null; if(it.kind==='toy'){ const y=S.toys.find(q=>q.id===it.id); return y&&y.type==='parkbench'?'bench':null; } return STYLES[it.kind]?it.kind:null; }
+function styleOf(it){ const k=paintKey(it); return (S.style||{})[k]||null; }
+function styleNative(kind){ if(kind==='arch') return S.garden==='hero'?'white':S.garden==='dark'?'stone':'wood'; return Object.keys(STYLES[kind])[0]; }
+function styleOwned(kind,id){ return id===Object.keys(STYLES[kind])[0]||id===styleNative(kind)||!!(S.stylesOwned||{})[kind+':'+id]; }
+/* ---------- builders ---------- */
+const SM=()=>({wood:mat('#a8764a',{tex:'bark'}),dark:mat('#6b4a2a',{tex:'bark'}),stone:mat('#9a948a',{tex:'rock'}),stone2:mat('#7e786e',{tex:'rock'}),white:mat('#f2efe8'),iron:mat('#2a2f3a',{metalness:.5,roughness:.4}),moss:mat('#5e8a3e',{tex:'mottle'}),brick:mat('#b5553a',{tex:'rock'}),brick2:mat('#9a4430',{tex:'rock'}),straw:mat('#d8b46a',{tex:'mottle'}),leaf:mat('#4a9c52',{tex:'mottle'})});
+function clearKids(g){ for(const c of [...g.children]) if(!c.isLight) g.remove(c); }
+function buildBenchStyle(g,style,seatY){ const M=SM(), y=seatY||.3, L=1.8;
+  if(style==='garden'){ for(let i=0;i<3;i++) g.add(mesh(GEO.box,M.wood,[L,.06,.15],[0,y,-.17+i*.17])); for(let i=0;i<2;i++) g.add(mesh(GEO.box,M.wood,[L,.12,.05],[0,y+.25+i*.17,-.3])); for(const sx of [-.78,.78]){ g.add(mesh(GEO.box,M.dark,[.07,y,.5],[sx,y/2,0])); g.add(mesh(GEO.box,M.dark,[.07,.5,.07],[sx,y+.25,-.3])); } }
+  else if(style==='stone'){ g.add(mesh(GEO.box,M.stone,[L,.14,.5],[0,y,0])); for(const sx of [-.65,.65]) g.add(mesh(GEO.box,M.stone2,[.3,y,.42],[sx,y/2,0])); g.add(mesh(GEO.ico,M.moss,[.22,.08,.18],[.5,y+.08,.1])); }
+  else if(style==='white'){ for(let i=0;i<4;i++) g.add(mesh(GEO.box,M.white,[L,.04,.09],[0,y,-.18+i*.12])); for(let i=0;i<3;i++) g.add(mesh(GEO.box,M.white,[L,.04,.04],[0,y+.18+i*.12,-.3])); for(const sx of [-.82,.82]){ g.add(mesh(GEO.cyl,M.white,[.03,y,.03],[sx,y/2,.18])); g.add(mesh(GEO.cyl,M.white,[.03,y+.5,.03],[sx,(y+.5)/2,-.3])); g.add(mesh(new THREE.TorusGeometry(.12,.02,6,16,Math.PI),M.white,[1,1,1],[sx,y+.18,0],[0,Math.PI/2,0])); } }
+  else { g.add(mesh(GEO.cyl,M.wood,[.28,L,.28],[0,y,0],[0,0,Math.PI/2])); for(const sx of [-.7,.7]) g.add(mesh(GEO.box,M.dark,[.12,y,.4],[sx,y/2,0])); }
+  g.traverse(o=>{ if(o.isMesh){ o.castShadow=true; o.receiveShadow=true; } }); }
+function styleFire(g,style){ const M=SM(); for(const c of g.children) if(c.isMesh&&c.geometry&&c.geometry.type==='DodecahedronGeometry') c.visible=false;
+  if(style==='brick'){ for(let i=0;i<14;i++){ const a=i/14*6.28; g.add(mesh(GEO.box,i%2?M.brick:M.brick2,[.22,.14,.13],[Math.cos(a)*.64,.07,Math.sin(a)*.64],[0,-a,0])); g.add(mesh(GEO.box,i%2?M.brick2:M.brick,[.22,.14,.13],[Math.cos(a+.22)*.64,.21,Math.sin(a+.22)*.64],[0,-a-.22,0])); } }
+  else if(style==='logs'){ for(let i=0;i<8;i++){ const a=i/8*6.28; g.add(mesh(GEO.cyl,M.dark,[.1,.5,.1],[Math.cos(a)*.66,.1,Math.sin(a)*.66],[Math.PI/2,0,-a])); } }
+  else if(style==='pit'){ g.add(mesh(new THREE.CylinderGeometry(.75,.45,.32,20,1,true),M.iron,[1,1,1],[0,.32,0])); g.add(mesh(new THREE.CylinderGeometry(.46,.46,.04,20),M.iron,[1,1,1],[0,.17,0])); for(let i=0;i<3;i++){ const a=i/3*6.28; g.add(mesh(GEO.cyl,M.iron,[.04,.2,.04],[Math.cos(a)*.48,.08,Math.sin(a)*.48])); } g.add(mesh(new THREE.TorusGeometry(.75,.035,6,24),M.iron,[1,1,1],[0,.48,0],[Math.PI/2,0,0])); }
+  else for(const c of g.children) if(c.isMesh&&c.geometry&&c.geometry.type==='DodecahedronGeometry') c.visible=true; }
+function stylePlot(g,style){ const M=SM(); const border=g.children.filter(c=>c.isMesh&&(c.geometry===GEO.tor||c.geometry===GEO.box)); border.forEach(c=>c.visible=style==='posts'||!style);
+  if(style==='picket'){ for(let k=0;k<18;k++){ const a=k/18*6.28; const p=mesh(GEO.box,M.white,[.09,.38,.05],[Math.cos(a)*1.3,.22,Math.sin(a)*1.3],[0,-a,0]); g.add(p); g.add(mesh(GEO.cone,M.white,[.05,.08,.03],[Math.cos(a)*1.3,.45,Math.sin(a)*1.3],[0,-a,0])); } g.add(mesh(GEO.tor,M.white,[1.3,1.3,.6],[0,.28,0],[Math.PI/2,0,0])); }
+  else if(style==='stone'){ for(let k=0;k<16;k++){ const a=k/16*6.28; g.add(mesh(new THREE.DodecahedronGeometry(1,0),k%2?M.stone:M.stone2,[.2,.16,.18],[Math.cos(a)*1.28,.14,Math.sin(a)*1.28],[k,k*2,0])); } }
+  else if(style==='hedge'){ g.add(mesh(new THREE.TorusGeometry(1.32,.2,8,32),M.leaf,[1,1,1.3],[0,.22,0],[Math.PI/2,0,0])); for(let k=0;k<6;k++){ const a=k/6*6.28+.3; g.add(mesh(GEO.sph,mat(['#ff8fb4','#fff2a8','#ffffff'][k%3]),[.05,.05,.05],[Math.cos(a)*1.32,.42,Math.sin(a)*1.32])); } } }
+function styleSchool(g,style){ const M=SM(); const cones=g.children.filter(c=>c.isMesh&&c.geometry.type==='ConeGeometry'); const walls=g.children.filter(c=>c.isMesh&&c.geometry.type==='BoxGeometry'&&c.scale.x>2&&c.scale.y>1);
+  const add=o=>{ o.castShadow=true; o.receiveShadow=true; g.add(o); return o; };
+  if(style==='cottage'){ cones.forEach(c=>c.visible=false); g.children.filter(c=>c.isMesh&&c.geometry.type==='BoxGeometry'&&Math.abs(c.position.y-2.55)<.05).forEach(c=>c.visible=false);
+    add(mesh(new THREE.SphereGeometry(1,20,12,0,Math.PI*2,0,Math.PI/2),M.straw,[1.55,1.15,1.25],[0,1.55,0])); add(mesh(GEO.box,M.stone2,[.28,.6,.28],[.6,2.5,-.3])); add(mesh(GEO.sph,M.straw,[.2,.12,.2],[0,2.68,0])); }
+  else if(style==='cabin'){ walls.forEach(w=>{ w.material=M.wood; }); for(let i=0;i<6;i++){ add(mesh(GEO.cyl,M.dark,[.06,2.5,.06],[0,.2+i*.24,-.97],[0,0,Math.PI/2])); for(const sx of [-1.22,1.22]) add(mesh(GEO.cyl,M.dark,[.06,1.95,.06],[sx,.2+i*.24,0],[Math.PI/2,0,0])); } cones.forEach(c=>{ c.material=mat('#3f6a3a',{tex:'mottle'}); }); add(mesh(GEO.box,M.stone2,[.3,.9,.3],[-.75,2.3,-.4])); }
+  else if(style==='castle'){ cones.forEach(c=>c.visible=false); g.children.filter(c=>c.isMesh&&c.geometry.type==='BoxGeometry'&&Math.abs(c.position.y-2.55)<.05).forEach(c=>c.visible=false); walls.forEach(w=>{ w.material=M.stone; });
+    add(mesh(GEO.box,M.stone,[2.5,.2,2],[0,1.65,0])); for(let i=0;i<5;i++){ for(const z of [-.95,.95]) add(mesh(GEO.box,M.stone2,[.28,.26,.12],[-1.1+i*.55,1.88,z])); }
+    for(const [x,z] of [[-1.25,-.95],[1.25,-.95],[-1.25,.95],[1.25,.95]]){ add(mesh(GEO.cyl,M.stone2,[.32,2.4,.32],[x,1.2,z])); add(mesh(GEO.cone,mat('#5a4a9a'),[.42,.6,.42],[x,2.7,z])); } add(mesh(GEO.box,mat('#e0453a'),[.02,.3,.4],[1.25,3.2,-.95])); add(mesh(GEO.cyl,M.iron,[.015,.6,.015],[1.25,3.1,-.95])); } }
+// arch styles reuse the garden builder's looks where they exist
+{ const _ar=arch; arch=function(x,z,ry,hero,dark){ const st=(S.style||{})['arch:'+(DECO.buildId||S.garden)]; let h=hero,dk=dark;
+    if(st==='wood'){ h=false; dk=false; } else if(st==='white'){ h=true; dk=false; } else if(st==='stone'){ h=false; dk=true; }
+    const r=_ar.call(this,x,z,ry,h,dk); if(st==='iron'){ const g=world.children[world.children.length-1]; if(g){ clearKids(g); const M=SM(); for(const sx of [-1.6,1.6]){ g.add(mesh(GEO.cyl,M.iron,[.08,3.4,.08],[sx,1.7,0])); for(let i=0;i<4;i++) g.add(mesh(new THREE.TorusGeometry(.18,.025,6,14),M.iron,[1,1,1],[sx,.6+i*.7,0],[0,Math.PI/2,0])); }
+        const top=new THREE.Mesh(new THREE.TorusGeometry(1.6,.06,8,28,Math.PI),M.iron); top.position.y=3.4; g.add(top); const t2=new THREE.Mesh(new THREE.TorusGeometry(1.35,.03,6,24,Math.PI),M.iron); t2.position.y=3.4; g.add(t2); for(let i=0;i<9;i++){ const a=i/8*Math.PI; g.add(mesh(GEO.ico,mat('#4a9c52',{tex:'mottle'}),[.16,.12,.16],[Math.cos(a)*1.6,3.4+Math.sin(a)*1.6,0])); } } } return r; }; }
+function styleApply(it){ const kind=styleKind(it); if(!kind) return; const st=styleOf(it); const g=it.obj; if(g.userData._st===st) return; const first=g.userData._st===undefined; g.userData._st=st; if(!st&&first) return;
+  if(kind==='bench'){ if(st){ clearKids(g); buildBenchStyle(g,st,it.kind==='toy'?.5:.3); } }
+  else if(kind==='fire') styleFire(g,st);
+  else if(kind==='plot') stylePlot(g,st);
+  else if(kind==='school'&&st) styleSchool(g,st); }
+// hook into building and syncing (style first, then paint)
+{ const _pa=paintApply; paintApply=function(obj,key){ try{ const it=(DECO.items||[]).find(o=>o.obj===obj)||(key&&key.startsWith('toy:')?{kind:'toy',id:key.slice(4),obj}:null); if(it) styleApply(it); else if(key&&key.startsWith('plots:')) styleApply({kind:'plot',obj}); }catch(e){ console.warn('style',e); } return _pa.apply(this,arguments); }; }
+{ const _se=syncEntities; syncEntities=function(){ const r=_se.apply(this,arguments); try{ for(const y of S.toys){ if(y.garden!==S.garden||y.type!=='parkbench') continue; const m=MESH.toy.get(y.id); if(!m) continue; const st=(S.style||{})['toy:'+y.id]||null; if(m.userData._st!==st){ if(m.userData._st&&!st){ ents.remove(m); MESH.toy.delete(y.id); continue; } styleApply({kind:'toy',id:y.id,obj:m}); paintApply(m,'toy:'+y.id); } } }catch(e){} return r; }; }
+/* ---------- Decorate bar: a Style button and picker ---------- */
+{ const _db=decoBar; decoBar=function(){ const r=_db.apply(this,arguments); try{ const it=DECO.sel, kind=styleKind(it); const b=$('#decoBar'); if(!b||!it||!kind) return r;
+      const row=b.querySelector('.db-row'); if(row&&!row.querySelector('[data-deco="style"]')){ const pb=row.querySelector('[data-deco="paint"]'); const html=`<button class="dbb wide ${DECO.styleOpen?'on':''}" data-deco="style">🏠 Style</button>`; if(pb) pb.insertAdjacentHTML('beforebegin',html); else row.insertAdjacentHTML('beforeend',html); }
+      if(DECO.styleOpen){ const cur=styleOf(it)||styleNative(kind); const opts=Object.entries(STYLES[kind]).map(([id,[n,c]])=>{ const own=styleOwned(kind,id); return `<button class="dbst ${cur===id?'on':''} ${own?'':'lk'}" data-style="${id}"><b>${n}</b><span>${own?(cur===id?'In use':'Owned'):'✦ '+c}</span></button>`; }).join('');
+        const anchor=b.querySelector('.db-paint')||row; anchor.insertAdjacentHTML('afterend',`<div class="db-styles">${opts}</div>`); } }catch(e){ console.warn(e); } return r; }; }
+document.addEventListener('click',ev=>{ if(!DECO.on) return; const b=ev.target.closest('[data-deco="style"],[data-style]'); if(!b) return; ev.stopPropagation(); const it=DECO.sel; if(!it) return;
+  if(b.dataset.deco==='style'){ DECO.styleOpen=!DECO.styleOpen; DECO.paintOpen=false; decoBar(); return; }
+  const kind=styleKind(it), id=b.dataset.style; if(!kind) return; const set=()=>{ decoPush(); S.style=S.style||{}; const k=paintKey(it); if(id===styleNative(kind)) delete S.style[k]; else S.style[k]=id; SND.pop&&SND.pop(); if(it.kind==='toy'){ const m=MESH.toy.get(it.id); if(m){ ents.remove(m); MESH.toy.delete(it.id); } syncEntities(); const n=decoItems().find(o=>o.kind==='toy'&&o.id===it.id); if(n){ DECO.sel=null; decoSelect(n); DECO.styleOpen=true; decoBar(); } } else { decoRebuild(); DECO.styleOpen=true; decoBar(); } saveGame(); };
+  if(styleOwned(kind,id)) return set(); const [n,c]=STYLES[kind][id];
+  confirmModal(`Unlock ${n}?`,`Use this style on any ${kind==='plot'?'plot border':kind==='school'?'Kindergarten':kind} in every garden.`,`Unlock ✦ ${c}`,()=>{ if(S.sparks<c) return toast('Not enough Sparks','warn'); S.sparks-=c; S.stylesOwned=S.stylesOwned||{}; S.stylesOwned[kind+':'+id]=1; SND.buy&&SND.buy(); renderHUD(); set(); toast(`${n} unlocked`,'good'); }); },true);
+// paint and style panels are one-at-a-time; undo remembers styles too
+{ const _sel=decoSelect; decoSelect=function(it){ if(it!==DECO.sel) DECO.styleOpen=false; return _sel.apply(this,arguments); }; }
+document.addEventListener('click',ev=>{ if(DECO.on&&ev.target.closest('[data-deco="paint"]')) DECO.styleOpen=false; },true);
+{ const _snap=decoSnapshot; decoSnapshot=function(){ const d=JSON.parse(_snap.apply(this,arguments)); d.style=S.style||{}; return JSON.stringify(d); }; }
+{ const _rest=decoRestore; decoRestore=function(snap){ try{ const d=JSON.parse(snap); S.style=d.style||{}; for(const y of S.toys){ if(y.type==='parkbench'){ const m=MESH.toy.get(y.id); if(m){ ents.remove(m); MESH.toy.delete(y.id); } } } }catch(e){} return _rest.apply(this,arguments); }; }
+/* =========================================================
    AUDIO — procedural music, ambience and creature voices
    (reverb bus, chord pads, bells, spatial voices)
    ========================================================= */
@@ -8744,7 +8981,7 @@ function updateBanner(){ if(document.getElementById('updBar')) return; const d=d
 /* =========================================================
    DIAGNOSTICS — performance readout, error capture, problem report
    ========================================================= */
-const GAME_VERSION='0.9.0';
+const GAME_VERSION='0.9.2';
 const DIAG={errors:[],trail:[],fps:[],show:false,acc:0,n:0,el:null,minFps:999};
 window.addEventListener('error',ev=>{ DIAG.errors.push(`${new Date().toLocaleTimeString()} ${ev.message} @${(ev.filename||'').split('/').pop()}:${ev.lineno}`); if(DIAG.errors.length>15) DIAG.errors.shift(); });
 window.addEventListener('unhandledrejection',ev=>{ DIAG.errors.push(`${new Date().toLocaleTimeString()} promise: ${ev.reason&&ev.reason.message||ev.reason}`); if(DIAG.errors.length>15) DIAG.errors.shift(); });
