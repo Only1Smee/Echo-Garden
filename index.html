@@ -11,7 +11,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
-<title>Echo Garden v0.9.2</title>
+<title>Echo Garden v0.9.3</title>
 <style>
 [hidden]{display:none!important}
 
@@ -909,6 +909,19 @@ h1,h2,h3,.ph h2,.dk span,.pill b{font-family:var(--f-display);font-weight:900;le
 .pw{width:26px;height:26px;border-radius:50%;border:2px solid rgba(255,255,255,.25);background:var(--c);position:relative} .pw.on{border-color:#fff;box-shadow:0 0 0 2px #f3c765}
 .pw.lk{opacity:.55} .pw.lk::after{content:'🔒';position:absolute;inset:0;display:grid;place-items:center;font-size:10px}
 
+
+/* v0.9.3 simpler Decorate: slim strip + side drawer */
+#ui.deco #essHud,#ui.deco .hud-right,#ui.deco .hud-left>*:not(.cur){display:none!important}
+#decoBar{left:50%;transform:translateX(-50%);width:auto;max-width:calc(100% - 24px);max-height:none;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;display:flex!important;flex-direction:row!important;align-items:center;gap:6px;padding:5px 6px 5px 12px;border-radius:999px;flex-wrap:nowrap}
+#decoBar .db-name{font-size:12px;font-weight:800;white-space:nowrap;max-width:130px;overflow:hidden;text-overflow:ellipsis;margin-right:2px} #decoBar .db-name.hint{font-weight:600;color:var(--muted)}
+#decoBar .db-beauty{font-size:11px;color:#ffd34a;font-weight:700;white-space:nowrap} #decoBar .db-gap{flex:0 0 4px}
+.dbi{flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;gap:5px;min-width:40px;height:40px;padding:0 10px;border-radius:999px;border:1px solid rgba(255,244,224,.14);background:rgba(255,255,255,.06);color:var(--text);font:inherit;font-size:17px;font-weight:800;white-space:nowrap}
+.dbi em{font-style:normal;font-size:12px} .dbi.on{background:rgba(243,199,101,.22);border-color:#f3c765;color:#ffe08a} .dbi.pri{background:linear-gradient(#ffe08a,#f3c765);color:#2a1a08;border-color:#f3c765} .dbi[disabled]{opacity:.35}
+#decoSide{position:absolute;right:calc(8px + env(safe-area-inset-right,0px));top:58px;bottom:calc(64px + env(safe-area-inset-bottom,0px));width:190px;z-index:25;display:none;flex-direction:column;gap:6px;padding:8px;border-radius:16px;background:var(--glass-2);border:1px solid rgba(255,244,224,.16);box-shadow:0 10px 28px rgba(0,0,0,.4);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);overflow-y:auto;scrollbar-width:none}
+#decoSide.open{display:flex}
+.ds-h{display:flex;align-items:center;justify-content:space-between;padding:0 2px} .ds-h b{font-size:13px} .ds-x{width:28px;height:28px;border-radius:50%;border:0;background:rgba(255,255,255,.08);color:var(--text);font:inherit;font-size:12px}
+.ds-list{display:flex;flex-direction:column;gap:5px} .ds-st{display:flex;justify-content:space-between;align-items:center;gap:6px;padding:9px 10px;border-radius:12px;border:1px solid rgba(255,244,224,.12);background:rgba(255,255,255,.04);color:var(--text);font:inherit;font-size:12px;text-align:left} .ds-st span{font-size:10px;color:var(--muted);white-space:nowrap} .ds-st.on{border-color:#f3c765;background:rgba(243,199,101,.16)} .ds-st.on span{color:#ffe08a}
+#decoSide .db-paint{display:flex;flex-direction:column;gap:8px} #decoSide .db-parts{flex-wrap:wrap;overflow:visible;order:1} #decoSide .db-sw{order:2} #decoSide .db-sets{order:3;flex-wrap:wrap;overflow:visible} #decoSide .db-sw{flex-wrap:wrap;overflow:visible;gap:7px} #decoSide .db-sw .dbb{flex:1 1 100%}
 </style>
 <div id="app">
   <canvas id="gl"></canvas>
@@ -6606,6 +6619,10 @@ const STARTER_INV={apple:6,sunpear:2,seed_apple:2,seed_dashberry:1,ess_speed:1,e
 { const _sg=seedNewGame; seedNewGame=function(){ const r=_sg.apply(this,arguments); if(S) S.inv080=1; return r; }; }
 /* ---------- what's new: shown once after each update ---------- */
 const CHANGELOG={
+  '0.9.3':[
+    ['🛠️','Simpler Decorate','The big Decorate panel is now one slim strip along the bottom, so you can see your garden while you customise.'],
+    ['👉','Just drag','Drag anything to move it. Turn it with ↺ ↻ or two fingers. Tap ✓ when you\'re happy with it.'],
+    ['🎨','Style and Paint on the side','Style and Paint open in a small drawer on the right instead of covering the garden. Tree plot borders can be painted too.']],
   '0.9.2':[
     ['🏠','New styles','In Decorate, pick something and tap Style to change how it looks, not just its colour.'],
     ['🪑','Benches','Log bench, garden bench, stone slab or white iron. The park bench toy can change too.'],
@@ -8735,6 +8752,42 @@ document.addEventListener('click',ev=>{ if(DECO.on&&ev.target.closest('[data-dec
 { const _snap=decoSnapshot; decoSnapshot=function(){ const d=JSON.parse(_snap.apply(this,arguments)); d.style=S.style||{}; return JSON.stringify(d); }; }
 { const _rest=decoRestore; decoRestore=function(snap){ try{ const d=JSON.parse(snap); S.style=d.style||{}; for(const y of S.toys){ if(y.type==='parkbench'){ const m=MESH.toy.get(y.id); if(m){ ents.remove(m); MESH.toy.delete(y.id); } } } }catch(e){} return _rest.apply(this,arguments); }; }
 /* =========================================================
+   v0.9.3 — simpler Decorate
+   One slim strip along the bottom instead of a big panel.
+   Style and Paint open in a narrow drawer on the right side,
+   so the garden stays in view while you customise.
+   ========================================================= */
+function decoSideUI(it){ const kind=typeof styleKind==='function'?styleKind(it):null;
+  if(DECO.styleOpen&&kind){ const cur=styleOf(it)||styleNative(kind);
+    return `<div class="ds-h"><b>Style</b><button class="ds-x" data-deco="style" aria-label="Close">✕</button></div><div class="ds-list">${Object.entries(STYLES[kind]).map(([id,[n,c]])=>{ const own=styleOwned(kind,id); return `<button class="ds-st ${cur===id?'on':''}" data-style="${id}"><b>${n}</b><span>${cur===id?'✓ In use':own?'Owned':'✦ '+c}</span></button>`; }).join('')}</div>`; }
+  if(DECO.paintOpen&&it.paint!==false){ return `<div class="ds-h"><b>Paint</b><button class="ds-x" data-deco="paint" aria-label="Close">✕</button></div>${decoPaintUI(it)}`; }
+  return ''; }
+decoBar=function(){ let b=$('#decoBar'); if(!b){ b=document.createElement('div'); b.id='decoBar'; $('#ui').appendChild(b); }
+  let s=$('#decoSide'); if(!s){ s=document.createElement('div'); s.id='decoSide'; $('#ui').appendChild(s); }
+  const it=DECO.sel; const kind=it&&typeof styleKind==='function'?styleKind(it):null; const canPaint=it&&(it.paint||it.kind==='plot'); const canAway=it&&it.kind==='toy';
+  if(it){ b.innerHTML=`<span class="db-name">${esc(it.name)}</span>
+      <button class="dbi" data-deco="left" aria-label="Turn left">↺</button><button class="dbi" data-deco="right" aria-label="Turn right">↻</button>
+      ${kind?`<button class="dbi t ${DECO.styleOpen?'on':''}" data-deco="style">🏠<em>Style</em></button>`:''}
+      ${canPaint?`<button class="dbi t ${DECO.paintOpen?'on':''}" data-deco="paint">🎨<em>Paint</em></button>`:''}
+      ${canAway?`<button class="dbi t" data-deco="away">📦<em>Put away</em></button>`:''}
+      <span class="db-gap"></span>
+      <button class="dbi" data-deco="undo" ${DECO.undo.length?'':'disabled'} aria-label="Undo">↶</button>
+      <button class="dbi pri" data-deco="done-sel" aria-label="Done with this">✓</button>`; }
+  else { const extra=Math.max(0,WORLD.plots.length-PLOTS.length), cost=PLOT_EXTRA_COST[Math.min(extra,PLOT_EXTRA_COST.length-1)];
+    b.innerHTML=`<span class="db-name hint">Drag to move</span><span class="db-beauty">${decoBeauty()}</span>
+      <span class="db-gap"></span>
+      <button class="dbi" data-deco="undo" ${DECO.undo.length?'':'disabled'} aria-label="Undo">↶</button>
+      <button class="dbi t ${DECO.snap?'on':''}" data-deco="snap">▦<em>Snap</em></button>
+      ${WORLD.plots.length<PLOT_MAX?`<button class="dbi t" data-deco="plot">➕<em>Plot ✦${cost}</em></button>`:''}
+      <button class="dbi t" data-deco="reset">⟲<em>Reset</em></button>
+      <button class="dbi pri t" data-deco="done"><em>Done</em></button>`; }
+  const side=it?decoSideUI(it):''; s.innerHTML=side; s.classList.toggle('open',!!side); };
+// Style and Paint share the drawer: opening one closes the other
+window.addEventListener('click',ev=>{ if(!DECO.on) return; if(ev.target.closest('[data-deco="style"]')) DECO.paintOpen=false; if(ev.target.closest('[data-deco="paint"]')) DECO.styleOpen=false; },true);
+// the old toast is replaced by the strip's hint
+{ const _o=decoOpen; decoOpen=function(){ S.seenDeco=Math.max(S.seenDeco||0,2); return _o.apply(this,arguments); }; }
+{ const _c=decoClose; decoClose=function(){ const s=$('#decoSide'); if(s) s.remove(); DECO.styleOpen=false; DECO.paintOpen=false; return _c.apply(this,arguments); }; }
+/* =========================================================
    AUDIO — procedural music, ambience and creature voices
    (reverb bus, chord pads, bells, spatial voices)
    ========================================================= */
@@ -8981,7 +9034,7 @@ function updateBanner(){ if(document.getElementById('updBar')) return; const d=d
 /* =========================================================
    DIAGNOSTICS — performance readout, error capture, problem report
    ========================================================= */
-const GAME_VERSION='0.9.2';
+const GAME_VERSION='0.9.3';
 const DIAG={errors:[],trail:[],fps:[],show:false,acc:0,n:0,el:null,minFps:999};
 window.addEventListener('error',ev=>{ DIAG.errors.push(`${new Date().toLocaleTimeString()} ${ev.message} @${(ev.filename||'').split('/').pop()}:${ev.lineno}`); if(DIAG.errors.length>15) DIAG.errors.shift(); });
 window.addEventListener('unhandledrejection',ev=>{ DIAG.errors.push(`${new Date().toLocaleTimeString()} promise: ${ev.reason&&ev.reason.message||ev.reason}`); if(DIAG.errors.length>15) DIAG.errors.shift(); });
