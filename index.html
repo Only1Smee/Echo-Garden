@@ -11,7 +11,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
-<title>Echo Garden v0.8.6</title>
+<title>Echo Garden v0.9.0</title>
 <style>
 [hidden]{display:none!important}
 
@@ -861,6 +861,37 @@ h1,h2,h3,.ph h2,.dk span,.pill b{font-family:var(--f-display);font-weight:900;le
 .trn-lv{display:flex;align-items:center;gap:10px;max-width:280px;margin:6px auto 10px;font-size:12px;font-weight:800} .trn-lv .trn-xp{flex:1;width:auto;height:7px}
 #miniHud .pill.tgrade{font-family:Georgia,serif;font-weight:900;font-size:14px;min-width:30px;justify-content:center}
 #miniHud .pill.tgrade.gS{color:#ffd34a;box-shadow:0 0 12px rgba(255,211,74,.5)}
+
+/* v0.9.0 next step card shares the quest card style */
+#nextStep{position:absolute;left:max(12px,env(safe-area-inset-left,0px));top:calc(50px + env(safe-area-inset-top,0px));z-index:5;display:flex;align-items:center;gap:7px;max-width:min(300px,40vw);padding:4px 10px 4px 4px;border-radius:14px;border:1px solid rgba(255,244,224,.16);background:var(--glass);color:var(--text);font:inherit;text-align:left;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+#nextStep[hidden]{display:none}
+#nextStep .qi{flex:0 0 auto;width:22px;height:22px;border-radius:50%;background:#8fd6c4;color:#10302a;font:800 12px/22px system-ui;text-align:center}
+#nextStep .qt{display:flex;flex-direction:column;min-width:0;line-height:1.2}#nextStep .qt em{font-style:normal;font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;opacity:.6}
+#nextStep .qt b{font-size:11.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#ui.care-open #nextStep,#ui.cine #nextStep,#ui.panel-open #nextStep,#ui.fishing #nextStep{display:none}
+#app.big-text #nextStep{font-size:115%}
+
+/* v0.9.0 line-up card, commentary, podium */
+#mgIntro{position:absolute;inset:0;z-index:30;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;background:radial-gradient(ellipse at center,rgba(20,12,40,.82),rgba(10,6,20,.9));color:#fff8e0;animation:miIn .35s ease;pointer-events:none;transition:opacity .4s}
+#mgIntro.out{opacity:0} @keyframes miIn{from{opacity:0;transform:scale(1.05)}}
+#mgIntro .mi-t{font-family:Georgia,serif;font-size:28px;font-weight:900;color:#ffe08a} #mgIntro .mi-s{font-size:12px;letter-spacing:.12em;text-transform:uppercase;opacity:.7;margin-bottom:6px}
+#mgIntro .mi-row{display:flex;gap:12px;align-items:center} #mgIntro .mi-c{display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 10px;border-radius:14px;background:rgba(255,255,255,.06);border:1px solid rgba(255,244,224,.14);min-width:92px;animation:miC .5s cubic-bezier(.2,1.4,.4,1) both}
+#mgIntro .mi-c:nth-child(2){animation-delay:.12s} #mgIntro .mi-c:nth-child(3){animation-delay:.24s} #mgIntro .mi-c:nth-child(4){animation-delay:.36s} @keyframes miC{from{opacity:0;transform:translateY(16px)}}
+#mgIntro .mi-c.me{border-color:#f3c765;background:rgba(243,199,101,.14)} #mgIntro .mi-c img{width:72px;height:72px} #mgIntro .mi-c b{font-size:13px} #mgIntro .mi-c span{font-size:10px;opacity:.65}
+#mgIntro .mi-vs{font-family:Georgia,serif;font-size:26px;color:#ff8a7a}
+#mgComm{position:absolute;left:50%;top:calc(52px + env(safe-area-inset-top,0px));transform:translate(-50%,-6px);z-index:12;padding:6px 14px;border-radius:999px;background:rgba(20,12,30,.72);color:#fff8e0;font-size:13px;font-weight:700;opacity:0;transition:opacity .25s,transform .25s;pointer-events:none;white-space:nowrap;max-width:70vw;overflow:hidden;text-overflow:ellipsis}
+#mgComm.show{opacity:1;transform:translate(-50%,0)}
+.podium{display:flex;align-items:flex-end;justify-content:center;gap:8px;margin:-4px 0 8px}
+.podium .pd{display:flex;flex-direction:column;align-items:center;width:86px} .podium .pd img{width:58px;height:58px} .podium .pd b{font-size:11px;margin:2px 0 3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:86px}
+.podium .pd-step{width:100%;border-radius:8px 8px 0 0;font-family:Georgia,serif;font-weight:900;font-size:20px;color:#2a1a08;display:flex;align-items:center;justify-content:center}
+.podium .p1 .pd-step{height:52px;background:linear-gradient(#ffe08a,#e6b84a)} .podium .p2 .pd-step{height:38px;background:linear-gradient(#eef2f6,#c4ccd6)} .podium .p3 .pd-step{height:28px;background:linear-gradient(#f0c09a,#c88a5a)}
+.podium .pd.me b{color:#ffe08a}
+/* breeding preview */
+.bp{display:flex;flex-direction:column;gap:3px;margin:4px 0} .bp-r{display:grid;grid-template-columns:1.1fr 1fr 1fr 1.3fr;gap:6px;align-items:center;font-size:11.5px;padding:3px 6px;border-radius:8px;background:rgba(255,255,255,.04)}
+.bp-r em{font-style:normal;color:#ffd34a;letter-spacing:-1px;font-size:11px} .bp-r b{color:#ffe08a;font-size:11px;letter-spacing:-1px} .bp-h{background:none;font-weight:800;opacity:.75} .bp-h em,.bp-h b{color:inherit;letter-spacing:0;font-size:10.5px}
+/* left-handed: game buttons on the left */
+#app.lefty #miniBtns{right:auto;left:max(14px,env(safe-area-inset-left,0px))}
+#app.lefty #foodBtn{right:auto!important;left:max(12px,env(safe-area-inset-left,0px))!important}
 
 </style>
 <div id="app">
@@ -4423,95 +4454,11 @@ function openTraining(e){ e=e||getEcho(UI.trainEcho)||gardenEchoes().find(x=>!x.
 document.addEventListener('click',ev=>{ if(!S) return; const w=ev.target.closest('[data-trwho]'); if(w){ ev.stopPropagation(); openTraining(getEcho(w.dataset.trwho)); return; }
   if(ev.target.closest('[data-trboost]')){ ev.stopPropagation(); UI.trainBoost=!UI.trainBoost; openTraining(getEcho(UI.trainEcho)); SND.ui&&SND.ui(); } },true);
 document.addEventListener('click',ev=>{ const b=ev.target.closest('[data-train]'); if(!b||!S) return; const e=getEcho(UI.trainEcho); if(!e) return; closeModal(); startTraining(e,b.dataset.train,!!b.dataset.boost); });
-function startTraining(e,stat,boost){ if(boost&&!take('ess_'+stat)) boost=false; if(CARE) closeCare(); const T=TRAIN[stat];
-  openMini('train',{echo:e.id,stat,boost,count:3,tip:T.tip,score:0,max:1,hits:0,t:0,time:0,done:false,app:appearanceOf(e,'happy')}); $('#mini').classList.add('g3'); $('#ui').classList.add('g3');
-  $('#miniHud').innerHTML=`<span class="pill" style="color:${STAT[stat].color}">${STAT[stat].name} · ${T.name}</span>${boost?'<span class="pill gold">Essence ×2</span>':''}<span class="pill tgrade" id="tGrade">C</span><span class="pill" id="tScore"></span><span class="pill" id="tTime"></span><span class="mg-prog" id="tProg"><i></i></span><button class="btn" style="margin-left:auto" data-mg="quit">Stop</button>`;
-  $('#miniBtns').innerHTML=stat==='focus'?['#ff6b8a','#ffd34a','#6fdc9c','#6fb8ff'].map((c,i)=>`<button class="btn big fbtn" data-mg="f${i}" style="--c:${c}" aria-label="Flower ${i+1}"></button>`).join(''):`<button class="btn pri big jumpbtn" data-mg="tap" aria-label="Tap">${stat==='endurance'?'Stroke':stat==='power'?'Smash':stat==='agility'?'Hop':'Dash'}</button>`;
-  buildTrain(); }
-function buildTrain(){ const M=MG, st=M.stat; const A=advScene(TRAIN[st].zone,'race',{noGuardian:true}); const T=A.T, sc=A.scene; A.mode='train';
-  const grass=new THREE.Mesh(advOwn(new THREE.CircleGeometry(60,40)),amat('#ffffff',{map:topTex(T)})); grass.material.map.repeat.set(16,16); grass.rotation.x=-Math.PI/2; grass.receiveShadow=true; sc.add(grass);
-  A.scen=makeScenery(T,90); for(let i=0;i<80;i++){ const a=Math.random()*Math.PI*2, r=11+Math.random()*25; placeDecor(pick(T.decor),Math.cos(a)*r,0,Math.sin(a)*r,Math.random()*6,.9+Math.random()*.8); }
-  const echo=echoRig(M.app,1.5); sc.add(echo); A.echo=echo; A.ph=0;
-  if(st==='speed'){ const ring=new THREE.Mesh(advOwn(new THREE.RingGeometry(3.3,4.7,64)),amat('#ffffff',{map:trackTex(T,'run')})); ring.rotation.x=-Math.PI/2; ring.position.y=.02; ring.receiveShadow=true; sc.add(ring);
-    A.pads=[]; for(let i=0;i<6;i++){ const a=i/6*Math.PI*2+.4; const pd=new THREE.Mesh(advOwn(new THREE.CircleGeometry(.62,24)),advOwn(new THREE.MeshBasicMaterial({color:'#ffd34a',transparent:true,opacity:.75}))); pd.rotation.x=-Math.PI/2; pd.position.set(Math.cos(a)*4,.04,Math.sin(a)*4); sc.add(pd); const gl=glowSprite('#ffd34a',1.6,.5); gl.position.set(Math.cos(a)*4,.3,Math.sin(a)*4); sc.add(gl); A.pads.push({a,pd,gl,used:-1}); }
-    M.ang=0; M.spd=1.1; M.time=20; M.lap=0; }
-  if(st==='power'){ const pad=mesh(GEO.cyl,mat('#8a8478',{tex:'rock'}),[3,.25,3],[0,.12,0]); sc.add(pad); A.rocks=[]; M.rock=0; M.needle=0; M.nd=1; M.zone=.5; M.zw=.2; M.time=0; M.max=5; newBoulder(); echo.position.set(-1.5,.25,0); echo.rotation.y=Math.PI/2; }
-  if(st==='agility'){ const path=new THREE.Mesh(advOwn(new THREE.PlaneGeometry(40,3)),amat('#ffffff',{map:runnerGroundTex(T,'meadow')})); path.rotation.x=-Math.PI/2; path.rotation.z=Math.PI/2; path.position.y=.02; sc.add(path); A.logs=[]; M.logs=0; M.max=12; M.y=0; M.vy=0; M.spawn=1.2; echo.rotation.y=Math.PI/2; echo.position.x=-3; }
-  if(st==='focus'){ A.flowers=[]; const cols=['#ff6b8a','#ffd34a','#6fdc9c','#6fb8ff']; cols.forEach((c,i)=>{ const a=-Math.PI/2+(i-1.5)*.62; const g=new THREE.Group(); g.add(mesh(GEO.cyl,mat('#4f9e45'),[.07,1.3,.07],[0,.65,0]));
-      const head=new THREE.Group(); head.position.y=1.4; for(let k=0;k<6;k++){ const pt=mesh(GEO.sph,mat(c,{emissive:c,emissiveIntensity:.1}),[.32,.08,.18],[Math.cos(k/6*6.28)*.32,0,Math.sin(k/6*6.28)*.32],[0,-k/6*6.28,0]); head.add(pt); } head.add(mesh(GEO.sph,mat('#fff2a8'),[.18,.12,.18])); head.rotation.x=.9; g.add(head);
-      const gl=glowSprite(c,2.6,0); gl.position.y=1.4; g.add(gl); g.position.set(Math.cos(a)*2.6,0,Math.sin(a)*2.6+.8); sc.add(g); A.flowers.push({g,head,gl,c,lit:0}); });
-    M.seq=[]; M.len=3; M.phase='show'; M.si=0; M.st=0; M.input=[]; M.best=0; M.max=7; echo.position.set(0,0,2.2); echo.rotation.y=Math.PI; focusNewRound(true); }
-  if(st==='endurance'){ const wt=atex(256,256,(x,w,h)=>{ x.fillStyle=T.water; x.fillRect(0,0,w,h); x.strokeStyle='rgba(255,255,255,.35)'; x.lineWidth=3; for(let i=0;i<14;i++){ const y=Math.random()*h; x.beginPath(); x.moveTo(0,y); x.bezierCurveTo(w*.3,y-8,w*.6,y+8,w,y); x.stroke(); } },6,2);
-    const river=new THREE.Mesh(advOwn(new THREE.PlaneGeometry(60,5)),amat('#ffffff',{map:wt,transparent:true,opacity:.92})); river.rotation.x=-Math.PI/2; river.position.y=.05; sc.add(river); A.wt=wt; M.pace=.5; M.band=.5; M.inT=0; M.time=18; M.dist=0; echo.rotation.y=Math.PI/2; }
-  M.howTo=TRAIN[st].tip; M.tip=''; renderer.compile&&renderer.compile(sc,A.cam); }
-function newBoulder(){ const A=ADV, M=MG; if(A.boulder) A.scene.remove(A.boulder); const g=new THREE.Group(); const b=mesh(DODE,mat('#9a948a',{tex:'rock'}),[1,.9,.95],[0,.95,0],[.3,.5,.1]); g.add(b); g.position.set(1.3,.25,0); A.scene.add(g); A.boulder=g; A.bhp=2; M.zw=Math.max(.08,.22-M.rock*.025); M.zone=.25+Math.random()*.5; }
-function focusNewRound(first){ const M=MG; if(first) M.seq=[irand(0,3),irand(0,3),irand(0,3)]; else M.seq.push(irand(0,3)); M.phase='show'; M.si=0; M.st=-.6; M.input=[]; }
-function flowerLight(i,dur){ const F=ADVflowers(); if(!F[i]) return; F[i].lit=dur||.45; SND.note&&SND.note(); }
-function ADVflowers(){ return ADV&&ADV.flowers||[]; }
-function trainInput(a){ const M=MG; if(!M||M.count>0||M.done) return; const A=ADV; const st=M.stat;
-  if(st==='focus'&&a[0]==='f'){ if(M.phase!=='input') return; const i=+a.slice(1); flowerLight(i,.3); A.echo.userData.react=.3; const want=M.seq[M.input.length]; M.input.push(i);
-    if(i!==want){ M.phase='over'; SND.hit(); advLabel('Oops!','#ff8a8a',0,2.6,2.2); finishTrain(); return; }
-    if(M.input.length===M.seq.length){ M.best=M.seq.length; M.score=M.best; SND.coin(); advLabel(M.seq.length>=6?'Amazing memory!':'Correct!','#9fe8a8',0,2.8,2.2); if(M.seq.length>=M.max){ finishTrain(); return; } M.phase='wait'; M.waitT=.7; } return; }
-  if(a!=='tap') return;
-  if(st==='speed'){ let best=null, bd=9; for(const p of A.pads){ let d=Math.abs(((M.ang-p.a)%(Math.PI*2)+Math.PI*3)%(Math.PI*2)-Math.PI); if(d<bd){ bd=d; best=p; } }
-    if(best&&bd<.32&&best.used!==M.lap){ best.used=M.lap; const perfect=bd<.14; M.score+=perfect?2:1; M.hits++; M.spd=Math.min(3.2,M.spd+(perfect?.35:.2)); advLabel(perfect?'Perfect!':'Good!',perfect?'#ffd34a':'#bfefff',Math.cos(M.ang)*4,1.6,Math.sin(M.ang)*4); SND.coin(); aBurst(Math.cos(M.ang)*4,.4,Math.sin(M.ang)*4,'#ffd34a',10,3); }
-    else { M.spd=Math.max(.8,M.spd-.35); M.trip=.5; SND.hit(); advLabel('Missed','#ff8a8a',Math.cos(M.ang)*4,1.6,Math.sin(M.ang)*4); } }
-  if(st==='power'){ if(M.swing>0||!ADV.boulder) return; const d=Math.abs(M.needle-M.zone); M.swing=.45; M.pend={t:.2,perfect:d<M.zw*.3,good:d<M.zw/2}; }
-  if(st==='agility'){ if(M.y<=0.01){ M.vy=7.8; M.y=.02; SND.jump&&SND.jump(); } }
-  if(st==='endurance'){ M.pace=Math.min(1,M.pace+.085); A.echo.userData.stroke=.35; puff(A.echo.position.x+.3,.15,(Math.random()-.5)*.6,{vy:1,size:.3,life:.5,color:'#e8fbff'}); SND.tap(); }
-}
-function updateTrain(dt){ const M=MG; if(!ADV) buildTrain(); const A=ADV; A.t+=dt; M.dt=dt; const st=M.stat, E=A.echo, t=A.t;
-  if(M.count>0){ M.count-=dt; } const live=M.count<=0&&!M.done;
-  let mode='stance', freq=10;
-  if(st==='speed'){ if(live){ M.time-=dt; const prev=M.ang; M.ang+=M.spd*dt*(M.trip>0?.4:1); for(const p of A.pads){ const k0=Math.floor((prev-p.a-.32)/(Math.PI*2)), k1=Math.floor((M.ang-p.a-.32)/(Math.PI*2)); if(k1>k0) M.passed=(M.passed||0)+1; } if(Math.floor(M.ang/(Math.PI*2))>Math.floor(prev/(Math.PI*2))) M.lap++; M.spd=Math.max(.9,M.spd-dt*.08); M.trip=Math.max(0,(M.trip||0)-dt); if(M.time<=0) finishTrain(); }
-    E.position.set(Math.cos(M.ang)*4,0,Math.sin(M.ang)*4); E.rotation.y=-M.ang; mode=M.trip>0?'trip':live?'run':'stance'; freq=8+M.spd*4;
-    M.near=false; for(const p of A.pads){ const ok=p.used!==M.lap; const d=Math.abs(((M.ang-p.a)%(Math.PI*2)+Math.PI*3)%(Math.PI*2)-Math.PI); const hot=ok&&d<.32; if(hot) M.near=true; p.pd.material.color.set(hot?'#ffffff':'#ffd34a'); p.pd.material.opacity=hot?.95:ok?.5+.2*Math.sin(t*6):.12; p.pd.scale.setScalar(hot?1.25:1); p.gl.material.opacity=hot?.95:ok?.45:.05; }
-    M.max=Math.max(1,(M.lap+1)*6*2); if(live&&Math.random()<dt*8) puff(E.position.x,.1,E.position.z,{vy:.3,size:.3,life:.4,color:'#e6cfa8',normal:true,op:.5});
-    A.cam.position.set(Math.cos(M.ang-.38)*9.4,6.3,Math.sin(M.ang-.38)*9.4); A.cam.lookAt(Math.cos(M.ang+.45)*2,.2,Math.sin(M.ang+.45)*2); }
-  if(st==='power'){ if(live){ const sp=.9+M.rock*.22; M.needle+=M.nd*dt*sp; if(M.needle>1){ M.needle=1; M.nd=-1; } if(M.needle<0){ M.needle=0; M.nd=1; } M.time+=dt; }
-    if(M.pend){ M.pend.t-=dt; if(M.pend.t<=0){ const P=M.pend; M.pend=null; const b=ADV.boulder;
-        if(b&&(P.perfect||P.good)){ ADV.bhp-=P.perfect?2:1; ADV.shake=P.perfect?.5:.3; SND.stomp&&SND.stomp(); aBurst(1.3,1.2,0,'#c8bca8',P.perfect?22:12,P.perfect?5:3); advLabel(P.perfect?'SMASH!':'Crack!',P.perfect?'#ffd34a':'#f7e6c4',1.3,2.4,0);
-          if(ADV.bhp<=0){ M.score+=P.perfect?3:2; M.rock++; for(let i=0;i<10;i++) puff(1.3,1,0,{vx:(Math.random()-.5)*8,vy:Math.random()*6,vz:(Math.random()-.5)*4,size:.6,life:.9,color:'#9a948a',normal:true,op:.9,g:-12}); ADV.scene.remove(b); ADV.boulder=null; if(M.rock>=M.max) finishTrain(); else M.nextRock=.5; }
-          else b.scale.set(1.05,.92,1.05); }
-        else if(b){ E.userData.dizzy=1; SND.hit(); advLabel('Bonk!','#ff8a8a',1.3,2.4,0); } } }
-    if(M.nextRock>0){ M.nextRock-=dt; if(M.nextRock<=0) newBoulder(); }
-    M.swing=Math.max(0,(M.swing||0)-dt); mode=E.userData.dizzy>0?'trip':M.swing>0?'attack':'stance'; E.userData.dizzy=Math.max(0,(E.userData.dizzy||0)-dt);
-    A.cam.position.set(-.6+Math.sin(t*.2)*.8,3.4,7.4); A.cam.lookAt(0,.55,0); }
-  if(st==='agility'){ if(live){ M.spawn-=dt; if(M.spawn<=0&&M.logs+A.logs.length<M.max){ const l=mesh(GEO.cyl,mat('#7a5236',{tex:'bark'}),[.32,2.6,.32],[14,.32,0],[Math.PI/2,0,0]); A.scene.add(l); A.logs.push({m:l,x:14,sp:5+M.logs*.35,hit:false}); M.spawn=1.1+Math.random()*1.1-Math.min(.6,M.logs*.05); }
-      if(M.y>0||M.vy>0){ M.vy-=26*dt; M.y+=M.vy*dt; if(M.y<=0){ M.y=0; M.vy=0; } }
-      for(const L of A.logs){ L.x-=L.sp*dt; L.m.position.x=L.x; L.m.rotation.y+=dt*L.sp/.32; if(!L.done&&L.x<-3.3){ L.done=true; if(!L.hit){ M.score++; M.logs++; advLabel(M.y>.9?'Big hop!':'Clear!','#9fe8a8',-3,2.4,0); SND.coin(); } }
-        if(!L.hit&&!L.done&&Math.abs(L.x-(-3))<.45&&M.y<.55){ L.hit=true; M.logs++; M.trip=.6; SND.hit(); advLabel('Bump!','#ff8a8a',-3,2.4,0); } }
-      A.logs=A.logs.filter(L=>{ if(L.x<-12){ A.scene.remove(L.m); return false; } return true; }); if(M.logs>=M.max&&!A.logs.length) finishTrain(); }
-    M.trip=Math.max(0,(M.trip||0)-dt); E.position.set(-3,M.y,0); mode=M.trip>0?'trip':M.y>.02?'hop':live?'run':'stance';
-    A.cam.position.set(1,3,9.5); A.cam.lookAt(1,1,0); }
-  if(st==='focus'){ for(const F of A.flowers){ F.lit=Math.max(0,F.lit-dt); F.gl.material.opacity=F.lit>0?.9:0; F.head.scale.setScalar(1+F.lit*.6); }
-    if(live&&M.phase==='wait'){ M.waitT-=dt; if(M.waitT<=0) focusNewRound(); }
-    if(live&&M.phase==='show'){ M.st+=dt; const gap=Math.max(.42,.75-M.seq.length*.04); if(M.st>=0&&M.st>=M.si*gap){ if(M.si<M.seq.length){ flowerLight(M.seq[M.si],gap*.75); E.userData.point=M.seq[M.si]; M.si++; } else if(M.st>M.si*gap+.2){ M.phase='input'; E.userData.point=null; advLabel('Your turn!','#ffe08a',0,2.8,2.2); } } }
-    mode=M.phase==='input'?'stance':'think'; if(E.userData.react>0){ E.userData.react-=dt; mode='cheer'; }
-    A.cam.position.set(0,3.6,7.4); A.cam.lookAt(0,1.1,.4); }
-  if(st==='endurance'){ if(live){ M.time-=dt; M.pace=Math.max(0,M.pace-dt*.16); M.band=.5+Math.sin(t*.55)*.22+Math.sin(t*1.3)*.06; const inb=Math.abs(M.pace-M.band)<.12; if(inb){ M.inT+=dt; M.dist+=dt*2; } M.score=Math.round(M.inT*10)/10; M.max=18; if(M.time<=0) finishTrain(); }
-    E.userData.stroke=Math.max(0,(E.userData.stroke||0)-dt); E.position.set(0,.06,0); mode='swim'; freq=6+M.pace*8; A.wt.offset.x+=dt*(.3+M.pace*.8);
-    if(Math.random()<dt*6) puff(.5,.1,(Math.random()-.5)*.6,{vy:.8,size:.25,life:.5,color:'#e8fbff'});
-    A.cam.position.set(0,3.2,7.5); A.cam.lookAt(0,.3,0); }
-  if(M.done) mode='cheer';
-  poseEcho(E,mode,t,{freq}); if(st==='focus'&&E.userData.point!=null){ const p=E.userData.parts; const F=A.flowers[E.userData.point]; const dx=F.g.position.x; p.arms[dx>0?0:1].rotation.x=-2.2; p.head.rotation.y=-dx*.25; }
-  if(st==='power'&&M.swing>0){ E.position.x=-1.5+Math.sin((1-M.swing/.45)*Math.PI)*.5; } else if(st==='power') E.position.x=-1.5;
-  const sh=A.shake>0?A.shake*.3:0; A.shake=Math.max(0,(A.shake||0)-dt); A.cam.position.x+=(Math.random()-.5)*sh; A.cam.position.y+=(Math.random()-.5)*sh;
-  advAtmos(dt,0,0,0); advRender(); drawAdvOverlay(); drawTrainHud(M);
-  const sc=$('#tScore'); if(sc) sc.textContent=st==='focus'?`Pattern ${M.seq.length}`:st==='endurance'?`In rhythm ${M.score}s`:st==='power'?`Boulders ${M.rock}/${M.max}`:st==='agility'?`Logs ${M.score}/${M.max}`:`Score ${M.score}`;
-  const gg=$('#tGrade'); if(gg&&M.count<=0){ const G=trainGrade(M); if(gg.textContent!==G){ gg.textContent=G; gg.className='pill tgrade g'+G; } } const pr=$('#tProg i'); if(pr){ const f=st==='speed'?1-M.time/20:st==='endurance'?1-M.time/18:st==='power'?M.rock/M.max:st==='agility'?M.logs/M.max:M.best/M.max; pr.style.width=clamp(f,0,1)*100+'%'; }
-  const tt=$('#tTime'); if(tt) tt.textContent=st==='speed'||st==='endurance'?Math.ceil(Math.max(0,M.time))+'s':''; tt&&(tt.hidden=!(st==='speed'||st==='endurance')); }
+function startTraining(){} // replaced by the Training Grounds
+/* the original five training scenes were replaced by the Training Grounds (p7h); these stubs keep old references harmless */
+function buildTrain(){} function newBoulder(){} function focusNewRound(){} function flowerLight(){} function ADVflowers(){ return []; } function trainInput(){} function updateTrain(){ if(MG&&MG.kind==='train') closeMini(); }
 function trainPill(c,d,W,y,txt,col,size){ c.font=`800 ${size*d}px system-ui,sans-serif`; const w=c.measureText(txt).width+28*d, h=(size+16)*d; c.fillStyle='rgba(20,12,30,.72)'; c.beginPath(); c.roundRect?c.roundRect(W/2-w/2,y-h/2,w,h,h/2):c.rect(W/2-w/2,y-h/2,w,h); c.fill(); c.fillStyle=col; c.textAlign='center'; c.textBaseline='middle'; c.fillText(txt,W/2,y+1*d); c.textBaseline='alphabetic'; }
-function drawTrainHud(M){ const c=M.ctx,d=M.dpr,W=M.W,H=M.H; c.lineJoin='round';
-  if(M.count>0&&M.howTo) trainPill(c,d,W,H*.66,M.howTo,'#f7e6c4',14);
-  if(M.stat==='speed'&&M.count<=0&&!M.done&&M.near) trainPill(c,d,W,H*.2,'TAP NOW!','#ffe08a',16);
-  if(M.stat==='endurance'&&M.count<=0&&!M.done){ const diff=M.pace-M.band; trainPill(c,d,W,H*.2,Math.abs(diff)<.12?'Nice rhythm!':diff<0?'Faster!':'Ease off…',Math.abs(diff)<.12?'#9fe8a8':'#ffd0a0',14); }
-  if(M.stat==='power'){ const w=Math.min(440*d,W*.52), x=W/2-w/2, y=H-58*d; c.fillStyle='rgba(20,12,30,.7)'; c.fillRect(x-6*d,y-6*d,w+12*d,28*d); c.fillStyle='rgba(255,255,255,.12)'; c.fillRect(x,y,w,16*d);
-    c.fillStyle='rgba(243,199,101,.55)'; c.fillRect(x+(M.zone-M.zw/2)*w,y,M.zw*w,16*d); c.fillStyle='#ffd34a'; c.fillRect(x+(M.zone-M.zw*.15)*w,y,M.zw*.3*w,16*d);
-    c.fillStyle='#ffffff'; c.fillRect(x+M.needle*w-2*d,y-6*d,4*d,28*d); }
-  if(M.stat==='endurance'){ const h=Math.min(220*d,H*.5), x=W-170*d, y=H/2-h/2; c.fillStyle='rgba(20,12,30,.7)'; c.fillRect(x-6*d,y-6*d,30*d,h+12*d); c.fillStyle='rgba(255,255,255,.1)'; c.fillRect(x,y,18*d,h);
-    c.fillStyle='rgba(111,220,156,.6)'; c.fillRect(x,y+(1-M.band-.12)*h,18*d,.24*h); c.fillStyle='#fff'; c.beginPath(); c.arc(x+9*d,y+(1-M.pace)*h,9*d,0,7); c.fill(); c.font=`800 ${10*d}px system-ui`; c.textAlign='center'; c.fillStyle='#f7e6c4'; c.fillText('PACE',x+9*d,y-12*d); }
-  if(M.stat==='focus'&&M.count<=0&&!M.done){ const txt=M.phase==='show'?'Watch closely…':M.phase==='input'?`Your turn: ${M.input.length}/${M.seq.length}`:''; if(txt) trainPill(c,d,W,H*.2,txt,'#ffe08a',15); } }
+function drawTrainHud(){}
 function trainGrade(M){ const st=M.stat; let r;
   if(st==='speed') r=M.score/Math.max(4,2*(M.passed||0)); else if(st==='power') r=M.score/(M.max*3); else if(st==='agility') r=M.score/M.max; else if(st==='focus') r=(M.best-2)/(M.max-2); else r=M.inT/16;
   r=clamp(r,0,1); return r>=.85?'S':r>=.62?'A':r>=.38?'B':'C'; }
@@ -6410,8 +6357,9 @@ function tzReset(){ TZ.stick=null; TZ.jump=null; if(MG&&MG.hold){ MG.hold.left=M
 function tzBind(){ const m=$('#mini'); if(!m||m.__tz) return; m.__tz=1;
   const active=()=>MG&&MG.kind==='side'&&!(S&&S.settings.advButtons);
   m.addEventListener('pointerdown',ev=>{ if(!active()||ev.target.closest('button,.pill,#miniHud')) return; ev.preventDefault(); SND.init(); const r=m.getBoundingClientRect(); const x=ev.clientX-r.left;
-    if(x<r.width*.5&&!TZ.stick){ TZ.stick={id:ev.pointerId,x0:ev.clientX,y0:ev.clientY}; const s=tzEl(); s.style.left=(ev.clientX-r.left)+'px'; s.style.top=(ev.clientY-r.top)+'px'; s.classList.add('on'); s.firstChild.style.transform='translate(-50%,-50%)'; }
-    else if(x>=r.width*.5&&!TZ.jump){ TZ.jump={id:ev.pointerId}; if(!MG.hold.jump) MG.buf=.14; MG.hold.jump=true; }
+    const lefty=!!(S&&S.settings.lefty); const onStickSide=lefty?x>=r.width*.5:x<r.width*.5;
+    if(onStickSide&&!TZ.stick){ TZ.stick={id:ev.pointerId,x0:ev.clientX,y0:ev.clientY}; const s=tzEl(); s.style.left=(ev.clientX-r.left)+'px'; s.style.top=(ev.clientY-r.top)+'px'; s.classList.add('on'); s.firstChild.style.transform='translate(-50%,-50%)'; }
+    else if(!onStickSide&&!TZ.jump){ TZ.jump={id:ev.pointerId}; if(!MG.hold.jump) MG.buf=.14; MG.hold.jump=true; }
     try{ m.setPointerCapture(ev.pointerId); }catch(e){} },true);
   m.addEventListener('pointermove',ev=>{ if(!active()) return; const S_=TZ.stick; if(!S_||S_.id!==ev.pointerId) return; const dx=ev.clientX-S_.x0, dz=16;
     // the stick follows the thumb if it drifts too far, so direction changes stay quick
@@ -6642,6 +6590,14 @@ const STARTER_INV={apple:6,sunpear:2,seed_apple:2,seed_dashberry:1,ess_speed:1,e
 { const _sg=seedNewGame; seedNewGame=function(){ const r=_sg.apply(this,arguments); if(S) S.inv080=1; return r; }; }
 /* ---------- what's new: shown once after each update ---------- */
 const CHANGELOG={
+  '0.9.0':[
+    ['🐾','Echos with lives of their own','Morning stretches, evenings round the campfire, puddle jumping in the rain, snowball fights, shy Echos hiding, energetic ones zooming about, friends sharing fruit, and Echos bringing you a toy to play.'],
+    ['🧭','A next-step card','When there\'s no story goal, a card shows the most useful thing to do next. Tap it to go there. First-time games show a slower demo.'],
+    ['🏆','Weekly challenges and rare finds','Three weekly challenges for Shards (finish all three for a rare egg), a Rare Finds collection in the Echodex, sparkling rare Echos, and a seasonal decoration in the shop.'],
+    ['☁️','Hero and Dark gardens','The Hero Garden has cloud trampolines and a Sky Shrine that blesses your Echos once a day. The Dark Garden is easier to see.'],
+    ['🏁','Race and karate day','A line-up card before each race or bout, live commentary, and a podium at the finish. Breeding shows what the baby could inherit.'],
+    ['⚙️','Settings and safety','Game feel (Relaxed, Normal, Tricky), no vibration, left-handed controls, stat symbols, daily backups, downloadable save files, and smoother graphics on busy scenes.'],
+    ['✦','More Sparks','Adventures pay full for 8 runs a day, training and shows pay Sparks for good grades, and daily goals pay more.']],
   '0.8.6':[
     ['🏫','Room to breathe','The Kindergarten is bigger and back in its usual spot in every garden, with clear space around it so you won\'t tap a tree plot by mistake.'],
     ['🌳','Tidier gardens','The tree plots have been spaced out again, and lights, bushes and trees moved out of the way. Trees you\'ve planted move with their plot.'],
@@ -8003,12 +7959,12 @@ TRG.agility={ setup(M){ const bpm=100+Math.min(16,M.lv*.4), b=60/bpm; const note
     Object.assign(M,{bpm,beat:b,notes,song:-.4,travel:1.5,score:0,judged:0,combo:0,best:0,flash:[0,0,0],lastBeat:-1,end:t+1}); },
   laneX(M,i){ return M.W*(.42+i*.16); },
   down(M,x,y){ let lane=-1, bd=1e9; for(let i=0;i<3;i++){ const dx=Math.abs(x-this.laneX(M,i)); if(dx<bd){ bd=dx; lane=i; } } if(bd>M.W*.12) return; M.flash[lane]=.15;
-    let best=null, bt=1; for(const n of M.notes){ if(n.j||n.lane!==lane) continue; const dt_=Math.abs(n.t-M.song); if(dt_<.17&&dt_<bt){ bt=dt_; best=n; } }
+    let best=null, bt=1; for(const n of M.notes){ if(n.j||n.lane!==lane) continue; const dt_=Math.abs(n.t-M.song); if(dt_<.17*(n.win||1)&&dt_<bt){ bt=dt_; best=n; } }
     if(best){ best.j=1; const v=bt<.05?1:bt<.1?.75:.45; M.score+=v; M.judged++; M.combo++; M.best=Math.max(M.best,M.combo); SND.pitch&&SND.pitch([0,4,7][lane]+(M.combo%8>3?12:0),'triangle',.25); trPop(M,v===1?'Perfect':v>.5?'Great':'Good',this.laneX(M,lane),M.H*.7,v===1?'#ffe08a':'#fff'); trBurst(M,this.laneX(M,lane),M.H*.8,TR_LANE_COL[lane],8); M.emo='excited'; }
     else { M.combo=0; } },
   update(M,dt){ M.song+=dt; for(let i=0;i<3;i++) M.flash[i]=Math.max(0,M.flash[i]-dt);
     const bt=Math.floor(M.song/M.beat); if(bt!==M.lastBeat&&M.song>0){ M.lastBeat=bt; SND.thump&&SND.thump(bt%2?2:0); }
-    for(const n of M.notes){ if(!n.j&&M.song-n.t>.17){ n.j=1; M.judged++; M.combo=0; trPop(M,'Miss',this.laneX(M,n.lane),M.H*.7,'#ffb0a0'); M.emo='surprised'; } }
+    for(const n of M.notes){ if(!n.j&&M.song-n.t>.17*(n.win||1)){ n.j=1; M.judged++; M.combo=0; trPop(M,'Miss',this.laneX(M,n.lane),M.H*.7,'#ffb0a0'); M.emo='surprised'; } }
     const total=M.notes.length; M.prog=clamp(M.song/(M.end-1),0,1); M.live=M.judged?M.score/M.judged:.5; if(M.song>M.end) trEnd(M,M.score/total); if(Math.random()<dt*.8&&M.emo!=='happy') M.emo='happy'; },
   score(M){ return M.combo>2?`Combo ×${M.combo}`:`${Math.round(M.score*10)/10} pts`; },
   draw(M,x,W,H,d){ x.fillStyle='rgba(20,12,40,.35)'; x.fillRect(this.laneX(M,0)-W*.08,0,this.laneX(M,2)-this.laneX(M,0)+W*.16,H);
@@ -8289,6 +8245,259 @@ TOY_GAMES.hula={ start(e,T){ const m=new THREE.Mesh(new THREE.TorusGeometry(.55,
     if(T.h>.15){ T.time+=dt; toyScore(e,T,Math.floor(T.time)); const s=Math.floor(T.time); if(s>0&&s%12===0&&!T.paid[s]){ T.paid[s]=1; S.sparks+=6; toyReward(e,T,6,'agility',`${s}s of hula! ✦ 6`); } } else if(T.time>2){ floatText(`The hoop dropped after ${Math.floor(T.time)}s`,e); T.time=0; T.h=.6; T.spin=.4; track('play'); } },
   pose(e,T,p,pose,t){ pose.rotation.z=Math.sin(t*12)*.1*Math.min(1,T.spin); p.arms[0].rotation.z=-1.2; p.arms[1].rotation.z=1.2; } };
 /* =========================================================
+   v0.9.0 — stability: one safety net around every mini-game and
+   adventure. If a mode ever throws repeatedly, the run is closed
+   cleanly and you are taken back to the garden instead of freezing.
+   ========================================================= */
+const GUARDRAIL={errs:0,last:0,stuck:0};
+{ const _um=updateMini; updateMini=function(dt){ const M=MG; if(!M) return;
+    try{ _um.apply(this,arguments); GUARDRAIL.errs=Math.max(0,GUARDRAIL.errs-dt*2); }
+    catch(e){ GUARDRAIL.errs++; console.warn('mini-game error',M.kind,e); if(GUARDRAIL.errs>12){ GUARDRAIL.errs=0; try{ if(M.kind==='adv'||M.kind==='side'||M.kind==='glide'){ if(!M.ended) endAdv(false); } }catch(_){} setTimeout(()=>{ if(MG===M){ try{ closeMini(); }catch(_){ MG=null; } toast('Something went wrong, so we headed home','warn'); } },600); } }
+    // a run that has ended but never closed (any mode) is closed after a few seconds
+    if(MG===M&&(M.ended||M.done)){ M._endT=(M._endT||0)+dt; if(M._endT>8&&$('#modal').hidden){ try{ closeMini(); }catch(_){ MG=null; } } } }; }
+/* ---------- performance: auto graphics also watches adventures and races; fewer moving lights on lower settings ---------- */
+const FPS3={t:0,n:0,cool:0};
+function watchFps3(dt){ if(!S||(S.settings.quality||'auto')!=='auto'||!MG||document.hidden) return; FPS3.cool-=dt; if(FPS3.cool>0) return; FPS3.t+=dt; FPS3.n++; if(FPS3.t<4) return; const fps=FPS3.n/FPS3.t; FPS3.t=0; FPS3.n=0;
+  const cur=qualityLevel(); if(fps<28&&cur!=='low'){ S.settings.autoQ=cur==='high'?'med':'low'; applyQuality(); FPS3.cool=4; saveGame(); } }
+{ const _um=updateMini; updateMini=function(dt){ const r=_um.apply(this,arguments); try{ watchFps3(dt); }catch(e){} return r; }; }
+function lightBudget(){ const q=qualityLevel(); const keep=q==='low'?3:q==='med'?6:99; let n=0; const lights=[]; scene.traverse(o=>{ if(o.isPointLight) lights.push(o); });
+  // the Guardian's torch and the campfire stay; extra pond and lantern lights switch off first
+  lights.sort((a,b)=>(b===TORCH.light)-(a===TORCH.light)||(b.distance>9)-(a.distance>9)); for(const L of lights){ if(L===TORCH.light||(MOM&&L===MOM.flashLight)){ continue; } n++; L.visible=n<=keep; } }
+{ const _aq=applyQuality; applyQuality=function(){ const r=_aq.apply(this,arguments); try{ lightBudget(); }catch(e){} return r; }; }
+{ const _bg=buildGarden; buildGarden=function(){ const r=_bg.apply(this,arguments); try{ setTimeout(lightBudget,0); }catch(e){} return r; }; }
+/* ---------- save safety: daily backups, restore, download a save file, and a gentle weekly reminder ---------- */
+const BK_KEYS=[SAVE_KEY+'.day0',SAVE_KEY+'.day1',SAVE_KEY+'.day2'];
+function snapBackup(force){ if(!S) return; try{ const day=todayKey(); const meta=JSON.parse(localStorage.getItem(SAVE_KEY+'.days')||'[]'); if(!force&&meta[0]&&meta[0].day===day){ localStorage.setItem(BK_KEYS[0],JSON.stringify(S)); meta[0].t=Date.now(); }
+    else { for(let i=BK_KEYS.length-1;i>0;i--){ const v=localStorage.getItem(BK_KEYS[i-1]); if(v) localStorage.setItem(BK_KEYS[i],v); } localStorage.setItem(BK_KEYS[0],JSON.stringify(S)); meta.unshift({day,t:Date.now(),echoes:S.echoes.length,sparks:S.sparks}); meta.length=Math.min(meta.length,BK_KEYS.length); }
+    localStorage.setItem(SAVE_KEY+'.days',JSON.stringify(meta)); }catch(e){} }
+setInterval(()=>{ try{ if(S&&!MG) snapBackup(); }catch(e){} },5*60*1000);
+setTimeout(()=>{ try{ snapBackup(); }catch(e){} },20000);
+{ const _lg=loadGame; loadGame=function(){ const d=_lg.apply(this,arguments); if(d) return d; for(const k of BK_KEYS){ try{ const raw=localStorage.getItem(k); if(raw){ const x=migrate(JSON.parse(raw)); if(x&&Array.isArray(x.echoes)){ x._restored=1; return x; } } }catch(e){} } return null; }; }
+setInterval(()=>{ try{ if(S&&S._restored&&$('#modal').hidden&&!MG&&!SCENE){ delete S._restored; toast('Your last save could not be read, so we loaded your most recent backup','warn'); } }catch(e){} },3000);
+function saveFileName(){ const d=new Date(); return `Echo-Garden-save-${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}.txt`; }
+function downloadSave(){ try{ const code=btoa(unescape(encodeURIComponent(JSON.stringify(S)))); const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([code],{type:'text/plain'})); a.download=saveFileName(); document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },500); S.lastExport=Date.now(); saveGame(); toast('Save file downloaded. Keep it somewhere safe','good'); }catch(e){ toast('Could not download. Use Copy save code instead','warn'); } }
+{ const _sa=saveAction; saveAction=function(a){ if(a==='export') S.lastExport=Date.now(); if(a==='download') return downloadSave();
+    if(a&&a.startsWith('restore')){ const i=+a.slice(7); const raw=localStorage.getItem(BK_KEYS[i]); let d=null; try{ d=migrate(JSON.parse(raw)); }catch(e){} if(!d) return toast('That backup could not be read','warn');
+      return confirmModal('Restore this backup?','Your garden will go back to how it was then. Anything since will be lost.','Restore',()=>{ S=d; RT.clear(); clearEntities(); buildGarden(S.garden); syncEntities(); closePanel(); renderHUD(); saveGame(); toast('Backup restored','good'); }); }
+    return _sa.apply(this,arguments); }; }
+{ const _mr=PANELS.settings.render; PANELS.settings.render=function(tab){ let h=_mr.apply(this,arguments); if(tab!=='save') return h; let meta=[]; try{ meta=JSON.parse(localStorage.getItem(SAVE_KEY+'.days')||'[]'); }catch(e){}
+    const bk=meta.map((m,i)=>`<div class="li"><div class="tx"><b>${i===0?'Today':new Date(m.t).toLocaleDateString()}</b><span>${m.echoes} Echo${m.echoes===1?'':'s'} · ✦ ${m.sparks} · ${new Date(m.t).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}</span></div><button class="btn sm" data-save="restore${i}">Restore</button></div>`).join('');
+    const extra=`<div class="sec">Keep your garden safe</div><p class="note">A save file lives outside the browser, so it survives clearing your history or changing phone. Load it again by pasting its contents below.</p><div class="row"><button class="btn pri" data-save="download">Download save file</button></div>${bk?`<div class="sec">Automatic backups</div><div class="list">${bk}</div>`:''}`;
+    return h.replace('<div class="sec">Load a save code</div>',extra+'<div class="sec">Load a save code</div>'); }; }
+setInterval(()=>{ try{ if(!S||MG||SCENE||CINE||!$('#modal').hidden||UI.panel) return; const played=(S.stats&&S.stats.hatched)||0; if(!played) return; const last=S.lastExport||S.backupNag||0; if(Date.now()-last<7*86400000) return; if(!S.backupNag){ S.backupNag=Date.now(); saveGame(); return; }
+    S.backupNag=Date.now(); saveGame(); showModal(`<h2>Keep your garden safe</h2><p>Your garden is saved in this browser. Download a save file now and then so you can get it back if you clear your browser or change phone.</p><div class="row"><button class="btn" data-close>Later</button><button class="btn pri" data-savedl>Download save file</button></div>`); }catch(e){} },60000);
+document.addEventListener('click',ev=>{ if(ev.target.closest('[data-savedl]')&&S){ ev.stopPropagation(); closeModal(); downloadSave(); } },true);
+/* =========================================================
+   v0.9.0 — Sparks balance for the slower growing-up pace:
+   adventures pay full for 8 runs a day (was 5), training and shows
+   pay Sparks for good grades, and daily goals pay a little more.
+   ========================================================= */
+const ADV_FULLPAY2=8;
+{ const _ap=advPay; advPay=function(M,full){ const r=_ap.apply(this,arguments); if(LAST_PAY&&LAST_PAY.half&&S.advDay&&S.advDay.n<=ADV_FULLPAY2){ r.base*=2; r.bonus*=2; LAST_PAY.half=false; LAST_PAY.bonus=r.bonus; } return r; }; }
+{ const _sm=showModal; showModal=function(html){ if(typeof html==='string') html=html.replace(`runs after the first ${ADV_FULLPAY} today pay half`,`runs after the first ${ADV_FULLPAY2} today pay half`); return _sm.call(this,html); }; }
+const TRAIN_PAY={S:20,A:12,B:6,C:2};
+{ const _ft=finishTrain; finishTrain=function(){ const M=MG; const r=_ft.apply(this,arguments); if(M&&!M._paid){ M._paid=1; setTimeout(()=>{ try{ const g=trainGrade(M); const n=TRAIN_PAY[g]||0; if(n){ S.sparks+=n; renderHUD(); const el=document.querySelector('.trn-res p'); if(el) el.insertAdjacentHTML('beforeend',`<br><b style="color:#ffe08a">✦ ${n}</b>`); saveGame(); } }catch(e){} },1400); } return r; }; }
+{ const _sf=showFinish; showFinish=function(e,T){ const was=T.over; const r=_sf.apply(this,arguments); if(!was&&T.over){ const acc=T.total?T.hits/T.total:0; const n=Math.round(6+acc*18); S.sparks+=n; renderHUD(); floatText(`Show reward ✦ ${n}`,e,'#ffe08a'); } return r; }; }
+for(const k in DG_POOL) DG_POOL[k][2]=Math.round(DG_POOL[k][2]*1.25);
+/* =========================================================
+   v0.9.0 — guidance and Echo life
+   - a "Next step" card when there's no story goal showing
+   - a longer, slower demo the first time you play each training game or show
+   - Echos with routines, weather play, personalities you can see,
+     friends who share fruit, and Echos who bring you a toy to play
+   ========================================================= */
+/* ---------- next step card ---------- */
+function nextStep(){ const G=gardenEchoes(), E=S.echoes; const hungry=G.filter(e=>e.needs.hunger<35&&rtOf(e).state!=='cocoon').sort((a,b)=>a.needs.hunger-b.needs.hunger)[0];
+  const D=dailyGoals(); const claim=D.list.some(g=>!g.claimed&&g.have>=DG_POOL[g.k][1]); const W=typeof weeklyState==='function'?weeklyState():null;
+  if(!E.length) return null;
+  if(hungry) return {t:'Feed '+hungry.name,s:`${hungry.name} is hungry`,go:()=>{ openPanel('bag','fruit'); }};
+  if(claim) return {t:'Claim your daily goal',s:'A reward is waiting',go:()=>openPanel('goals','today')};
+  if(!S.trees.length&&Object.keys(S.inv).some(k=>ITEMS[k]&&ITEMS[k].cat==='seed'&&S.inv[k]>0)) return {t:'Plant a seed',s:'Tap an empty plot to plant it',go:()=>{ openPanel('bag','seed'); }};
+  const noSkill=G.find(e=>e.stage!=='baby'&&!e.lesson&&!Object.keys(e.skills||{}).length)||G.find(e=>!e.lesson&&!Object.keys(e.skills||{}).length&&e.ageSec>600);
+  if(noSkill) return {t:'Send '+noSkill.name+' to class',s:'Lessons teach things Echos do on their own',go:()=>{ UI.schoolEcho=noSkill.id; openPanel('school','class'); }};
+  if(!(S.stats.trained>0)&&G.length) return {t:'Train an Echo',s:'Play → Training',go:()=>openTraining()};
+  if((S.stats.runs||0)<3) return {t:'Go on an Adventure',s:'Bring back sparks and essences',go:()=>openPanel('adv')};
+  if(!S.toys.some(y=>y.type==='toychest')&&!(S.inv.dec_toychest>0)&&S.sparks>=260) return {t:'Buy a Toy Box',s:'Shop → Basics',go:()=>openPanel('shop','basic')};
+  if(W){ const g=W.list.find(x=>!x.claimed); if(g) return {t:'Weekly: '+WEEKLY[g.k][0],s:`${Math.min(g.have,WEEKLY[g.k][1])}/${WEEKLY[g.k][1]} · ◆ ${WEEKLY[g.k][2]}`,go:()=>openPanel('goals','today')}; }
+  const boss=ZONE_ORDER.find(z=>zoneOpen(z)&&isBossLv(zoneLv(z))); if(boss) return {t:`Beat the ${ZONES[boss].name} boss`,s:`Level ${zoneLv(boss)} boss stage`,go:()=>openPanel('adv')};
+  const teen=G.find(e=>e.stage==='teen'); if(teen) return {t:`Help ${teen.name} grow up`,s:'Train, feed and keep them happy',go:()=>openTraining(teen)};
+  return null; }
+function renderNext(){ if(!S) return; let n=$('#nextStep'); const q=$('#quest'); const busy=!S.seenIntro||(S.tut!=null&&S.tut<99)||(q&&!q.hidden)||MG||CARE||CINE;
+  const st=busy?null:nextStep(); if(!st){ if(n) n.hidden=true; return; }
+  if(!n){ n=document.createElement('button'); n.id='nextStep'; $('#ui').appendChild(n); n.addEventListener('click',ev=>{ ev.stopPropagation(); const s=n._s; if(s&&s.go){ SND.ui&&SND.ui(); s.go(); } }); }
+  n._s=st; n.hidden=false; const html=`<span class="qi">→</span><span class="qt"><em>Next step</em><b>${esc(st.t)}</b></span>`; if(n._h!==html){ n._h=html; n.innerHTML=html; n.title=st.s||''; } }
+setInterval(()=>{ try{ renderNext(); }catch(e){} },1500);
+/* ---------- first-time demos ---------- */
+{ const _st=startTraining; startTraining=function(e,stat){ const r=_st.apply(this,arguments); try{ S.seenTr=S.seenTr||{}; if(MG&&MG.kind==='tr2'&&!S.seenTr[stat]){ S.seenTr[stat]=1; MG.count=6.6; } }catch(_){} return r; }; }
+{ const _sr=startRecital; startRecital=function(e,k){ const r=_sr.apply(this,arguments); try{ S.seenShow=S.seenShow||{}; const T=CARE&&CARE.toy; if(T&&!S.seenShow[k]){ S.seenShow[k]=1; T.intro=4.8; } }catch(_){} return r; }; }
+/* ---------- Echo life ---------- */
+
+function lifeFree2(e,rt){ return onFeet(e)&&!e.lesson&&!(CARE&&CARE.id===e.id)&&GA.carry!==e.id&&['idle','walk','wander','explore'].includes(rt.state); }
+function treeSpot(e){ let best=null,bd=1e9; for(const t of S.trees){ if(t.garden!==S.garden||t.stage<2) continue; const p=WORLD.plots[t.plot]; const d=Math.hypot(p.x-e.pos.x,p.z-e.pos.z); if(d<bd){ bd=d; best=p; } } return best; }
+function lifeStart(e,rt,k,o={}){ rt.state='sk_life'; rt.sk=Object.assign({k:'life',life:k,t:0,dur:o.dur||rand(8,14)},o); rt.timer=5; }
+{ const _de=decide; decide=function(e,rt){ try{ if(lifeFree2(e,rt)||rt.state==='idle'){ const t=S.time.t, w=weatherNow(), n=e.needs, day=todayKey();
+      // morning stretch, once a day
+      if(t>.23&&t<.36&&e._stretch!==day&&Math.random()<.5){ e._stretch=day; lifeStart(e,rt,'stretch',{dur:3}); return; }
+      // evenings at the campfire (or by the Guardian's torch)
+      if((t>.74||t<.18)&&n.energy>30&&WORLD.fire&&Math.random()<.22){ const a=rand(6.28), r=2.1+rand(.4); lifeStart(e,rt,'campfire',{tx:WORLD.fire.x+Math.cos(a)*r,tz:WORLD.fire.z+Math.sin(a)*r,dur:rand(14,24)}); rt.tx=rt.sk.tx; rt.tz=rt.sk.tz; return; }
+      // rain and snow play
+      if((w==='rain'||w==='thunder')&&Math.random()<.3){ const tr=treeSpot(e); if(tr&&(e.personality==='calm'||e.personality==='nervous'||Math.random()<.4)){ const a=rand(6.28); lifeStart(e,rt,'shelter',{tx:tr.x+Math.cos(a)*1.3,tz:tr.z+Math.sin(a)*1.3,dur:rand(14,22)}); rt.tx=rt.sk.tx; rt.tz=rt.sk.tz; } else lifeStart(e,rt,'puddle',{dur:rand(6,10)}); return; }
+      if(w==='snow'&&Math.random()<.28){ const fr=bestFriend(e); lifeStart(e,rt,'snow',{dur:rand(7,11),mode:fr&&Math.random()<.6?'throw':'angel',to:fr&&fr.id}); return; }
+      // personalities
+      if(e.personality==='shy'&&e.trust<55&&Math.hypot(GUARD.x-e.pos.x,GUARD.z-e.pos.z)<2.4&&Math.random()<.6){ const a=Math.atan2(e.pos.x-GUARD.x,e.pos.z-GUARD.z); lifeStart(e,rt,'hide',{tx:e.pos.x+Math.sin(a)*2.4,tz:e.pos.z+Math.cos(a)*2.4,dur:5}); rt.tx=rt.sk.tx; rt.tz=rt.sk.tz; return; }
+      if((e.personality==='energetic'||e.personality==='playful')&&n.energy>55&&e.stats.speed.lv>=2&&Math.random()<.12){ lifeStart(e,rt,'zoom',{cx:e.pos.x,cz:e.pos.z,dur:rand(4,6),a:rand(6.28)}); return; }
+      // bring the Guardian a toy to play with
+      const box=typeof toyBoxHere==='function'&&toyBoxHere(); if(box&&e.bond>30&&n.happy>40&&!gardenEchoes().some(o=>rtOf(o).sk&&rtOf(o).sk.life==='ask')&&Math.random()<.05){ const av=boxAvail().filter(isHandToy).filter(k=>TOY_PLAY[k]&&TOY_PLAY[k]!=='big'); if(av.length){ const a=Math.atan2(-box.x,-box.z); lifeStart(e,rt,'ask',{phase:'box',toy:pick(av),dur:40,tx:box.x+Math.sin(a)*.9,tz:box.z+Math.cos(a)*.9}); rt.tx=rt.sk.tx; rt.tz=rt.sk.tz; return; } }
+      // friends share fruit with a hungry friend
+      const hungryFr=gardenEchoes().find(o=>o!==e&&(e.rel[o.id]||0)>=55&&o.needs.hunger<40); if(hungryFr&&n.hunger>50&&(groundFruit(e)||shakeableTree())&&Math.random()<.35){ startSkill(e,'forage'); return; } } }catch(err){ console.warn('life',err); }
+    return _de.apply(this,arguments); }; }
+{ const _rs=runSkill; runSkill=function(e,rt,dt){ const K=rt.sk; if(!K||K.k!=='life') return _rs.apply(this,arguments); K.t+=dt; rt.timer=5; const n=e.needs; const done=()=>{ rt.state='idle'; rt.timer=1.5; rt.sk=null; };
+    const L=K.life;
+    if(L==='stretch'){ if(K.t>K.dur){ n.happy=clamp(n.happy+3,0,100); done(); } return; }
+    if(L==='campfire'){ if(!K.at){ if(stepTo(e,rt,dt)||K.t>14){ K.at=1; K.t=0; if(WORLD.fire) rt.ang=Math.atan2(WORLD.fire.x-e.pos.x,WORLD.fire.z-e.pos.z); } return; } n.happy=clamp(n.happy+dt*.5,0,100); n.social=clamp((n.social||50)+dt*.4,0,100); if(Math.random()<dt*.2) fx(Math.random()<.5?'note':'heart',{x:e.pos.x,y:1.1,z:e.pos.z},{vy:.6,size:.22}); if(K.t>K.dur) done(); return; }
+    if(L==='shelter'){ if(!K.at){ if(stepTo(e,rt,dt)||K.t>14){ K.at=1; K.t=0; } return; } if(K.t>K.dur||!['rain','thunder'].includes(weatherNow())) done(); return; }
+    if(L==='puddle'){ K.hop=(K.hop||0)-dt; if(K.hop<=0){ K.hop=.55; for(let i=0;i<5;i++) fx('drop',{x:e.pos.x,y:.2,z:e.pos.z},{vx:rand(-1,1),vz:rand(-1,1),vy:rand(.8,1.6),size:.18,color:'#bfe8ff'}); } n.happy=clamp(n.happy+dt*.6,0,100); if(K.t>K.dur) done(); return; }
+    if(L==='snow'){ const fr=K.to&&getEcho(K.to); if(K.mode==='throw'&&fr&&inGarden(fr)){ rt.ang=Math.atan2(fr.pos.x-e.pos.x,fr.pos.z-e.pos.z); K.th=(K.th||1.2)-dt; if(K.th<=0){ K.th=1.6; fx('puff',{x:fr.pos.x,y:.7,z:fr.pos.z},{vy:.6,size:.5,color:'#ffffff'}); befriend(e,fr,1); if(Math.random()<.5) eventEmotion(fr,'giggle',2); } } n.happy=clamp(n.happy+dt*.5,0,100); if(K.t>K.dur) done(); return; }
+    if(L==='hide'){ stepTo(e,rt,dt,1.3); rt.ang=Math.atan2(GUARD.x-e.pos.x,GUARD.z-e.pos.z); if(K.t>K.dur){ e.trust=clamp(e.trust+1,0,100); done(); } return; }
+    if(L==='zoom'){ K.a+=dt*3.2; rt.tx=K.cx+Math.cos(K.a)*2.4; rt.tz=K.cz+Math.sin(K.a)*2.4; stepTo(e,rt,dt,2.2); if(Math.random()<dt*10) fx('puff',{x:e.pos.x,y:.1,z:e.pos.z},{vy:.3,size:.25,life:.4,color:'#efe3c8'}); n.energy=clamp(n.energy-dt*.3,0,100); if(K.t>K.dur) done(); return; }
+    if(L==='ask'){ const box=toyBoxHere(); if(!box&&K.phase==='box') return done();
+      if(K.phase==='box'){ if(stepTo(e,rt,dt)||K.t>14){ boxBounce&&boxBounce(box); SND.pop&&SND.pop(); K.phase='bring'; K.carry=K.toy; } return; }
+      if(K.phase==='bring'){ const a=Math.atan2(e.pos.x-GUARD.x,e.pos.z-GUARD.z); rt.tx=GUARD.x+Math.sin(a)*1.1; rt.tz=GUARD.z+Math.cos(a)*1.1; if(stepTo(e,rt,dt)||Math.hypot(GUARD.x-e.pos.x,GUARD.z-e.pos.z)<1.4){ K.phase='wait'; K.wt=0; skToast&&skToast('ask:'+e.id,`${e.name} brought you the ${TOYS[K.toy].name}. Tap ${e.name} to play!`); } return; }
+      if(K.phase==='wait'){ K.wt+=dt; rt.ang=Math.atan2(GUARD.x-e.pos.x,GUARD.z-e.pos.z); if(Math.random()<dt*.8) fx('heart',{x:e.pos.x,y:1.2,z:e.pos.z},{vy:.6,size:.22}); if(K.wt>25){ eventEmotion(e,'sad',2); done(); } return; } } }; }
+// tapping an Echo that brought you a toy starts playing with it
+{ const _oc=openCare; openCare=function(e){ const rt=e&&rtOf(e); const ask=rt&&rt.sk&&rt.sk.k==='life'&&rt.sk.life==='ask'&&rt.sk.phase==='wait'?rt.sk.toy:null; const r=_oc.apply(this,arguments);
+    if(ask){ rt.sk=null; setTimeout(()=>{ try{ if(CARE&&CARE.id===e.id){ startToy(e,ask); eventEmotion(e,'excited',3); e.bond=clamp(e.bond+2,0,100); } }catch(_){} },500); } return r; }; }
+// poses
+{ const _ae=animateEchoes; animateEchoes=function(dt){ const r=_ae.apply(this,arguments); const t=TIME;
+    for(const e of gardenEchoes()){ const rt=rtOf(e); if(rt.state!=='sk_life'||!rt.sk) continue; const m=MESH.echo.get(e.id); if(!m) continue; const p=m.parts, pose=p.pose, K=rt.sk, L=K.life;
+      const prop=L==='ask'&&K.carry?'toy:'+K.carry:null; const g=setProp(m,prop); if(g){ g.position.set(0,(p.height||1)*1.02,0); p.arms[0].rotation.z=-2.7; p.arms[1].rotation.z=2.7; }
+      if(L==='stretch'){ const k=Math.sin(Math.min(1,K.t/K.dur)*Math.PI); p.arms[0].rotation.z=-2.8*k; p.arms[1].rotation.z=2.8*k; pose.position.y+=k*.05; p.head.rotation.x=-.4*k; if(K.t<.1&&typeof setFace==='function') setFace(p,'sleepy',false); }
+      else if(L==='campfire'&&K.at){ pose.position.y-=.06; pose.rotation.z=Math.sin(t*1.4+(+e.id||0))*.05; p.arms[0].rotation.x=p.arms[1].rotation.x=-.6; p.head.rotation.z=Math.sin(t*1.2)*.1; }
+      else if(L==='shelter'&&K.at){ pose.position.y-=.05; p.arms[0].rotation.x=p.arms[1].rotation.x=-1; p.head.rotation.x=.2; }
+      else if(L==='puddle'){ const k=K.hop!=null?Math.sin(Math.max(0,K.hop)/.55*Math.PI):0; pose.position.y+=k*.22; p.arms[0].rotation.z=-1.6*k; p.arms[1].rotation.z=1.6*k; }
+      else if(L==='snow'){ if(K.mode==='angel'){ pose.rotation.x=-1.3; pose.position.y=.1; p.arms[0].rotation.z=-1.4-Math.sin(t*4)*.6; p.arms[1].rotation.z=1.4+Math.sin(t*4)*.6; } else { p.arms[1].rotation.x=-2.4+Math.max(0,Math.sin(t*4))*1.6; } }
+      else if(L==='hide'){ p.head.rotation.x=.35; p.arms[0].rotation.set(-1.6,0,-.4); p.arms[1].rotation.set(-1.6,0,.4); pose.rotation.z=Math.sin(t*1.5)*.05; }
+    } return r; }; }
+/* =========================================================
+   v0.9.0 — gardens and long-term goals
+   - the Dark Garden is easier to see while keeping its mood
+   - the Hero Garden gets cloud trampolines and a Sky Shrine with a daily blessing
+   - weekly challenges, a Rare Finds collection, sparkling rare Echos,
+     and a seasonal decoration in the shop each season
+   ========================================================= */
+/* ---------- Dark Garden visibility ---------- */
+{ const _us=updateSky; updateSky=function(){ const r=_us.apply(this,arguments); try{ if(!MG&&S.garden==='dark'){ hemi.intensity+=.32; if(fillLight) fillLight.intensity+=.25; } }catch(e){} return r; }; }
+{ const _bg=buildGarden; buildGarden=function(id){ const r=_bg.apply(this,arguments); try{ if(id==='dark'){ world.traverse(o=>{ if(o.isMesh&&o.material&&o.material.emissive&&o.material.emissiveIntensity>=1.1&&o.material.emissiveIntensity<1.5){ o.material.emissiveIntensity=1.9; } });
+      const pl=new THREE.PointLight(0x9f7aff,3,16,1.6); pl.position.set(0,5,0); world.add(pl); } }catch(e){ console.warn(e); } return r; }; }
+/* ---------- Hero Garden: cloud trampolines and the Sky Shrine ---------- */
+const HERO_CLOUDS=[{x:-11.4,z:-3},{x:11.6,z:3.2}], SHRINE={x:-6.4,z:12.2};
+function cloudPad(x,z){ const g=new THREE.Group(); g.position.set(x,0,z); const m=mat('#ffffff',{emissive:'#e8f6ff',emissiveIntensity:.25}); for(const [px,pz,s] of [[0,0,1],[.7,.2,.7],[-.7,.1,.75],[.2,.6,.6],[-.3,-.6,.65]]) g.add(mesh(GEO.sph,m,[s*.9,s*.4,s*.9],[px,.35,pz]));
+  world.add(g); addObs(x,z,.6,'cloud'); return g; }
+function buildShrine(){ const g=new THREE.Group(); g.position.set(SHRINE.x,0,SHRINE.z); g.rotation.y=Math.atan2(-SHRINE.x,-SHRINE.z); const st=mat('#f6f1e8'), gold=mat('#ffd36a',{emissive:'#ffb020',emissiveIntensity:.35});
+  g.add(mesh(GEO.cyl,st,[.9,.3,.9],[0,.15,0])); g.add(mesh(GEO.cyl,st,[.5,.9,.5],[0,.75,0])); g.add(mesh(GEO.cyl,gold,[.62,.1,.62],[0,1.2,0]));
+  for(const sx of [-.85,.85]){ g.add(mesh(GEO.cyl,st,[.12,2.2,.12],[sx,1.1,-.4])); } const roof=new THREE.Mesh(new THREE.TorusGeometry(.85,.09,6,20,Math.PI),gold); roof.position.set(0,2.2,-.4); g.add(roof);
+  const orb=new THREE.Mesh(new THREE.SphereGeometry(.24,16,12),new THREE.MeshBasicMaterial({color:'#fff6c8'})); orb.position.y=1.55; g.add(orb); const gl=new THREE.Sprite(new THREE.SpriteMaterial({map:glowTex(),color:'#ffe08a',transparent:true,opacity:.8,blending:THREE.AdditiveBlending,depthWrite:false})); gl.scale.setScalar(1.6); gl.position.y=1.55; g.add(gl);
+  world.add(g); addObs(SHRINE.x,SHRINE.z,1,'shrine'); SHRINE.mesh=g; SHRINE.orb=orb; SHRINE.gl=gl; WORLD.anim.push(t=>{ const ready=S.shrineDay!==todayKey(); orb.position.y=1.55+Math.sin(t*1.6)*.06; gl.material.opacity=ready?.6+Math.sin(t*3)*.25:.2; orb.material.color.set(ready?'#fff6c8':'#c8c0b0'); }); }
+{ const _bg=buildGarden; buildGarden=function(id){ const r=_bg.apply(this,arguments); try{ SHRINE.mesh=null; if(id==='hero'){ HERO_CLOUDS.forEach(c=>{ c.mesh=cloudPad(c.x,c.z); }); buildShrine(); } }catch(e){ console.warn(e); } return r; }; }
+function shrineBless(){ if(S.shrineDay===todayKey()){ toast('The shrine is resting. Come back tomorrow','warn'); return; } S.shrineDay=todayKey(); for(const e of gardenEchoes()){ e.needs.happy=clamp(e.needs.happy+15,0,100); e.bond=clamp(e.bond+1,0,100); fx('star',{x:e.pos.x,y:1.2,z:e.pos.z},{vy:.9,size:.3}); }
+  S.sparks+=25; SND.win&&SND.win(); toast('The Sky Shrine blesses your Echos ✦ 25','gold'); renderHUD(); saveGame(); }
+{ const _ht=handleTap; handleTap=function(cx,cy){ if(SHRINE.mesh&&S.garden==='hero'&&!(CARE||HANDS||CINE)){ const r=renderer.domElement.getBoundingClientRect(); ndc.set((cx-r.left)/r.width*2-1,-((cy-r.top)/r.height)*2+1); ray.setFromCamera(ndc,camera); if(ray.intersectObject(SHRINE.mesh,true).length){ goTo('shrine',0); return; } } return _ht.apply(this,arguments); }; }
+{ const _pp=pendPos; pendPos=function(P){ if(P.kind==='shrine'){ const a=Math.atan2(-SHRINE.x,-SHRINE.z); return {x:SHRINE.x+Math.sin(a)*1.6,z:SHRINE.z+Math.cos(a)*1.6}; } return _pp.apply(this,arguments); }; }
+{ const _ar=arrive; arrive=function(P){ if(P.kind==='shrine') return shrineBless(); return _ar.apply(this,arguments); }; }
+// Echos bounce on the clouds
+{ const _de=decide; decide=function(e,rt){ if(S.garden==='hero'&&lifeFree2(e,rt)&&e.needs.energy>40&&Math.random()<.12){ const c=pick(HERO_CLOUDS); lifeStart(e,rt,'cloud',{tx:c.x,tz:c.z,dur:rand(7,11)}); rt.tx=c.x; rt.tz=c.z; return; } return _de.apply(this,arguments); }; }
+{ const _rs=runSkill; runSkill=function(e,rt,dt){ const K=rt.sk; if(!K||K.k!=='life'||K.life!=='cloud') return _rs.apply(this,arguments); K.t+=dt; rt.timer=5;
+    if(!K.at){ if(stepTo(e,rt,dt)||Math.hypot(K.tx-e.pos.x,K.tz-e.pos.z)<.5||K.t>12){ K.at=1; K.t=0; } return; } e.pos.x=lerp(e.pos.x,K.tx,dt*3); e.pos.z=lerp(e.pos.z,K.tz,dt*3); e.needs.happy=clamp(e.needs.happy+dt*.8,0,100); giveXP(e,'agility',dt*.12,true); if(K.t>K.dur){ rt.state='idle'; rt.timer=1.5; rt.sk=null; } }; }
+{ const _ae=animateEchoes; animateEchoes=function(dt){ const r=_ae.apply(this,arguments); for(const e of gardenEchoes()){ const rt=rtOf(e); if(rt.state!=='sk_life'||!rt.sk||rt.sk.life!=='cloud'||!rt.sk.at) continue; const m=MESH.echo.get(e.id); if(!m) continue; const k=Math.abs(Math.sin(rt.sk.t*3.4)); m.root.position.y+=.45+k*1.1; const p=m.parts; p.arms[0].rotation.z=-2.4*k; p.arms[1].rotation.z=2.4*k; if(k<.08&&Math.random()<.4) fx('puff',{x:e.pos.x,y:.6,z:e.pos.z},{vy:.3,size:.35,life:.5,color:'#ffffff'}); } return r; }; }
+/* ---------- weekly challenges ---------- */
+const WEEKLY={adv:['Finish Adventures',15,6],train:['Train your Echos',12,5],race:['Enter races',5,5],bout:['Fight karate bouts',5,5],harvest:['Pick fruit',30,4],cook:['Cook at the campfire',6,4],pet:['Pet your Echos',40,3],play:['Play with toys',15,4],wish:['Grant Echo wishes',4,6],hatch:['Hatch an egg',1,5]};
+function weekKey(){ const d=new Date(); const day=(d.getDay()+6)%7; d.setHours(0,0,0,0); d.setDate(d.getDate()-day); return d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate(); }
+function weeklyState(){ const wk=weekKey(); if(!S.wk||S.wk.week!==wk){ const r=seeded(wk*7+3); const keys=Object.keys(WEEKLY).filter(k=>!(k==='race'||k==='bout')||S.echoes.some(e=>e.stage!=='baby')); const L=[]; while(L.length<3){ const k=keys[Math.floor(r()*keys.length)]; if(!L.includes(k)) L.push(k); } S.wk={week:wk,list:L.map(k=>({k,have:0,claimed:false})),bonus:false}; } return S.wk; }
+{ const _tr=track; track=function(k,n=1){ const r=_tr.apply(this,arguments); try{ if(!S) return r; const W=weeklyState(); for(const g of W.list) if(g.k===k&&!g.claimed){ const need=WEEKLY[k][1], was=g.have; g.have=Math.min(need,g.have+n); if(was<need&&g.have>=need) toast(`Weekly challenge done: ${WEEKLY[k][0]}`,'good'); } }catch(e){} return r; }; }
+{ const _rt=renderToday; renderToday=function(){ let h=_rt.apply(this,arguments); const W=weeklyState(); const end=new Date(); end.setDate(end.getDate()+(7-((end.getDay()+6)%7))); end.setHours(0,0,0,0); const days=Math.max(1,Math.ceil((end-Date.now())/86400000));
+    const rows=W.list.map((g,i)=>{ const [name,need,sh]=WEEKLY[g.k]; const done=g.have>=need; return `<div class="li"><div class="tx"><b>${name}</b><div class="prog" style="margin-top:4px"><i style="width:${g.have/need*100}%"></i></div><span>${g.have} / ${need} · ◆ ${sh} · ✦ 100</span></div>${g.claimed?'<span class="chip">Claimed</span>':`<button class="btn sm ${done?'pri':''}" data-claimweek="${i}" ${done?'':'disabled'}>Claim</button>`}</div>`; }).join('');
+    return h+`<h4 class="shop-h" style="margin-top:12px">Weekly challenges · ${days} day${days===1?'':'s'} left</h4><div class="list">${rows}</div><p class="note">${W.bonus?'Weekly bonus collected.':'Finish all three for a Mystery Egg.'}</p>`; }; }
+document.addEventListener('click',ev=>{ const b=ev.target.closest('[data-claimweek]'); if(!b||!S) return; ev.stopPropagation(); const W=weeklyState(); const g=W.list[+b.dataset.claimweek]; if(!g||g.claimed||g.have<WEEKLY[g.k][1]) return; g.claimed=true; S.shards+=WEEKLY[g.k][2]; S.sparks+=100; SND.buy&&SND.buy(); toast(`◆ ${WEEKLY[g.k][2]} · ✦ 100`,'good');
+  if(!W.bonus&&W.list.every(x=>x.claimed)){ W.bonus=true; const egg=pick(Object.keys(EGGS).filter(k=>EGGS[k].rare))||'egg_plain'; addInv(egg); setTimeout(()=>toast(`All weekly challenges done! ${EGGS[egg].name}`,'gold'),500); }
+  renderHUD(); refreshPanel(); saveGame(); },true);
+/* ---------- rare colours: a sparkle in the garden and a Rare Finds collection ---------- */
+const RARE_KINDS=[['shiny','Shiny','A metallic sheen. About 1 in 100 eggs.'],['crystal','Crystal','See-through and glassy. A rare mutation.'],['prism','Prism','Shimmers through the colours. A rare mutation.'],['twotone','Two-tone','Two colours at once, from special eggs.']];
+function rareOf(e){ const g=e.genes||{}; return RARE_KINDS.filter(([k])=>k==='twotone'?g.hue2!=null&&g.colored:g[k]).map(([k])=>k); }
+{ const _ae=animateEchoes; animateEchoes=function(dt){ const r=_ae.apply(this,arguments); for(const e of gardenEchoes()){ if(!rareOf(e).length||Math.random()>dt*1.6) continue; const m=MESH.echo.get(e.id); if(!m) continue; fx('spark',{x:e.pos.x+rand(-.3,.3),y:(m.parts.height||1)*rand(.4,1.1),z:e.pos.z+rand(-.3,.3)},{vy:.4,vx:0,vz:0,size:.2,life:.8,color:'#fff6c8'}); } return r; }; }
+setInterval(()=>{ try{ if(!S) return; S.rares=S.rares||{}; for(const e of S.echoes) for(const k of rareOf(e)) if(!S.rares[k]){ S.rares[k]=e.name; if(inGarden(e)) toast(`Rare find: ${e.name} is ${RARE_KINDS.find(r=>r[0]===k)[1]}!`,'gold'); } }catch(e){} },4000);
+{ const _rd=PANELS.echoes.render; PANELS.echoes.render=function(tab){ let h=_rd.apply(this,arguments); if(tab!=='dex') return h; const R=S.rares||{}; const got=Object.keys(R).length;
+    return h+`<div class="sec">Rare finds · ${got} of ${RARE_KINDS.length}</div><div class="list">${RARE_KINDS.map(([k,t,d])=>`<div class="li" style="${R[k]?'':'opacity:.5'}"><div class="tx"><b>${R[k]?'✦ ':''}${t}</b><span>${R[k]?`First found: ${esc(R[k])}`:d}</span></div></div>`).join('')}</div>`; }; }
+/* ---------- seasonal decorations ---------- */
+const SEASON_DECOR={0:['blossomlamp','Blossom Lantern','#ffb8d8','glow'],1:['paddlepool','Paddling Pool','#5fd0e0','bath'],2:['pumpkin','Pumpkin Lantern','#ff8a2a','glow'],3:['snowman','Snowman','#f4f8ff','gnome']};
+Object.assign(NEW_TOY,{
+  blossomlamp:(g,c)=>{ g.add(mesh(GEO.cyl,mat('#6b4a2a',{tex:'bark'}),[.06,1.6,.06],[0,.8,0])); const l=mesh(GEO.sph,mat(c,{emissive:c,emissiveIntensity:.8}),[.3,.36,.3],[0,1.75,0]); g.add(l); for(let i=0;i<6;i++){ const a=i/6*6.28; g.add(mesh(GEO.sph,mat('#ffffff'),[.08,.05,.08],[Math.cos(a)*.3,1.95,Math.sin(a)*.3])); } },
+  paddlepool:(g,c)=>{ g.add(mesh(new THREE.TorusGeometry(.8,.18,8,24),mat('#4fa3e0'),[1,1,1],[0,.18,0],[Math.PI/2,0,0])); g.add(mesh(new THREE.TorusGeometry(.8,.12,8,24),mat('#ffffff'),[1,1,1],[0,.32,0],[Math.PI/2,0,0])); g.add(mesh(new THREE.CircleGeometry(.8,24),mat(c,{transparent:true,opacity:.85}),[1,1,1],[0,.25,0],[-Math.PI/2,0,0])); },
+  pumpkin:(g,c)=>{ for(let i=0;i<6;i++){ const a=i/6*6.28; g.add(mesh(GEO.sph,mat(c),[.22,.3,.22],[Math.cos(a)*.18,.3,Math.sin(a)*.18])); } g.add(mesh(GEO.sph,mat('#ffd060',{emissive:'#ffa020',emissiveIntensity:1.2}),[.24,.26,.24],[0,.3,0])); g.add(mesh(GEO.cyl,mat('#4a7a2a'),[.04,.16,.04],[0,.62,0])); },
+  snowman:(g,c)=>{ const w=mat(c); g.add(mesh(GEO.sph,w,[.45,.42,.45],[0,.42,0])); g.add(mesh(GEO.sph,w,[.32,.3,.32],[0,1.05,0])); g.add(mesh(GEO.sph,w,[.22,.22,.22],[0,1.5,0])); g.add(mesh(GEO.cone,mat('#ff8a2a'),[.04,.18,.04],[0,1.5,.24],[Math.PI/2,0,0])); g.add(mesh(GEO.cyl,mat('#2a2238'),[.18,.2,.18],[0,1.78,0])); g.add(mesh(new THREE.TorusGeometry(.2,.05,6,16),mat('#e0453a'),[1,1,1],[0,1.3,0],[Math.PI/2,0,0])); } });
+for(const s in SEASON_DECOR){ const [k,n,c,b]=SEASON_DECOR[s]; TOYS[k]={decor:true,name:n,c,price:0,beh:b}; item('dec_'+k,{name:n,cat:'decor',toy:k,rar:'R',price:420,icon:{shape:'toy_'+k,c},desc:`${SEASONS[s]} only. ${TOY_DESC[b]||''}`}); }
+{ const _rs=renderShop2; renderShop2=function(tab){ let h=_rs.apply(this,arguments); if(tab==='feat'||tab===undefined){ const [k]=SEASON_DECOR[S.time.season]; const id='dec_'+k; h=`<div class="shop-h">${SEASONS[S.time.season]} special</div><div class="grid">${shopCard(id,{attr:`data-buy="${id}" data-cur="sparks"`})}</div>`+h; } return h; }; }
+/* =========================================================
+   v0.9.0 — presentation and settings
+   - races and karate: a line-up card before the start, live commentary,
+     and a podium on the results
+   - breeding: what the baby could inherit, and the rare-colour odds
+   - accessibility: vibration switch, left-handed controls, stat symbols
+   - updates: the app checks for a new upload when you come back to it
+   - game feel: Relaxed / Normal / Tricky
+   ========================================================= */
+/* ---------- line-up card and commentary ---------- */
+function mgIntro(title,sub,cards){ let el=$('#mgIntro'); if(el) el.remove(); el=document.createElement('div'); el.id='mgIntro';
+  el.innerHTML=`<div class="mi-t">${esc(title)}</div><div class="mi-s">${esc(sub)}</div><div class="mi-row">${cards.map((c,i)=>`${i&&c.vs?'<b class="mi-vs">VS</b>':''}<div class="mi-c ${c.me?'me':''}"><img src="${c.img}" alt=""><b>${esc(c.name)}</b>${c.tag?`<span>${esc(c.tag)}</span>`:''}</div>`).join('')}</div>`;
+  $('#mini').appendChild(el); setTimeout(()=>{ el.classList.add('out'); setTimeout(()=>el.remove(),400); },2600); }
+function comm(txt){ let el=$('#mgComm'); if(!el){ el=document.createElement('div'); el.id='mgComm'; $('#mini').appendChild(el); } el.textContent=txt; el.classList.remove('show'); void el.offsetWidth; el.classList.add('show'); clearTimeout(el._t); el._t=setTimeout(()=>el.classList.remove('show'),2600); }
+{ const _sr=startRace; startRace=function(){ const r=_sr.apply(this,arguments); const M=MG; if(M&&M.kind==='race'){ M.count=Math.max(M.count,5.2); M.comm={lead:null,final:false,tired:false};
+      mgIntro(M.c.name,'Today\'s line-up',M.racers.map((x,i)=>({img:x.img&&x.img.src||'',name:x.name,me:!!x.me,tag:i===0?'Your Echo':'Rival'}))); setTimeout(()=>{ if(MG===M) comm('And they\'re off!'); },5200); } return r; }; }
+{ const _ur=updateRace; updateRace=function(dt){ const M=MG; const r=_ur.apply(this,arguments); try{ if(M&&M.kind==='race'&&M.count<=0&&!M.done&&M.comm){ const lead=[...M.racers].sort((a,b)=>(b.x||0)-(a.x||0))[0];
+        if(lead&&M.comm.lead!==lead.name&&(lead.x||0)>15){ if(M.comm.lead) comm(`${lead.name} takes the lead!`); M.comm.lead=lead.name; }
+        if(!M.comm.final&&lead&&(lead.x||0)>M.len*.8){ M.comm.final=true; comm('Into the final stretch!'); }
+        const me=M.racers[0]; if(!M.comm.tired&&me.st<me.stam*.2){ M.comm.tired=true; comm(`${me.name} is tiring. Cheer them on!`); } } }catch(e){} return r; }; }
+{ const _fr=finishRace; finishRace=function(order){ const M=MG; const r=_fr.apply(this,arguments); try{ const top=order.slice(0,3); setTimeout(()=>{ const box=document.querySelector('#modal .mbox'); if(!box||box.querySelector('.podium')) return;
+      box.insertAdjacentHTML('afterbegin',`<div class="podium">${[1,0,2].map(i=>top[i]?`<div class="pd p${i+1} ${top[i].me?'me':''}"><img src="${top[i].img&&top[i].img.src||''}" alt=""><b>${esc(top[i].name)}</b><div class="pd-step">${i+1}</div></div>`:'').join('')}</div>`); },60); }catch(e){} return r; }; }
+{ const _sb=startBout; startBout=function(){ const r=_sb.apply(this,arguments); const M=MG; if(M&&M.kind==='arena'){ M.count=Math.max(M.count,4.2); M.lastLog=null;
+      mgIntro(ARENA_RANKS[Math.min(S.arenaRank,3)],`Bout ${S.arenaStreak+1}`,[{img:M.A.img&&M.A.img.src||'',name:M.A.name,me:true,tag:'Your Echo'},{img:M.B.img&&M.B.img.src||'',name:M.B.name,vs:true,tag:M.style||'Rival'}]); } return r; }; }
+{ const _ua=updateArena; updateArena=function(dt){ const M=MG; const r=_ua.apply(this,arguments); try{ if(M&&M.kind==='arena'&&M.log&&M.log[0]&&M.log[0]!==M.lastLog){ M.lastLog=M.log[0]; comm(M.log[0]); } }catch(e){} return r; }; }
+/* ---------- breeding preview ---------- */
+const POT_STARS=n=>'★'.repeat(Math.max(1,Math.min(5,Math.round(n||1))))+'☆'.repeat(Math.max(0,5-Math.max(1,Math.min(5,Math.round(n||1)))));
+{ const _rb=renderBreed; renderBreed=function(){ let h=_rb.apply(this,arguments); const a=getEcho(UI.breedA), b=getEcho(UI.breedB); if(!a||!b||a===b) return h; const ga=a.genes, gb=b.genes;
+    const rows=STATS.map(s=>{ const lo=Math.min(ga.pot[s],gb.pot[s]), hi=Math.max(ga.pot[s],gb.pot[s]); return `<div class="bp-r"><span style="color:${STAT[s].color}">${STAT[s].name}</span><em>${POT_STARS(ga.pot[s])}</em><em>${POT_STARS(gb.pot[s])}</em><b>${lo===hi?POT_STARS(hi):POT_STARS(lo)+' – '+POT_STARS(Math.min(5,hi+1)).replace(/☆/g,'')}</b></div>`; }).join('');
+    const pct=(x)=>Math.round(x*100)+'%'; const sh=(ga.shiny||gb.shiny)?.45:.02, cr=(ga.crystal||gb.crystal)?.4:.01, pr=(ga.prism&&gb.prism)?.5:(ga.prism||gb.prism)?.15:.004;
+    const tt=(ga.hue2!=null||gb.hue2!=null)?.6:'small';
+    const box=`<div class="sec">What the baby could inherit</div><div class="bp"><div class="bp-r bp-h"><span>Stat grade</span><em>${esc(a.name)}</em><em>${esc(b.name)}</em><b>Baby</b></div>${rows}</div>
+      <p class="note">Rare colours: Shiny ${pct(sh)} · Crystal ${pct(cr)} · Prism ${pct(pr)} · Two-tone ${typeof tt==='number'?pct(tt):'small chance'}. Every egg also has a 4% chance of a surprise mutation.</p>`;
+    return h.replace('<div class="sec">Possible babies</div>',box+'<div class="sec">Possible babies</div>'); }; PANELS.breed.render=renderBreed; }
+/* ---------- accessibility ---------- */
+COMFORT_OPTS.push(['noVibe','No vibration','Turns off phone buzzes.'],['lefty','Left-handed controls','Puts game buttons on the left and swaps the adventure touch sides.'],['statSym','Stat symbols','Adds a shape to each stat colour: ▲ Speed ● Focus ■ Endurance ◆ Power ★ Agility.']);
+const STAT_SYM={speed:'▲',focus:'●',endurance:'■',power:'◆',agility:'★'};
+try{ const _vib=navigator.vibrate&&navigator.vibrate.bind(navigator); if(_vib) Object.defineProperty(navigator,'vibrate',{configurable:true,value:function(p){ if(S&&S.settings&&S.settings.noVibe) return false; return _vib(p); }}); }catch(e){}
+{ const _ac=applyComfort; applyComfort=function(){ const r=_ac.apply(this,arguments); try{ const app=document.getElementById('app'); app.classList.toggle('lefty',!!S.settings.lefty); app.classList.toggle('statsym',!!S.settings.statSym); }catch(e){} return r; }; }
+setTimeout(()=>{ try{ applyComfort(); }catch(e){} },1500);
+{ const _rh=renderHUD; renderHUD=function(){ const r=_rh.apply(this,arguments); try{ if(S&&S.settings.statSym) document.querySelectorAll('#essHud .ess').forEach((el,i)=>{ const s=STATS[i]; const l=el.querySelector('.lbl'); if(l&&!l.dataset.sym){ l.dataset.sym=1; l.textContent=STAT_SYM[s]+' '+l.textContent; } }); }catch(e){} return r; }; }
+{ const _ot=openTraining; openTraining=function(){ const r=_ot.apply(this,arguments); try{ if(S.settings.statSym) document.querySelectorAll('.trn-card').forEach(c=>{ const s=c.dataset.train; const b=c.querySelector('b'); if(b&&s&&!b.dataset.sym){ b.dataset.sym=1; b.textContent=STAT_SYM[s]+' '+b.textContent; } }); }catch(e){} return r; }; }
+/* ---------- updates: look for a new upload whenever you come back to the app ---------- */
+const UPD={tag:null,busy:false};
+function updCheck(){ if(UPD.busy||!/^https?:/.test(location.protocol)) return; UPD.busy=true; fetch(location.pathname.replace(/[^/]*$/,'')+'index.html',{method:'HEAD',cache:'no-store'}).then(r=>{ const t=r.headers.get('etag')||r.headers.get('last-modified'); if(t){ if(UPD.tag&&t!==UPD.tag) updateBanner(); UPD.tag=UPD.tag||t; } }).catch(()=>{}).finally(()=>{ UPD.busy=false; }); }
+setTimeout(updCheck,4000); document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='visible') setTimeout(updCheck,800); }); setInterval(updCheck,15*60*1000);
+/* ---------- game feel: Relaxed / Normal / Tricky ---------- */
+const FEEL={relaxed:{spd:.85,hp:-1,heart:1,win:1.35,lab:'Relaxed'},normal:{spd:1,hp:0,heart:0,win:1,lab:'Normal'},tricky:{spd:1.12,hp:1,heart:0,win:.8,lab:'Tricky'}};
+const feel=()=>FEEL[(S&&S.settings.feel)||'normal']||FEEL.normal;
+function feelAdv(){ const M=MG, F=feel(); if(!M) return; if(M.lvS) M.lvS*=F.spd; if(M.lvG) M.lvG*=F.spd; if(F.heart){ M.hearts=(M.hearts||3)+F.heart; M.maxHearts=(M.maxHearts||3)+F.heart; } }
+{ const _a=startRun; startRun=function(){ const r=_a.apply(this,arguments); feelAdv(); return r; }; }
+{ const _a=startSide; startSide=function(){ const r=_a.apply(this,arguments); feelAdv(); try{ const B=ADV&&ADV.L&&ADV.L.boss; if(B){ B.hp=Math.max(2,B.hp+feel().hp); B.max=B.hp; } }catch(e){} return r; }; }
+{ const _a=startGlide; startGlide=function(){ const r=_a.apply(this,arguments); feelAdv(); return r; }; }
+{ const _a=glBossStart; glBossStart=function(M){ const r=_a.apply(this,arguments); if(M.B){ M.B.hp=Math.max(2,M.B.hp+feel().hp); M.B.max=M.B.hp; } return r; }; }
+{ const _a=runBossStart; runBossStart=function(M){ const r=_a.apply(this,arguments); if(M.B){ M.B.hp=Math.max(2,M.B.hp+feel().hp); M.B.max=M.B.hp; } return r; }; }
+{ const _st=startTraining; startTraining=function(){ const r=_st.apply(this,arguments); const M=MG, F=feel(); if(M&&M.kind==='tr2'){ const w=F.win;
+      if(M.stat==='speed') M.ghostV/=w; if(M.stat==='power'&&M.band) M.band.w*=w; if(M.stat==='agility') M.notes.forEach(n=>n.win=w); if(M.stat==='focus') M.cap*=w; if(M.stat==='endurance') M.cap*=w; M.feelW=w; } return r; }; }
+{ const _nb=TRG.power.newBand; TRG.power.newBand=function(M){ const r=_nb.apply(this,arguments); if(M.feelW) M.band.w*=M.feelW; return r; }; }
+{ const _rs=PANELS.settings.render; PANELS.settings.render=function(tab){ let h=_rs.apply(this,arguments); if(tab!=='comfort') return h; const cur=(S.settings.feel||'normal');
+    return h.replace('<div class="list">',`<div class="list"><div class="li"><div class="tx"><b>Game feel</b><span>Relaxed: slower adventures, an extra heart, weaker bosses, wider timing in training. Tricky: the opposite.</span></div><div class="row" style="gap:4px">${Object.keys(FEEL).map(k=>`<button class="btn sm ${cur===k?'pri':''}" data-feel="${k}">${FEEL[k].lab}</button>`).join('')}</div></div>`); }; }
+document.addEventListener('click',ev=>{ const b=ev.target.closest('[data-feel]'); if(!b||!S) return; ev.stopPropagation(); S.settings.feel=b.dataset.feel; refreshPanel(); saveGame(); SND.ui&&SND.ui(); toast(`Game feel: ${FEEL[S.settings.feel].lab}`); },true);
+/* =========================================================
    AUDIO — procedural music, ambience and creature voices
    (reverb bus, chord pads, bells, spatial voices)
    ========================================================= */
@@ -8535,7 +8744,7 @@ function updateBanner(){ if(document.getElementById('updBar')) return; const d=d
 /* =========================================================
    DIAGNOSTICS — performance readout, error capture, problem report
    ========================================================= */
-const GAME_VERSION='0.8.6';
+const GAME_VERSION='0.9.0';
 const DIAG={errors:[],trail:[],fps:[],show:false,acc:0,n:0,el:null,minFps:999};
 window.addEventListener('error',ev=>{ DIAG.errors.push(`${new Date().toLocaleTimeString()} ${ev.message} @${(ev.filename||'').split('/').pop()}:${ev.lineno}`); if(DIAG.errors.length>15) DIAG.errors.shift(); });
 window.addEventListener('unhandledrejection',ev=>{ DIAG.errors.push(`${new Date().toLocaleTimeString()} promise: ${ev.reason&&ev.reason.message||ev.reason}`); if(DIAG.errors.length>15) DIAG.errors.shift(); });
