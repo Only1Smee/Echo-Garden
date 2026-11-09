@@ -1,4 +1,4 @@
-const CACHE='echo-garden-3381428';
+const CACHE='echo-garden-62797243';
 const FILES=['./','./index.html','./manifest.webmanifest','./icon-192.png','./icon-512.png','./icon-maskable.png'];
 // install: cache the new version and take over at once (the page then offers a restart)
 self.addEventListener('install',e=>{ e.waitUntil(caches.open(CACHE).then(c=>c.addAll(FILES.map(u=>new Request(u,{cache:'reload'})))).then(()=>self.skipWaiting())); });

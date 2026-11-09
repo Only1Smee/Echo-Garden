@@ -11,7 +11,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
-<title>Echo Garden v0.9.3</title>
+<title>Echo Garden v0.8.1</title>
 <style>
 [hidden]{display:none!important}
 
@@ -922,6 +922,9 @@ h1,h2,h3,.ph h2,.dk span,.pill b{font-family:var(--f-display);font-weight:900;le
 .ds-h{display:flex;align-items:center;justify-content:space-between;padding:0 2px} .ds-h b{font-size:13px} .ds-x{width:28px;height:28px;border-radius:50%;border:0;background:rgba(255,255,255,.08);color:var(--text);font:inherit;font-size:12px}
 .ds-list{display:flex;flex-direction:column;gap:5px} .ds-st{display:flex;justify-content:space-between;align-items:center;gap:6px;padding:9px 10px;border-radius:12px;border:1px solid rgba(255,244,224,.12);background:rgba(255,255,255,.04);color:var(--text);font:inherit;font-size:12px;text-align:left} .ds-st span{font-size:10px;color:var(--muted);white-space:nowrap} .ds-st.on{border-color:#f3c765;background:rgba(243,199,101,.16)} .ds-st.on span{color:#ffe08a}
 #decoSide .db-paint{display:flex;flex-direction:column;gap:8px} #decoSide .db-parts{flex-wrap:wrap;overflow:visible;order:1} #decoSide .db-sw{order:2} #decoSide .db-sets{order:3;flex-wrap:wrap;overflow:visible} #decoSide .db-sw{flex-wrap:wrap;overflow:visible;gap:7px} #decoSide .db-sw .dbb{flex:1 1 100%}
+
+.fam-li .tx{flex:1;min-width:0} .fam-bar{height:5px;margin-top:4px} .fam-love{color:#ff8fb4;font-weight:700} .fam-grow{color:#ffd34a} .fam-warn{color:#ffb070} .fam-mut{color:var(--muted)}
+.fam-pair{width:100%;text-align:left;font:inherit;color:var(--text);cursor:pointer} .fam-pair.sel{border-color:#ff8fb4;background:rgba(255,143,180,.12)} .fam-prev{margin:6px 0 10px;padding:10px;border-radius:14px;border:1px solid rgba(255,143,180,.3);background:rgba(255,143,180,.06)}
 </style>
 <div id="app">
   <canvas id="gl"></canvas>
@@ -3065,7 +3068,7 @@ function renderHub(k){
     ['arena','arena','Echo Arena','Stat-driven bouts and league tournaments',ARENA_RANKS[Math.min(S.arenaRank,3)]]]
    :[
     ['school','school','Kindergarten','Lessons, the doctor and development checks',`${S.echoes.filter(e=>e.lesson).length} in class`],
-    ['breed','breed','Breeding','Pair two adults for a new egg',`${adults} adult${adults===1?'':'s'} · ${S.inv.heartbloom||0} Heart Bloom${(S.inv.heartbloom||0)===1?'':'s'}`],
+    ['breed','breed','Family','Who\'s in love and the best matches',`${adults} adult${adults===1?'':'s'} · ${S.inv.heartbloom||0} Heart Bloom${(S.inv.heartbloom||0)===1?'':'s'}`],
     ['more:today','care','Today','Daily goals and your daily gift',(()=>{ const D=dailyGoals(); return `${D.list.filter(g=>g.claimed).length} of 3 done`; })()],
     ['more:goals','dex','Goals','Milestones that pay out Sparks',`${done} of ${ACHIEVEMENTS.length}`],
     ['more:gardens','care','Gardens','Travel between unlocked gardens',`${Object.keys(S.unlocked).length} of 3 unlocked`],
@@ -3096,7 +3099,7 @@ function renderBag(tab){
     if(it.cat==='egg') acts=`<button class="btn pri" data-bag="place">Place in garden</button>`;
     if(it.cat==='seed') acts=`<span class="sub">Tap an empty plot in the garden to plant.</span>`;
     if(it.id==='trainband') acts=`<button class="btn pri" data-bag="use">Use (${S.trainBand} feedings left)</button>`;
-    if(it.id==='heartbloom') acts=`<button class="btn pri" data-bag="tobreed">Open Breeding</button>`;
+    if(it.id==='heartbloom') acts=`<button class="btn pri" data-bag="tobreed">Open Family</button>`;
     h+=`<div class="li" style="margin:6px 0 10px"><img src="${iconURL(it.id)}" alt=""><div class="tx"><b>${esc(it.name)} ×${S.inv[it.id]}</b><span>${esc(it.desc||'')}</span></div><div class="row">${acts}</div></div>`;
   }
   if(!ids.length) h+=`<p class="note">Nothing here yet. ${tab==='essence'?'Essences come from the Adventure, races and arena bouts.':tab==='animal'?'Animals are found on Adventures. Each one gives a body trait.':tab==='dish'?'Cook dishes at the campfire from fruit and essences.':'Visit the Shop or go on an Adventure.'}</p>`;
@@ -5872,7 +5875,7 @@ const STORY2=[
   unlock:'rook',reward:{sparks:300,shards:3}},
  {act:'Act IV · Home',t:'Old Arguments',
   intro:[['lumi','So. All three of us. In the meadow. Like before.'],['rook','Before, you were shouting about moving everyone into the clouds.','shrug'],['lumi','The meadow was underwater, Eclipse!'],['nova','And then it dried out. Three years ago. You\'d know, if either of you had come back.','think'],['fen','If you\'re quite finished. The Well only gives eggs when there\'s a proper garden around it. Raise a family. Then we\'ll see.']],
-  goal:'Breed a new egg',hint:'Two happy adults and a Heart Bloom. Garden → Breeding.',done:()=>S.echoes.some(e=>e.gen>=2)||S.eggs.some(g=>g.type==='bred'),
+  goal:'Breed a new egg',hint:'Happy adults fall in love. Put one in love down beside a friend who\'s in love too.',done:()=>S.echoes.some(e=>e.gen>=2)||S.eggs.some(g=>g.type==='bred'),
   outro:[['narr','The new egg is warm. The next morning there is another one by the pond that nobody laid.'],['rook','...Huh.'],['lumi','That\'s the Well. It\'s working again.','cheer'],['nova','Told you. It just needed people.']],
   lore:['cup'],reward:{sparks:400,shards:4}},
  {act:'Act IV · Home',t:'A Proper Garden',
@@ -6037,7 +6040,7 @@ const MORE_MAP={story:'story',journal:'story',today:'goals',goals:'goals',sound:
     const D=dailyGoals(); const done=ACHIEVEMENTS.filter(a=>S.ach[a[0]]).length; const adults=gardenEchoes().filter(e=>e.stage==='adult').length; const lore=Object.keys(st.lore||{}).length;
     const T=[['story','dex','Story',C.goal?`Chapter ${st.ch+1}: ${C.t}`:'The story so far',`${lore} journal pages`],
       ['school','school','Kindergarten','Lessons, the doctor and development checks',`${S.echoes.filter(e=>e.lesson).length} in class`],
-      ['breed','breed','Breeding','Pair two adults for a new egg',`${adults} adult${adults===1?'':'s'} · ${S.inv.heartbloom||0} Heart Bloom${(S.inv.heartbloom||0)===1?'':'s'}`],
+      ['breed','breed','Family','Who\'s in love and the best matches',`${adults} adult${adults===1?'':'s'} · ${S.inv.heartbloom||0} Heart Bloom${(S.inv.heartbloom||0)===1?'':'s'}`],
       ['goals:today','care','Goals','Daily goals, your daily gift and milestones',`${D.list.filter(g=>g.claimed).length}/3 today · ${done}/${ACHIEVEMENTS.length}`]];
     return `<div class="hub">${T.map(([o,ic,t,d,s])=>`<button class="hubtile" data-hub="${o}"><span class="hi">${ICON[ic]}</span><span class="ht"><b>${esc(t)}</b><span>${esc(d)}</span></span><span class="hs">${esc(s)}</span></button>`).join('')}</div>`; };
   PANELS.care.render=()=>renderHub('care'); }
@@ -7233,7 +7236,7 @@ const STORY3=[
   reward:{sparks:300,shards:3}},
  {act:'Act IV · Home',t:'Old Arguments',
   intro:[['lumi','So. All three of us. In the meadow. Like before.'],['rook','Before, you wanted to move everyone into the clouds.','shrug'],['lumi','The meadow was underwater, Eclipse!'],['nova','It dried out three years ago. You\'d know, if either of you had come back.','think'],['fen','If you\'re quite finished. The Well only gives eggs to a garden that\'s raising a family. So raise one.']],
-  goal:'Breed a new egg',hint:'Two happy adults and a Heart Bloom. Garden → Breeding.',done:()=>S.echoes.some(e=>e.gen>=2)||S.eggs.some(g=>g.type==='bred'),
+  goal:'Breed a new egg',hint:'Happy adults fall in love. Put one in love down beside a friend who\'s in love too.',done:()=>S.echoes.some(e=>e.gen>=2)||S.eggs.some(g=>g.type==='bred'),
   outro:[['narr','The new egg is warm. The next morning there is another by the pond that nobody laid.'],['rook','...Huh.'],['lumi','That\'s the Well! It\'s waking up!','cheer'],['nova','It just needed people.']],
   lore:['cup'],reward:{sparks:400,shards:4}},
  {act:'Act IV · Home',t:'A Proper Garden',
@@ -7680,7 +7683,7 @@ const FLY={
     return [
     {hub:'story',ic:'dex',t:'Story',s:`Chapter ${Math.min(st.ch,STORY.length-1)+1}`},
     {hub:'school',ic:'school',t:'Kindergarten',s:`${S.echoes.filter(e=>e.lesson).length} in class`},
-    {hub:'breed',ic:'breed',t:'Breeding',s:`${adults} adult${adults===1?'':'s'}`},
+    {hub:'breed',ic:'breed',t:'Family',s:`${adults} adult${adults===1?'':'s'}`},
     {hub:'goals:today',ic:'care',t:'Goals',s:`${D.list.filter(g=>g.claimed).length}/3 today`,dot:ready>0||(typeof dgReady==='function'&&dgReady())},
     {hub:'more:gardens',ic:'travel',t:'Travel',s:`${n} of ${Object.keys(GARDENS).length} gardens`}]; }
 };
@@ -8788,6 +8791,108 @@ window.addEventListener('click',ev=>{ if(!DECO.on) return; if(ev.target.closest(
 { const _o=decoOpen; decoOpen=function(){ S.seenDeco=Math.max(S.seenDeco||0,2); return _o.apply(this,arguments); }; }
 { const _c=decoClose; decoClose=function(){ const s=$('#decoSide'); if(s) s.remove(); DECO.styleOpen=false; DECO.paintOpen=false; return _c.apply(this,arguments); }; }
 /* =========================================================
+   v0.8.1 (renumbered) — love in the garden
+   No more breeding menu. Adults fall in love from good care
+   (or a Heart Bloom), and you play matchmaker by putting one
+   down beside another. They court in a ring of flowers and an
+   egg pops out. The old Breeding panel is now a Family page.
+   ========================================================= */
+const LOVE={rings:[],bonus:null,autoT:0,friend:15,time:240};
+const loveFriends=(a,b)=>((a.rel[b.id]||0)>=LOVE.friend)||((b.rel[a.id]||0)>=LOVE.friend);
+const loveResting=e=>e.ageSec-(e.lastBred??-9999)<600;
+const loveCrowded=()=>gardenEchoes().length+S.eggs.filter(g=>g.garden===S.garden).length>=8;
+function loveStatus(e){ if(e.stage!=='adult') return {t:'Too young',c:'mut'}; if(loveResting(e)) return {t:'Resting after an egg',c:'mut'}; if(e.inLove) return {t:'In love ♥',c:'love'};
+  if(e.needs.happy<65) return {t:'Needs to feel happier',c:'warn'}; if(e.needs.hunger<40||e.needs.health<50) return {t:'Needs looking after',c:'warn'}; return {t:`Falling in love… ${Math.floor(e.love||0)}%`,c:'grow'}; }
+// why two Echos can't court yet, as moods rather than rules
+function courtWhy(a,b){ if(!a||!b||a===b) return 'Pick two Echos'; if(a.stage!=='adult'||b.stage!=='adult') return `${(a.stage!=='adult'?a:b).name} is too young to fall in love`;
+  for(const x of [a,b]){ if(loveResting(x)) return `${x.name} is resting after an egg`; } for(const x of [a,b]){ if(!x.inLove) return `${x.name} isn't in love yet`; }
+  if(!loveFriends(a,b)) return `${b.name} feels shy. They need to be better friends first`; if(loveCrowded()) return 'The garden feels too full for a new egg';
+  for(const x of [a,b]){ const st=rtOf(x).state; if(['sleep','cocoon','mate'].includes(st)) return `${x.name} is busy right now`; } return null; }
+function startCourt(a,b){ const ra=rtOf(a), rb=rtOf(b); ra.state='mate'; ra.partner=b.id; ra.lead=true; ra.mt=-4; rb.state='mate'; rb.partner=a.id; rb.lead=false; rb.mt=-4;
+  ra.court=true; toast(`💕 ${a.name} and ${b.name} are courting`,'gold'); SND.pop&&SND.pop(); }
+function tryCourt(a,b,quiet){ const why=courtWhy(a,b); if(!why){ startCourt(a,b); return true; }
+  if(!quiet){ if(why.includes('shy')){ befriend(a,b,3); const rb=rtOf(b); fx('q',{x:b.pos.x,y:1.4,z:b.pos.z}); eventEmotion(b,'confused',2); toast(why+'. They got a little closer.','warn'); } else toast(why,'warn'); } return false; }
+/* ---------- flower ring ---------- */
+function loveRing(x,z){ const g=new THREE.Group(); g.position.set(x,0,z); const cols=['#ff8fb4','#ffffff','#ffd84a','#ff5d8f','#d8a8ff'];
+  for(let i=0;i<16;i++){ const a=i/16*Math.PI*2, r=1.5; const f=new THREE.Group(); f.position.set(Math.cos(a)*r,0,Math.sin(a)*r);
+    f.add(mesh(GEO.cyl,mat('#4a9c52'),[.02,.3,.02],[0,.15,0])); f.add(mesh(GEO.sph,mat(cols[i%cols.length]),[.11,.07,.11],[0,.32,0])); f.add(mesh(GEO.sph,mat('#ffe27a'),[.04,.04,.04],[0,.36,0])); f.scale.setScalar(.01); g.add(f); }
+  ents.add(g); const R={g,t:0,end:null}; LOVE.rings.push(R); return R; }
+function ringsTick(dt){ for(const R of [...LOVE.rings]){ R.t+=dt; R.g.children.forEach((f,i)=>{ const k=R.end!=null?Math.max(0,1-(R.t-R.end)/1.2):Math.min(1,Math.max(0,(R.t-i*.06)/.6)); f.scale.setScalar(Math.max(.01,k)); f.rotation.y+=dt*.6; });
+    if(R.end!=null&&R.t-R.end>1.3){ ents.remove(R.g); LOVE.rings.splice(LOVE.rings.indexOf(R),1); } else if(R.t>30){ R.end=R.end??R.t; } } }
+/* ---------- love spots from Decorate ---------- */
+function loveSpot(x,z){ let best=null; for(const it of DECO.items||[]){ if(!['fire','bench','arch'].includes(it.kind)) continue; const p=it.obj.position; const d=Math.hypot(p.x-x,p.z-z); if(d<3.6&&(!best||d<best.d)) best={d,name:it.kind==='fire'?'the campfire':it.kind==='bench'?'a bench':'the archway'}; } return best; }
+/* ---------- the tick: love grows, courting sings ---------- */
+{ const _bt=bubblesTick; bubblesTick=function(dt){ const r=_bt.apply(this,arguments); try{ if(MG||!S) return r; ringsTick(dt);
+    for(const e of gardenEchoes()){ if(e.stage!=='adult') continue; const rt=rtOf(e);
+      if(!e.inLove){ const ok=!loveResting(e)&&e.needs.happy>=65&&e.needs.hunger>=40&&e.needs.health>=50; e.love=clamp((e.love||0)+(ok?dt*100/LOVE.time:-dt*.05),0,100);
+        if(e.love>=100) fallInLove(e); }
+      else { if(e.needs.happy<35){ e.inLove=false; e.love=60; e.loveBoost=false; toast(`${e.name} isn't in the mood any more`,'warn'); }
+        if(rt.state!=='sleep'&&rt.state!=='mate'&&Math.random()<dt*.35){ const m=MESH.echo.get(e.id); fx('heart',{x:e.pos.x,y:(m?m.parts.height:1)+.35,z:e.pos.z},{size:.22}); } }
+      if(rt.state==='mate'&&rt.lead){ const o=getEcho(rt.partner); if(o){ const d=Math.hypot(o.pos.x-e.pos.x,o.pos.z-e.pos.z);
+          if(d<1.9&&!rt.ring){ rt.ring=loveRing((e.pos.x+o.pos.x)/2,(e.pos.z+o.pos.z)/2); }
+          // bigger Echos can't get closer than their bodies allow, so count courting time from arm's length too
+          if(d>=1.3&&d<1.9){ const ro=rtOf(o); rt.ang=Math.atan2(o.pos.x-e.pos.x,o.pos.z-e.pos.z); ro.ang=rt.ang+Math.PI; rt.mt=(rt.mt||0)+dt; if(Math.random()<dt*2) fx('heart',{x:e.pos.x,y:1.5,z:e.pos.z});
+            if(rt.mt>4){ rt.mt=0; layBredEgg(e,o); rt.state='idle'; rt.timer=3; ro.state='idle'; ro.timer=3; } }
+          if(rt.ring&&Math.random()<dt*1.5){ fx('note',{x:(e.pos.x+o.pos.x)/2,y:1.7,z:(e.pos.z+o.pos.z)/2}); if(Math.random()<.3) SND.note&&SND.note('sing'); } } }
+      if(rt.state==='together'&&rt.partner&&Math.random()<dt*.25){ const o=getEcho(rt.partner); if(o&&loveFriends(e,o)) fx('heart',{x:e.pos.x,y:1.4,z:e.pos.z},{size:.18}); } }
+    // optional: in-love friends pair up by themselves
+    if(S.settings&&S.settings.autoLove){ LOVE.autoT-=dt; if(LOVE.autoT<=0){ LOVE.autoT=15; const L=gardenEchoes().filter(e=>e.inLove&&!loveResting(e)); outer: for(const a of L) for(const b of L){ if(a.id<b.id&&!courtWhy(a,b)&&Math.random()<.35){ startCourt(a,b); break outer; } } } }
+  }catch(e){ console.warn('love',e); } return r; }; }
+function fallInLove(e,boost){ e.inLove=true; e.love=100; if(boost) e.loveBoost=true; eventEmotion(e,'affectionate',4); const m=MESH.echo.get(e.id); for(let i=0;i<6;i++) fx('heart',{x:e.pos.x,y:(m?m.parts.height:1)*.8,z:e.pos.z},{vx:rand(-1,1),vz:rand(-1,1),vy:rand(.8,1.6)});
+  SND.hatch&&0; SND.pop&&SND.pop();
+  if(!S.seenLove){ S.seenLove=1; setTimeout(()=>{ if(!MG&&$('#modal').hidden) showModal(`<h2>💕 ${esc(e.name)} is in love!</h2><p>Happy, well-cared-for adults fall in love. A floating heart shows who's in the mood.</p><p><b>To get an egg:</b> pick up an Echo that's in love and put it down next to another one that's in love too. If they're friends, they'll court in a ring of flowers and an egg will pop out.</p><p class="note">Courting near the campfire, a bench or the archway can bring luck. A Heart Bloom makes an adult fall in love straight away. The Family page shows who's ready.</p><div class="row"><button class="btn pri" data-close>Lovely</button></div>`); },600); }
+  else toast(`💕 ${e.name} is in love! Put them down beside a friend who's in love too.`,'gold'); saveGame(); }
+{ const _ef=emoteFor; emoteFor=function(e,rt){ const r=_ef.apply(this,arguments); if(r) return r; if(e.inLove&&rt.state!=='sleep') return 'heart'; return null; }; }
+/* ---------- the egg, with luck from love spots and Heart Blooms ---------- */
+{ const _lb=layBredEgg; layBredEgg=function(a,b){ const mx=(a.pos.x+b.pos.x)/2, mz=(a.pos.z+b.pos.z)/2; const spot=loveSpot(mx,mz); LOVE.bonus={boost:!!(a.loveBoost||b.loveBoost),spot};
+    let r; try{ r=_lb.apply(this,arguments); } finally{ LOVE.bonus=null; }
+    for(const x of [a,b]){ x.inLove=false; x.love=0; x.loveBoost=false; const xr=rtOf(x); xr.court=false; if(xr.ring){ xr.ring.end=xr.ring.t; xr.ring=null; } }
+    for(let i=0;i<14;i++) fx('heart',{x:mx,y:.6,z:mz},{vx:rand(-1.5,1.5),vz:rand(-1.5,1.5),vy:rand(1,2.2)});
+    if(spot) setTimeout(()=>toast(`Courting by ${spot.name} brought a little luck ✨`,'good'),1200); saveGame(); return r; }; }
+{ const _ig=inheritGenes; inheritGenes=function(a,b){ const g=_ig.apply(this,arguments); const B=LOVE.bonus; if(!B) return g;
+    if(B.boost) for(const s of STATS) if(Math.random()<.3) g.pot[s]=Math.min(5,g.pot[s]+1);
+    if(B.spot){ if(!g.shiny&&Math.random()<.05) g.shiny=true; if(g.hue2==null&&Math.random()<.12) g.hue2=(g.hue+rand(90,180))%360; for(const s of STATS) if(Math.random()<.12) g.pot[s]=Math.min(5,g.pot[s]+1); }
+    return g; }; }
+/* ---------- matchmaking: put one down beside another ---------- */
+{ const _dc=dropCarry; dropCarry=function(silent){ const id=GA.carry; const r=_dc.apply(this,arguments); try{ const e=getEcho(id); if(!e||silent||e.stage!=='adult') return r;
+      let best=null; for(const o of gardenEchoes()){ if(o.id===e.id) continue; const d=Math.hypot(o.pos.x-e.pos.x,o.pos.z-e.pos.z); if(d<2.6&&(!best||d<best.d)) best={o,d}; }
+      if(best&&(e.inLove||best.o.inLove)&&best.o.stage==='adult') setTimeout(()=>tryCourt(e,best.o),450); }catch(err){ console.warn(err); } return r; }; }
+/* ---------- Heart Bloom: fall in love straight away ---------- */
+{ const _fi=foodIds; foodIds=function(){ const ids=_fi.apply(this,arguments); if((S.inv.heartbloom||0)>0&&!ids.includes('heartbloom')) ids.push('heartbloom'); return ids; }; }
+{ const _gi=giveItem; giveItem=function(e,id){ if(id!=='heartbloom') return _gi.apply(this,arguments);
+    if(!e) return; if(e.stage!=='adult') return toast(`${e.name} is too young for a Heart Bloom`,'warn'); if(e.inLove&&e.loveBoost) return toast(`${e.name} is already head over heels`,'warn'); if(loveResting(e)) return toast(`${e.name} is resting after an egg`,'warn');
+    if(!take('heartbloom')) return; fallInLove(e,true); faceGuardian&&faceGuardian(e); gesture&&gesture('give'); renderHUD(); saveGame(); }; }
+ITEMS.heartbloom.desc='Give it to an adult Echo to make it fall in love straight away, with a better chance of strong babies.';
+/* ---------- Family page (replaces the breeding menu) ---------- */
+function renderFamily(){ const adults=gardenEchoes().filter(e=>e.stage==='adult');
+  let h=`<p class="note">Echos fall in love when they're happy and well cared for. Pick up one that's in love and put it down next to a friend who's in love too. A Heart Bloom makes an adult fall in love straight away. Heart Blooms: ${S.inv.heartbloom||0}.</p>`;
+  if(!adults.length) return h+`<p class="note">When your Echos grow up, they'll show up here.</p>`;
+  h+=`<div class="sec">Who's in love</div><div class="list">${adults.sort((a,b)=>(b.inLove-a.inLove)||((b.love||0)-(a.love||0))).map(e=>{ const s=loveStatus(e); const pct=e.inLove?100:Math.floor(e.love||0);
+      return `<div class="li fam-li"><img src="${echoThumb(e)}" alt="" style="width:40px;height:40px"><div class="tx"><b>${esc(e.name)}</b><span class="fam-${s.c}">${s.t}</span><div class="prog fam-bar"><i style="width:${pct}%"></i></div></div>${(S.inv.heartbloom||0)&&!e.inLove&&!loveResting(e)?`<button class="btn sm pink" data-lovebloom="${e.id}">Heart Bloom</button>`:''}</div>`; }).join('')}</div>`;
+  if(adults.length>=2){ const pairs=[]; for(let i=0;i<adults.length;i++) for(let j=i+1;j<adults.length;j++) pairs.push([adults[i],adults[j],compat(adults[i],adults[j])]); pairs.sort((x,y)=>((y[0].inLove&&y[1].inLove)-(x[0].inLove&&x[1].inLove))||y[2]-x[2]);
+    h+=`<div class="sec">Best matches</div><div class="list">${pairs.slice(0,6).map(([a,b,c])=>{ const sel=(UI.breedA===a.id&&UI.breedB===b.id); const fr=Math.max(a.rel[b.id]||0,b.rel[a.id]||0); const hearts='♥'.repeat(Math.max(0,Math.min(5,Math.ceil(fr/20))))+'♡'.repeat(5-Math.max(0,Math.min(5,Math.ceil(fr/20))));
+        return `<button class="li fam-pair ${sel?'sel':''}" data-lovepair="${a.id},${b.id}"><div class="tx"><b>${esc(a.name)} & ${esc(b.name)}</b><span><span class="fam-love">${hearts}</span> · Match ${c}%${a.inLove&&b.inLove?' · <span class="fam-love">both in love</span>':''}</span></div><span class="price">${sel?'▲':'▼'}</span></button>`; }).join('')}</div>`;
+    const a=getEcho(UI.breedA), b=getEcho(UI.breedB);
+    if(a&&b&&a!==b&&adults.includes(a)&&adults.includes(b)){ let prev=''; try{ const full=renderBreed(); const i=full.indexOf('<div class="sec">Compatibility'); const j=full.indexOf('<p class="note" style="color:var(--danger)">',i)>-1?full.indexOf('<p class="note" style="color:var(--danger)">',i):full.indexOf('<button class="btn pink" data-breedgo',i); if(i>-1) prev=full.slice(i,j>-1?j:undefined); }catch(e){}
+      const why=courtWhy(a,b); h+=`<div class="fam-prev">${prev}${why?`<p class="note">${esc(why)}.</p>`:''}<button class="btn pink" data-lovego ${why?'disabled':''}>💕 Bring them together</button></div>`; } }
+  const fams=S.echoes.filter(e=>e.parents&&e.parents.length); if(fams.length) h+=`<div class="sec">Family tree</div><div class="list">${fams.slice(-8).reverse().map(k=>{ const p=k.parents.map(id=>getEcho(id)); return `<div class="li"><img src="${echoThumb(k)}" alt="" style="width:36px;height:36px"><div class="tx"><b>${esc(k.name)} · Gen ${k.gen}</b><span>Child of ${p.map((x,i)=>x?esc(x.name):'an Echo who moved on').join(' & ')}</span></div></div>`; }).join('')}</div>`;
+  return h; }
+PANELS.breed.title='Family'; PANELS.breed.tabs=[['pair','Family']]; PANELS.breed.render=renderFamily;
+document.addEventListener('click',ev=>{ const t=ev.target.closest('[data-lovepair],[data-lovego],[data-lovebloom]'); if(!t) return; ev.stopPropagation();
+  if(t.dataset.lovepair){ const [a,b]=t.dataset.lovepair.split(',').map(Number); if(UI.breedA===a&&UI.breedB===b){ UI.breedA=null; UI.breedB=null; } else { UI.breedA=a; UI.breedB=b; } refreshPanel(); return; }
+  if(t.dataset.lovebloom){ const e=getEcho(+t.dataset.lovebloom); if(e) giveItem(e,'heartbloom'); refreshPanel(); return; }
+  if('lovego' in t.dataset){ const a=getEcho(UI.breedA), b=getEcho(UI.breedB); if(a&&b&&tryCourt(a,b)) closePanel(); } },true);
+COMFORT_OPTS.push(['autoLove','Echos pair up on their own','Echos who are in love and friends may court without your help. Look out for flower rings.']);
+/* ---------- patch notes (numbering restarts at 0.8.1) ---------- */
+CHANGELOG['0.8.1']=[
+  ['💕','Love in the garden','The breeding menu is gone. Happy, well-cared-for adults now fall in love by themselves, and a floating heart shows who\'s in the mood.'],
+  ['🤲','Play matchmaker','Pick up an Echo that\'s in love and put it down next to a friend who\'s in love too. They\'ll court in a ring of flowers and an egg will pop out.'],
+  ['🌸','Heart Blooms','Give one to an adult from the food bar to make it fall in love straight away. Its babies get a better chance of high stat grades.'],
+  ['🔥','Love spots','Courting near the campfire, a bench or the archway brings a little luck with rare colours and stats.'],
+  ['👪','Family page','Breeding is now the Family page. It shows who\'s in love, the best matches with what their baby could inherit, and your family tree. Tap "Bring them together" to send a pair off to court.'],
+  ['⚙️','Optional','Turn on "Echos pair up on their own" in Settings if you\'d like your Echos to find love without your help.'],
+  ['🔢','New version numbers','Echo Garden is still early in development, so version numbers start again from 0.8.1.']];
+/* =========================================================
    AUDIO — procedural music, ambience and creature voices
    (reverb bus, chord pads, bells, spatial voices)
    ========================================================= */
@@ -9034,7 +9139,7 @@ function updateBanner(){ if(document.getElementById('updBar')) return; const d=d
 /* =========================================================
    DIAGNOSTICS — performance readout, error capture, problem report
    ========================================================= */
-const GAME_VERSION='0.9.3';
+const GAME_VERSION='0.8.1';
 const DIAG={errors:[],trail:[],fps:[],show:false,acc:0,n:0,el:null,minFps:999};
 window.addEventListener('error',ev=>{ DIAG.errors.push(`${new Date().toLocaleTimeString()} ${ev.message} @${(ev.filename||'').split('/').pop()}:${ev.lineno}`); if(DIAG.errors.length>15) DIAG.errors.shift(); });
 window.addEventListener('unhandledrejection',ev=>{ DIAG.errors.push(`${new Date().toLocaleTimeString()} promise: ${ev.reason&&ev.reason.message||ev.reason}`); if(DIAG.errors.length>15) DIAG.errors.shift(); });
