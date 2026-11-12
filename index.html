@@ -11,7 +11,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
-<title>Echo Garden v0.8.1</title>
+<title>Echo Garden v0.8.2</title>
 <style>
 [hidden]{display:none!important}
 
@@ -925,6 +925,8 @@ h1,h2,h3,.ph h2,.dk span,.pill b{font-family:var(--f-display);font-weight:900;le
 
 .fam-li .tx{flex:1;min-width:0} .fam-bar{height:5px;margin-top:4px} .fam-love{color:#ff8fb4;font-weight:700} .fam-grow{color:#ffd34a} .fam-warn{color:#ffb070} .fam-mut{color:var(--muted)}
 .fam-pair{width:100%;text-align:left;font:inherit;color:var(--text);cursor:pointer} .fam-pair.sel{border-color:#ff8fb4;background:rgba(255,143,180,.12)} .fam-prev{margin:6px 0 10px;padding:10px;border-radius:14px;border:1px solid rgba(255,143,180,.3);background:rgba(255,143,180,.06)}
+
+.alb{display:inline-block;position:relative;width:70px;height:7px;border-radius:4px;vertical-align:1px;background:linear-gradient(90deg,#a01e44,#5b3fa8 30%,#9aa4b2 50%,#ffe9a0 70%,#ffd34a)} .alb i{position:absolute;top:-3px;width:4px;height:13px;margin-left:-2px;border-radius:2px;background:#fff;box-shadow:0 0 4px #000}
 </style>
 <div id="app">
   <canvas id="gl"></canvas>
@@ -1331,6 +1333,7 @@ function mat(color,o={}){
 }
 const OUTLINE_MAT=new THREE.MeshBasicMaterial({color:0x2a1c30,side:THREE.BackSide});
 function colHSL(h,s,l){const c=new THREE.Color();c.setHSL(((h%360+360)%360)/360,clamp(s,0,1),clamp(l,0,1));return '#'+c.getHexString()}
+function mixCol(a,b,t){ const c=new THREE.Color(a); c.lerp(new THREE.Color(b),clamp(t,0,1)); return '#'+c.getHexString(); }
 const BASE_HUE=192; const STAT_HUE={speed:205,focus:272,endurance:140,power:6,agility:38};
 // Standard Echos all hatch the same colour; their strongest stat sets the colour as they evolve.
 function evoColour(stage,primary,secondary){ return {hue:stage==='baby'||!primary?BASE_HUE:STAT_HUE[primary], sat:stage==='baby'?.5:stage==='teen'?.56:.62, light:stage==='baby'?.7:stage==='teen'?.66:.64,
@@ -1342,7 +1345,7 @@ function appearanceOf(e,emo){
   const C=e.genes.colored?{hue:e.genes.hue,sat:e.genes.sat,light:e.genes.light,hue2:e.genes.hue2}:evoColour(f.stage,f.primary,f.secondary);
   return {stage:f.stage,align:f.align,primary:f.primary,secondary:f.secondary,hue:C.hue,sat:C.sat,light:C.light,hue2:C.hue2,
     shiny:e.genes.shiny,crystal:e.genes.crystal,prism:e.genes.prism,parts:Object.assign({},e.parts),hat:e.hat,emo:emo||'happy',
-    alignLean:e.alignLocked?0:Math.round(clamp(e.align/100,-1,1)*10)/10};
+    alignLean:e.alignLocked?0:Math.round(clamp(e.align/45,-1,1)*20)/20};
 }
 function appearanceOfForm(key){
   const f=FORMS[key];
@@ -1525,7 +1528,7 @@ function buildEcho(app,opts={}){
   if(app.hat) head.add(buildHat(app.hat));
   // orb / jewel
   const orb=new THREE.Group(); const orbY=1.25+(app.hat?.42:0); orb.position.set(0,orbY,0); head.add(orb); parts.orb=orb;
-  const orbCol=stg==='baby'?colHSL(app.hue,app.sat+.1,Math.min(.9,app.light+.14)):P.accent;
+  const orbCol=stg==='baby'?(()=>{ const c=colHSL(app.hue,app.sat+.1,Math.min(.9,app.light+.14)), L=app.alignLean||0; return L>0?mixCol(c,'#ffe066',L*.85):L<0?mixCol(c,'#d0203f',-L*.85):c; })():P.accent;
   const om=mat(orbCol,{emissive:orbCol,emissiveIntensity:app.primary==='focus'?.75:.28,roughness:.3});
   const p=stg==='baby'?'baby':(app.primary||'normal');
   if(p==='speed'){ orb.add(mesh(GEO.sph,om,[.13,.13,.3],[0,0,-.08])); orb.rotation.x=.4; }
@@ -2979,7 +2982,7 @@ function renderPopup(){
   let h='';
   if(P.kind==='echo'){
     const e=getEcho(P.id); if(!e||!inGarden(e)){ closePopup(); return; } const f=FORMS[e.form], n=e.needs, rt=rtOf(e);
-    const al=e.alignLocked?`<span class="chip ${e.alignLocked}">${ALIGN_NAME[e.alignLocked]}</span>`:`<span class="chip">Leaning ${ALIGN_NAME[alignClass(e.align)]}</span>`;
+    const al=e.alignLocked?`<span class="chip ${e.alignLocked}">${ALIGN_NAME[e.alignLocked]}</span>`:`<span class="chip ${alignLeanClass(e)}">${alignWord(e)}</span>`;
     h=popShell(echoThumb(e,e.emotion),`${esc(f.name)}${f.stage==='baby'?' · '+MOBILITY_LABEL[mobility(e)]:''} · ${EMO_LABEL[e.emotion]}${rt.state==='sleep'?' · asleep':''}${e.lesson?' · in class':''}`,esc(e.name),al,
       srow('Hunger',n.hunger)+srow('Happy',n.happy)+srow('Energy',n.energy)+srow('Health',n.health),
       UI.tray?renderTray(e):tile('pet','pet','Pet',{cls:'pink'})+tile('play','toy','Play')+tile('feed','feed','Give',{cls:'gold'})+tile('poke','tease','Tease')+tile('dress','dress','Dress')+tile('profile','prof','Profile'),true);
@@ -3182,11 +3185,11 @@ function renderProfile(tab){
   if(tab==='overview'){
     const a0=(e.history||[]).filter(h=>h.to&&FORMS[e.form]&&h.to===FORMS[e.form].name).map(h=>h.at)[0]||0; const life=e.stage==='adult'?Math.min(100,(e.ageSec-a0)/Math.max(1,e.lifespan-a0)*100):0;
     return `<div class="prof-hero"><img src="${echoThumb(e,e.emotion)}" alt=""><div style="min-width:0"><h3>${esc(e.name)}</h3><div class="sub">${esc(f.name)} · ${f.stage[0].toUpperCase()+f.stage.slice(1)} · Gen ${e.gen}${e.reincarnations?` · Reborn ×${e.reincarnations}`:''}</div>
-      <div class="row" style="margin-top:6px"><span class="chip ${e.alignLocked||alignClass(e.align)}">${e.alignLocked?ALIGN_NAME[e.alignLocked]:'Leaning '+ALIGN_NAME[alignClass(e.align)]}</span><span class="chip">${e.personality}</span><span class="chip">${EMO_LABEL[e.emotion]}</span>${f.primary?`<span class="chip" style="color:${STAT[f.primary].color}">${STAT[f.primary].name} type</span>`:''}</div>
+      <div class="row" style="margin-top:6px"><span class="chip ${e.alignLocked||alignLeanClass(e)}">${e.alignLocked?ALIGN_NAME[e.alignLocked]:alignWord(e)}</span><span class="chip">${e.personality}</span><span class="chip">${EMO_LABEL[e.emotion]}</span>${f.primary?`<span class="chip" style="color:${STAT[f.primary].color}">${STAT[f.primary].name} type</span>`:''}</div>
       <p class="note">${esc(PERS_DESC[e.personality])}</p></div></div>
       <div class="bars" style="grid-template-columns:repeat(3,1fr)">${bar('Hunger',n.hunger,needCol(n.hunger))}${bar('Happiness',n.happy,needCol(n.happy))}${bar('Health',n.health,needCol(n.health))}${bar('Energy',n.energy,needCol(n.energy))}${bar('Affection',n.affection,'var(--bloom)')}${bar('Social',n.social,'var(--foc)')}</div>
       <div class="kv" style="margin-top:10px"><div><span>Age</span><b>${Math.floor(e.ageSec/60)} min</b></div><div><span>Bond with you</span><b>${Math.round(e.bond)}</b></div><div><span>Trust</span><b>${Math.round(e.trust)}</b></div><div><span>Stamina</span><b>${Math.round(e.stamina)}/${Math.round(staminaMax(e))}</b></div>
-      <div><span>Alignment</span><b>${e.align>0?'+':''}${Math.round(e.align)}</b></div><div><span>${f.stage==='adult'?'Life':'Next evolution'}</span><b>${f.stage==='adult'?Math.round(life)+'%':Math.round(e.evo)+'%'}</b></div>
+      <div><span>Alignment</span><b>${alignBar(e)}</b></div><div><span>${f.stage==='adult'?'Life':'Next evolution'}</span><b>${f.stage==='adult'?Math.round(life)+'%':Math.round(e.evo)+'%'}</b></div>
       <div><span>Moves</span><b>${MOBILITY_LABEL[mobility(e)]}</b></div><div><span>Skills</span><b>${Object.keys(e.skills).length}</b></div><div><span>Hat</span><b>${e.hat?HATS[e.hat].name:'None'}</b></div></div>
       <div class="row" style="margin-top:8px"><button class="btn sm" data-rename="${e.id}">Rename</button>${e.hat?`<button class="btn sm" data-unhat="${e.id}">Remove hat</button>`:''}</div>`;
   }
@@ -7081,8 +7084,12 @@ palette=function(app){ const a=app.align, stg=app.stage, h=app.hue, s0=app.sat, 
   if(app.special==='fiend') return {body:'#1c0c14',belly:'#3a0f1c',tip:'#ff2a44',accent:'#ff3a50',eye:'#ff3048',glow:'#ff2a44'};
   if(app.special==='aeon') return {body:'#bfe8ff',belly:'#e8f8ff',tip:'#9f8cff',accent:'#7ff0ff',eye:'#3a2aa8',glow:'#9ff4ff'};
   const sh=h2!=null?h2:h; let body,belly,tip,accent,eye,glow;
-  if(stg==='baby'){ const L=app.alignLean||0; body=colHSL(h,s0-(L>0?L*.15:0),l0+(L>0?L*.1:L*.26)); belly=colHSL(h,s0-.15,Math.min(.92,l0+.18+(L<0?L*.2:0)));
-    tip=L>.25?colHSL(45,.85,.68+(1-L)*.08):L<-.25?colHSL(h,.9,.5):colHSL(h,s0+.05,l0-.1); accent=colHSL(h,s0+.1,Math.min(.9,l0+.1)); eye='#2a1f1a'; glow=accent; }
+  if(stg==='baby'){ const L=app.alignLean||0, k=Math.min(1,Math.abs(L)*1.1);
+    const b0=colHSL(h,s0,l0), be0=colHSL(h,s0-.15,Math.min(.92,l0+.18)), t0=colHSL(h,s0+.05,l0-.1), a0=colHSL(h,s0+.1,Math.min(.9,l0+.1));
+    if(L>0){ body=mixCol(b0,'#ffeab8',k*.85); belly=mixCol(be0,'#ffffff',k); tip=mixCol(t0,'#ffd35a',Math.min(1,k*1.3)); accent=mixCol(a0,'#ffe08a',k); }
+    else if(L<0){ body=mixCol(b0,'#2a1834',k*.9); belly=mixCol(be0,'#5a3c68',k*.8); tip=mixCol(t0,'#ff2a44',Math.min(1,k*1.3)); accent=mixCol(a0,'#ff3a5a',k); }
+    else { body=b0; belly=be0; tip=t0; accent=a0; }
+    eye=L<-.5?'#3a0a12':'#2a1f1a'; glow=accent; }
   else if(a==='hero'){ const l=app.colored?Math.min(.88,l0+.14):.7; body=colHSL(h,app.colored?s0:.78,l); belly=colHSL(stg==='adult'&&h2!=null?h2:h,.5,Math.min(.94,l+.1));
     tip=stg==='adult'&&app.primary?colHSL(sh,.78,.68):colHSL(45,.9,.68); accent='#ffe08a'; eye='#2f6fb3'; glow='#fff0b0'; }
   else if(a==='dark'){ const l=app.colored?Math.max(.08,l0*.28):.1; body=colHSL(h,app.colored?Math.min(.55,s0):.5,l); belly=colHSL(stg==='adult'&&h2!=null?h2:h,.6,l+.08);
@@ -7115,7 +7122,7 @@ function decorateEcho(root,app){ const P=palette(app), parts=root.userData.parts
   else if(sp==='aeon'){ hideOrb(); const core=mesh(GEO.oct,mat('#ffffff',{emissive:'#9ff4ff',emissiveIntensity:1}),[.14,.2,.14]); mark.add(core); halo(.3,ghostMat('#b8a8ff',.6)); }
   else if(stg!=='baby'&&a==='hero'){ hideOrb(); halo(.3,mGlow); }
   else if(stg!=='baby'&&a==='dark'){ hideOrb(); crescent(mat(colHSL(app.hue,.5,.12)),mat(P.accent,{emissive:P.accent,emissiveIntensity:.9})); }
-  else if(stg==='baby'){ const L=app.alignLean||0; if(L>=.3) halo(.26,ghostMat('#ffe9a0',Math.min(.75,L*.8))); else if(L<=-.3){ const c=new THREE.Mesh(crescentGeo(),ghostMat(colHSL(app.hue,.9,.55),Math.min(.75,-L*.8))); c.rotation.z=Math.PI*.82; c.scale.setScalar(.8); mark.add(c); } }
+  else if(stg==='baby'){ const L=app.alignLean||0; if(L>=.15) halo(.2+L*.08,ghostMat('#ffe9a0',Math.min(.85,.25+L*.7))); else if(L<=-.15){ const c=new THREE.Mesh(crescentGeo(),ghostMat('#ff3a5a',Math.min(.85,.25-L*.7))); c.rotation.z=Math.PI*.82; c.scale.setScalar(.6-L*.3); mark.add(c); } }
   // Prime forms: the stat's signature, exaggerated
   if(stg==='adult'&&app.primary&&app.primary===app.secondary&&!sp){ const p=app.primary, acc=mat(STAT[p].color,{emissive:STAT[p].color,emissiveIntensity:.25});
     if(p==='speed'){ head.add(mesh(GEO.cone,acc,[.08,.5,.18],[0,.5,-.75],[-2.2,0,0])); for(const sx of [-1,1]) head.add(mesh(GEO.cone,acc,[.06,.36,.12],[sx*.3,.55,-.6],[-2,0,sx*.35])); }
@@ -8893,6 +8900,35 @@ CHANGELOG['0.8.1']=[
   ['⚙️','Optional','Turn on "Echos pair up on their own" in Settings if you\'d like your Echos to find love without your help.'],
   ['🔢','New version numbers','Echo Garden is still early in development, so version numbers start again from 0.8.1.']];
 /* =========================================================
+   v0.8.2 — alignment like the Chao Garden
+   Whoever looks after an Echo shapes it. Every kind act from
+   Vortex pulls toward Hero, from Eclipse toward Dark, and Rift
+   keeps things balanced. Babies visibly change colour as they
+   lean, and the head mark grows into a halo or a crescent.
+   ========================================================= */
+nudgeAlign=function(e,amt){ if(!e||e.alignLocked||!amt) return; const g=(GUARDIANS[S.guardian]||{}).align||0; const before=e.align; let d;
+  if(amt>0){ if(g>0) d=amt*1.3; else if(g<0) d=-amt*1.3; else { const pull=Math.min(Math.abs(e.align),amt*1.2); d=-Math.sign(e.align)*pull; } }
+  else d=amt*1.2; // teasing and neglect always darken
+  e.align=clamp(e.align+d,-100,100); alignFeedback(e,before); };
+function alignFeedback(e,before){ const a=e.align; if(Math.floor(Math.abs(before)/9)===Math.floor(Math.abs(a)/9)&&Math.sign(before)===Math.sign(a)) return;
+  const m=MESH.echo&&MESH.echo.get(e.id); const hero=a>before, col=hero?'#ffe066':'#c02a5a'; if(m&&!MG) for(let i=0;i<5;i++) fx('spark',{x:e.pos.x,y:m.parts.height*.9,z:e.pos.z},{color:col,vx:rand(-.6,.6),vz:rand(-.6,.6),vy:rand(.8,1.4),size:.3});
+  for(const th of [15,30]){ if(Math.abs(before)<th&&Math.abs(a)>=th){ const side=a>0?'Hero':'Dark'; toast(th===30?`${e.name} will grow up ${side} if it evolves now ${a>0?'😇':'😈'}`:`${e.name} is starting to lean ${side}`,a>0?'gold':'warn'); } }
+  if(Math.abs(before)>=30&&Math.abs(a)<30) toast(`${e.name} is drifting back toward Neutral`,'info'); }
+function alignLeanClass(e){ const c=alignClass(e.align); if(c!=='neutral') return c; return Math.abs(e.align)>=10?(e.align>0?'hero':'dark'):'neutral'; }
+function alignWord(e){ const v=Math.round(e.align); if(Math.abs(v)<10) return 'Neutral'; const side=v>0?'Hero':'Dark'; return Math.abs(v)>=30?side:`Leaning ${side}`; }
+function alignBar(e){ if(e.alignLocked) return ALIGN_NAME[e.alignLocked]+' (set)'; const v=Math.round(e.align), p=(v+100)/2;
+  return `<span class="alb"><i style="left:${p}%"></i></span> ${v>0?'+':''}${v}`; }
+// more of everyday care counts
+{ const _ai=applyItem; applyItem=function(e,id){ const it=ITEMS[id]; const r=_ai.apply(this,arguments); try{ if(e&&it&&!(it.fx&&it.fx.align)&&['fruit','dish','fish','food'].includes(it.cat)) nudgeAlign(e,1.8); }catch(err){} return r; }; }
+{ const _ft=finishTrain; finishTrain=function(){ const M=MG; const r=_ft.apply(this,arguments); try{ if(M&&!M._al){ M._al=1; const e=getEcho(M.echo); const g=trainGrade(M); if(e) setTimeout(()=>nudgeAlign(e,{S:6,A:5,B:4,C:3}[g]||3),400); } }catch(err){} return r; }; }
+{ const _cs=careStroke; careStroke=function(region){ const r=_cs.apply(this,arguments); const e=CARE&&getEcho(CARE.id); if(e&&!e.alignLocked){ CARE.al2=(CARE.al2||0)+1; if(CARE.al2%12===0) nudgeAlign(e,1.4); } return r; }; }
+// the guardian swap tip explains it
+CHANGELOG['0.8.2']=[
+  ['🌗','Alignment you can feel','Whoever looks after an Echo shapes it, like in the Chao Garden. Petting, feeding, playing and training with Vortex pulls a baby toward Hero, with Eclipse toward Dark, and Rift keeps it balanced.'],
+  ['🎨','Colours that change','Babies change colour as they lean. Hero babies turn pale and golden with a glowing halo. Dark babies turn shadowy with red tips and a crescent. Their head orb changes colour too.'],
+  ['✨','You can see it happen','Gold or red sparkles show when an Echo shifts, and a message tells you when it starts to lean and when it will grow up Hero or Dark.'],
+  ['📊','Clearer profile','The profile shows Neutral, Leaning Hero/Dark or Hero/Dark, with a bar so you can track progress.']];
+/* =========================================================
    AUDIO — procedural music, ambience and creature voices
    (reverb bus, chord pads, bells, spatial voices)
    ========================================================= */
@@ -9139,7 +9175,7 @@ function updateBanner(){ if(document.getElementById('updBar')) return; const d=d
 /* =========================================================
    DIAGNOSTICS — performance readout, error capture, problem report
    ========================================================= */
-const GAME_VERSION='0.8.1';
+const GAME_VERSION='0.8.2';
 const DIAG={errors:[],trail:[],fps:[],show:false,acc:0,n:0,el:null,minFps:999};
 window.addEventListener('error',ev=>{ DIAG.errors.push(`${new Date().toLocaleTimeString()} ${ev.message} @${(ev.filename||'').split('/').pop()}:${ev.lineno}`); if(DIAG.errors.length>15) DIAG.errors.shift(); });
 window.addEventListener('unhandledrejection',ev=>{ DIAG.errors.push(`${new Date().toLocaleTimeString()} promise: ${ev.reason&&ev.reason.message||ev.reason}`); if(DIAG.errors.length>15) DIAG.errors.shift(); });
