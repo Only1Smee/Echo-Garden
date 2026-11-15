@@ -11,7 +11,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
-<title>Echo Garden v0.8.2</title>
+<title>Echo Garden v0.8.4</title>
 <style>
 [hidden]{display:none!important}
 
@@ -927,6 +927,27 @@ h1,h2,h3,.ph h2,.dk span,.pill b{font-family:var(--f-display);font-weight:900;le
 .fam-pair{width:100%;text-align:left;font:inherit;color:var(--text);cursor:pointer} .fam-pair.sel{border-color:#ff8fb4;background:rgba(255,143,180,.12)} .fam-prev{margin:6px 0 10px;padding:10px;border-radius:14px;border:1px solid rgba(255,143,180,.3);background:rgba(255,143,180,.06)}
 
 .alb{display:inline-block;position:relative;width:70px;height:7px;border-radius:4px;vertical-align:1px;background:linear-gradient(90deg,#a01e44,#5b3fa8 30%,#9aa4b2 50%,#ffe9a0 70%,#ffd34a)} .alb i{position:absolute;top:-3px;width:4px;height:13px;margin-left:-2px;border-radius:2px;background:#fff;box-shadow:0 0 4px #000}
+
+/* v0.8.3 more game, less website */
+#actBtn{position:absolute;right:max(14px,env(safe-area-inset-right,0px));bottom:calc(108px + env(safe-area-inset-bottom,0px));z-index:7;width:72px;height:72px;border-radius:50%;border:2px solid rgba(255,236,190,.55);background:radial-gradient(circle at 35% 30%,#ffe9a8,#f3b84a 60%,#c8862a);color:#3a2408;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;pointer-events:auto;box-shadow:0 6px 18px rgba(0,0,0,.4),inset 0 -4px 0 rgba(0,0,0,.15);font:inherit;padding:0;touch-action:none;transition:transform .12s,opacity .3s}
+#actBtn[hidden]{display:none} #actBtn .ai{font-size:24px;line-height:1} #actBtn b{font-size:11px;font-weight:900;line-height:1.1} #actBtn em{position:absolute;bottom:-17px;left:50%;transform:translateX(-50%);font-style:normal;font-size:10px;font-weight:700;color:#fff;white-space:nowrap;text-shadow:0 1px 3px #000;max-width:110px;overflow:hidden;text-overflow:ellipsis}
+#actBtn.press{transform:scale(.88)} #actBtn.pop{animation:actpop .28s ease} @keyframes actpop{0%{transform:scale(.85)}60%{transform:scale(1.08)}100%{transform:scale(1)}}
+#actBtn.idle{background:radial-gradient(circle at 35% 30%,#d8eaff,#8fb4e8 60%,#5a7fc0);color:#14223a;width:58px;height:58px;bottom:calc(115px + env(safe-area-inset-bottom,0px));right:max(21px,env(safe-area-inset-right,0px));opacity:.85}
+#app.lefty #actBtn{right:auto;left:max(14px,env(safe-area-inset-left,0px))}
+#ui.fishing #actBtn,#ui.deco #actBtn,#ui.panel-open #actBtn,#ui.pop-open #actBtn{opacity:0;pointer-events:none}
+#ui.holding #armBanner,#ui.holding #foodBar{display:none!important}
+/* calm: the top bar fades away until you touch the screen */
+#ui .hud-top,#ui #essHud,#ui #slotRail,#ui #nextStep,#ui #quest,#ui #dock,#ui #camReset,#ui #foodBtn{transition:opacity .8s ease}
+#ui.calm .hud-top,#ui.calm #essHud,#ui.calm #slotRail,#ui.calm #nextStep,#ui.calm #quest,#ui.calm #camReset{opacity:0;pointer-events:none}
+#ui.calm #dock,#ui.calm #foodBtn{opacity:.35}
+/* compact dock: Bag, Adventure, Shop and Echodex sit under More (they live in the garden now) */
+#dock:not(.all):not(.classic) .dk[data-dock="bag"],#dock:not(.all):not(.classic) .dk[data-dock="adv"],#dock:not(.all):not(.classic) .dk[data-dock="shop"],#dock:not(.all):not(.classic) .dk[data-dock="dex"]{display:none}
+#dock.classic .dk-more{display:none} .dk-more span{font-size:20px;line-height:18px;font-weight:900} #dock.all .dk-more{color:#ffe08a}
+/* boards opened from a place sit to the right, the place stays in view on the left */
+#panel.world{width:min(400px,calc(52% - 10px));background:linear-gradient(180deg,rgba(74,46,24,.94),rgba(52,32,18,.95));border:2px solid #c8925a;box-shadow:0 10px 30px rgba(0,0,0,.5),inset 0 0 0 3px rgba(255,220,170,.08)}
+#panel.world .ph{border-bottom:1px dashed rgba(255,220,170,.25)}
+.sorb{position:fixed;width:12px;height:12px;margin:-6px 0 0 -6px;border-radius:50%;background:radial-gradient(circle,#fffbe0,#ffd34a 55%,rgba(255,180,40,0));box-shadow:0 0 10px #ffd34a;pointer-events:none;z-index:60}
+.pill.cur.bump{animation:bump .3s ease} @keyframes bump{50%{transform:scale(1.12)}}
 </style>
 <div id="app">
   <canvas id="gl"></canvas>
@@ -8929,6 +8950,220 @@ CHANGELOG['0.8.2']=[
   ['✨','You can see it happen','Gold or red sparkles show when an Echo shifts, and a message tells you when it starts to lean and when it will grow up Hero or Dark.'],
   ['📊','Clearer profile','The profile shows Neutral, Leaning Hero/Dark or Hero/Dark, with a bar so you can track progress.']];
 /* =========================================================
+   v0.8.3 — more game, less website
+   Places in the garden instead of menus (a market stall, a
+   storage chest, a love tree, a signpost to the games and a
+   glowing archway to Adventure), one action button that changes
+   with what's nearby, carrying fruit to feed Echos, shaking
+   trees, a whistle, and a calmer screen that gets out of the way.
+   ========================================================= */
+const PLACE={list:[],focus:null,t:0};
+const buzz=ms=>{ try{ if(!(S.settings&&S.settings.noVibe)&&navigator.vibrate) navigator.vibrate(ms); }catch(e){} };
+const PLACE_DEF={
+  stall:{name:'Market stall',r:1.5,def:[11.6,2.4],act:'Shop',ic:'🛒',open:()=>openPanel('shop')},
+  chest:{name:'Storage chest',r:.8,def:[-11,2.4],act:'Open',ic:'🧺',open:()=>openPanel('bag')},
+  lovetree:{name:'Love tree',r:1.3,def:[0,-4],act:'Family',ic:'💕',open:()=>openPanel('breed')},
+  sign:{name:'Games signpost',r:.7,def:[-11.6,-3.4],act:'Games',ic:'🏁',open:()=>{ setTimeout(()=>openFly('play'),30); }}};
+/* ---------- models ---------- */
+function loveHeartGeo(){ if(loveHeartGeo.g) return loveHeartGeo.g; const s=new THREE.Shape(); s.moveTo(0,-.5); s.bezierCurveTo(-.1,-.35,-.55,-.1,-.5,.18); s.bezierCurveTo(-.45,.45,-.08,.5,0,.25); s.bezierCurveTo(.08,.5,.45,.45,.5,.18); s.bezierCurveTo(.55,-.1,.1,-.35,0,-.5);
+  loveHeartGeo.g=new THREE.ExtrudeGeometry(s,{depth:.18,bevelEnabled:true,bevelThickness:.06,bevelSize:.06,bevelSegments:2,curveSegments:10}); loveHeartGeo.g.center(); return loveHeartGeo.g; }
+function buildStall(g){ const wood=mat('#b07a48',{tex:'bark'}), dark=mat('#7a4e2a',{tex:'bark'}), cloth=mat('#e8564a'), cloth2=mat('#fff4e2');
+  g.add(mesh(GEO.box,wood,[2.6,.9,.9],[0,.45,.15])); g.add(mesh(GEO.box,dark,[2.75,.08,1.05],[0,.92,.15]));
+  for(const [x,z] of [[-1.25,-.35],[1.25,-.35],[-1.25,.62],[1.25,.62]]) g.add(mesh(GEO.box,dark,[.12,2.3,.12],[x,1.15,z]));
+  for(let i=0;i<8;i++){ const s=mesh(GEO.box,i%2?cloth:cloth2,[.36,.06,1.5],[-1.26+i*.36,2.38,.12],[-.28,0,0]); g.add(s); g.add(mesh(GEO.cone,i%2?cloth:cloth2,[.2,.22,.06],[-1.26+i*.36,2.0,.85],[Math.PI,0,0])); }
+  for(let i=0;i<3;i++) g.add(mesh(GEO.box,wood,[.6,.28,.4],[-.8+i*.8,1.1,.25])); g.add(mesh(GEO.box,dark,[2.4,.06,.32],[0,1.62,.42])); for(const x of [-1.15,1.15]) g.add(mesh(GEO.box,dark,[.06,.5,.06],[x,1.4,.42]));
+  const shelf=new THREE.Group(); g.add(shelf); g.userData.shelf=shelf;
+  const sign=new THREE.Group(); sign.position.set(0,2.75,.75); sign.add(mesh(GEO.box,wood,[1.1,.42,.06])); sign.add(mesh(GEO.cyl,mat('#ffd34a',{metalness:.4,roughness:.3}),[.15,.04,.15],[0,0,.06],[Math.PI/2,0,0])); g.add(sign);
+  // the shopkeeper: a round, friendly mole
+  const k=new THREE.Group(); k.position.set(0,.9,-.55); const fur=mat('#8a6a5a'); k.add(mesh(GEO.sph,fur,[.42,.48,.4],[0,.42,0])); k.add(mesh(GEO.sph,mat('#f2dcc8'),[.3,.3,.12],[0,.4,.3])); k.add(mesh(GEO.sph,fur,[.32,.3,.3],[0,.95,0]));
+  k.add(mesh(GEO.sph,mat('#ff9ab0'),[.08,.06,.07],[0,.93,.29])); for(const sx of [-.12,.12]) k.add(mesh(GEO.sph,mat('#1f1612'),[.04,.05,.03],[sx,1.03,.26])); for(const sx of [-.22,.22]) k.add(mesh(GEO.sph,fur,[.09,.09,.05],[sx,1.2,0]));
+  k.add(mesh(GEO.cone,mat('#3f7fe0'),[.3,.3,.3],[0,1.32,0])); k.add(mesh(GEO.sph,mat('#fff'),[.06,.06,.06],[0,1.48,0])); g.add(k); g.userData.keeper=k; }
+function buildChest(g){ const wood=mat('#9a6a3a',{tex:'bark'}), band=mat('#5a5a66',{metalness:.5,roughness:.4}), gold=mat('#ffd34a',{metalness:.5,roughness:.3});
+  g.add(mesh(GEO.box,wood,[1.1,.55,.7],[0,.3,0])); for(const x of [-.4,.4]) g.add(mesh(GEO.box,band,[.08,.57,.72],[x,.3,0]));
+  const lid=new THREE.Group(); lid.position.set(0,.58,-.35); const top=new THREE.Mesh(new THREE.CylinderGeometry(.35,.35,1.1,14,1,false,0,Math.PI),wood); top.rotation.z=Math.PI/2; top.position.set(0,0,.35); top.scale.set(1,1,1); lid.add(top);
+  for(const x of [-.4,.4]){ const b=new THREE.Mesh(new THREE.CylinderGeometry(.36,.36,.08,14,1,false,0,Math.PI),band); b.rotation.z=Math.PI/2; b.position.set(x,0,.35); lid.add(b); } g.add(lid); g.userData.lid=lid;
+  g.add(mesh(GEO.box,gold,[.14,.18,.06],[0,.52,.37])); g.add(mesh(GEO.sph,mat('#e0453a'),[.09,.09,.09],[-.25,.95,.1])); g.add(mesh(GEO.sph,mat('#ffb347'),[.08,.08,.08],[-.05,.98,.05])); g.add(mesh(GEO.sph,mat('#9ad14a'),[.08,.08,.08],[.18,.94,.12])); g.userData.fruit=g.children.slice(-3); }
+function buildLoveTree(g){ const bark=mat('#7a5236',{tex:'bark'}); g.add(mesh(GEO.cyl,bark,[.28,2.4,.28],[0,1.2,0])); g.add(mesh(GEO.cyl,bark,[.12,1,.12],[.4,2.2,.1],[0,0,-.7])); g.add(mesh(GEO.cyl,bark,[.12,1,.12],[-.4,2.3,-.1],[0,0,.7]));
+  const pinks=['#ffb6d0','#ff9ac2','#ffd0e2','#ff86b4']; [[0,3.1,0,1.25],[.9,2.7,.2,.85],[-.9,2.8,-.1,.9],[.2,2.6,.85,.8],[-.2,2.7,-.85,.8],[0,3.7,.1,.75]].forEach(([x,y,z,s],i)=>g.add(mesh(GEO.ico,mat(pinks[i%4],{tex:'mottle'}),[s,s*.8,s],[x,y,z])));
+  const hearts=[]; const hg=loveHeartGeo(); for(let i=0;i<8;i++){ const a=i/8*Math.PI*2+.3, r=1+(i%2)*.25; const h=new THREE.Group(); h.position.set(Math.cos(a)*r,2.15-(i%3)*.12,Math.sin(a)*r); h.add(mesh(GEO.cyl,mat('#fff'),[.006,.35,.006],[0,.2,0])); const hm=new THREE.Mesh(hg,mat('#ff4f8a',{emissive:'#ff2a6a',emissiveIntensity:.25})); hm.scale.setScalar(.22); h.add(hm); h.visible=false; g.add(h); hearts.push(h); }
+  g.userData.hearts=hearts; g.add(mesh(GEO.box,mat('#c09060',{tex:'bark'}),[.5,.05,.25],[0,.55,.25])); }
+function buildSign(g){ const wood=mat('#a8764a',{tex:'bark'}); g.add(mesh(GEO.cyl,mat('#7a5236',{tex:'bark'}),[.09,2.4,.09],[0,1.2,0]));
+  [['#e0453a',2.05,.3,'race'],['#3f7fe0',1.65,-.25,'karate'],['#4f9e45',1.25,.2,'train']].forEach(([c,y,ry])=>{ const a=new THREE.Group(); a.position.y=y; a.rotation.y=ry; a.add(mesh(GEO.box,mat(c),[1,.26,.06],[.42,0,0])); a.add(mesh(GEO.cone,mat(c),[.17,.2,.06],[.98,0,0],[0,0,-Math.PI/2])); a.add(mesh(GEO.box,mat('#fff'),[.5,.05,.07],[.4,0,0])); g.add(a); });
+  const flag=new THREE.Group(); flag.position.set(0,2.4,0); flag.add(mesh(GEO.box,mat('#fff'),[.4,.26,.02],[.22,0,0])); for(let i=0;i<2;i++) for(let j=0;j<3;j++) if((i+j)%2) flag.add(mesh(GEO.box,mat('#1f1f26'),[.13,.13,.025],[.09+j*.13,-.06+i*.13,0])); g.add(flag); g.userData.flag=flag; }
+/* ---------- placing them so nothing overlaps ---------- */
+function placeFree(x,z,r){ if(Math.hypot(x,z)>RAD-r-.4) return false; const P=WORLD.pond; if(P&&Math.hypot(P.x-x,P.z-z)<P.r+r+.6) return false;
+  for(const o of WORLD.obstacles){ if(o.kind==='floor') continue; if(Math.hypot(o.x-x,o.z-z)<o.r+r+.35) return false; }
+  for(const it of DECO.items){ const p=it.obj.position; if(Math.hypot(p.x-x,p.z-z)<it.r+r+.3) return false; }
+  if(SCHOOL&&Math.hypot(SCHOOL.x-x,SCHOOL.z-z)<r+1.4) return false; if(Math.hypot(x,z-3)<2.2) return false; return true; }
+function placeSpot(x,z,r){ if(placeFree(x,z,r)) return {x,z}; for(let d=.6;d<8;d+=.6) for(let a=0;a<12;a++){ const t=a/12*Math.PI*2; const px=x+Math.cos(t)*d, pz=z+Math.sin(t)*d; if(placeFree(px,pz,r)) return {x:px,z:pz}; } return {x,z}; }
+function buildPlaces(id){ PLACE.list=[]; const L=layOf(id);
+  for(const [key,D] of Object.entries(PLACE_DEF)){ let p=L[key]; if(!p){ const s=placeSpot(D.def[0],D.def[1],D.r); p={x:s.x,z:s.z,rot:Math.atan2(-s.x,-s.z)}; }
+    const g=new THREE.Group(); g.position.set(p.x,0,p.z); g.rotation.y=p.rot||0; ({stall:buildStall,chest:buildChest,lovetree:buildLoveTree,sign:buildSign})[key](g); g.traverse(o=>{ if(o.isMesh){ o.castShadow=true; o.receiveShadow=true; } });
+    world.add(g); addObs(p.x,p.z,D.r*.85,'post'); const it={kind:'place',key,obj:g,r:D.r,name:D.name,paint:true}; DECO.items.push(it); PLACE.list.push({key,obj:g,D}); paintApply(g,paintKey(it)); } }
+{ const _bg=buildGarden; buildGarden=function(id){ const r=_bg.apply(this,arguments); try{ buildPlaces(id||S.garden); portalArch(); }catch(e){ console.warn('places',e); } return r; }; }
+// the archway becomes a glowing portal to Adventure
+function portalArch(){ const it=DECO.items.find(o=>o.kind==='arch'); if(!it) return; const g=it.obj; const pm=new THREE.MeshBasicMaterial({color:'#bfe9ff',transparent:true,opacity:.18,depthWrite:false,blending:THREE.AdditiveBlending,side:THREE.DoubleSide});
+  const plane=new THREE.Mesh(new THREE.CircleGeometry(1.35,28),pm); plane.position.y=1.75; plane.scale.y=1.25; g.add(plane); g.userData.portal=plane;
+  const motes=[]; for(let i=0;i<10;i++){ const m=new THREE.Mesh(GEO.sph,new THREE.MeshBasicMaterial({color:i%2?'#fff6c8':'#bfe9ff',transparent:true,opacity:.8,depthWrite:false})); m.scale.setScalar(.05); g.add(m); motes.push({m,a:i/10*Math.PI*2,s:.6+Math.random()*.6}); } g.userData.motes=motes; }
+/* ---------- living details ---------- */
+function placesTick(dt){ PLACE.t+=dt; const t=PLACE.t;
+  for(const P of PLACE.list){ const u=P.obj.userData;
+    if(u.keeper){ u.keeper.position.y=.9+Math.abs(Math.sin(t*2.2))*.05; u.keeper.rotation.y=Math.sin(t*.7)*.5; const near=Math.hypot(GUARD.x-P.obj.position.x,GUARD.z-P.obj.position.z)<4; if(near&&!u.waved){ u.waved=1; fx('note',{x:P.obj.position.x,y:2.6,z:P.obj.position.z}); } if(!near) u.waved=0; }
+    if(u.lid){ const want=PLACE.focus===P.key?-1.25:0; u.lid.rotation.x+=(want-u.lid.rotation.x)*Math.min(1,dt*6); }
+    if(u.hearts){ const n=gardenEchoes().filter(e=>e.inLove).length; u.hearts.forEach((h,i)=>{ h.visible=i<n; h.rotation.y=t*.9+i; h.position.y+=Math.sin(t*2+i)*.0015; }); }
+    if(u.flag) u.flag.rotation.y=Math.sin(t*3)*.25; }
+  const it=DECO.items.find(o=>o.kind==='arch'); if(it&&it.obj.userData.portal){ const u=it.obj.userData; u.portal.material.opacity=.14+Math.sin(t*2)*.06+(PLACE.near==='portal'?.12:0); for(const M of u.motes){ M.a+=dt*M.s; M.m.position.set(Math.cos(M.a)*1.1,1.75+Math.sin(M.a*1.3)*1.3,Math.sin(M.a*2)*.15); } } }
+/* ---------- walking up to places ---------- */
+function placeFront(key){ if(key==='portal'){ const it=DECO.items.find(o=>o.kind==='arch'); if(!it) return null; const g=it.obj; const f=g.rotation.y; return {x:g.position.x+Math.sin(f)*1.8,z:g.position.z+Math.cos(f)*1.8,o:g}; }
+  const P=PLACE.list.find(p=>p.key===key); if(!P) return null; const g=P.obj, f=g.rotation.y, d=P.D.r+1.1; return {x:g.position.x+Math.sin(f)*d,z:g.position.z+Math.cos(f)*d,o:g}; }
+{ const _pp=pendPos; pendPos=function(P){ if(P.kind==='place'){ const f=placeFront(P.id); return f?resolve({x:f.x,z:f.z},.5,false):null; } return _pp.apply(this,arguments); }; }
+{ const _ar=arrive; arrive=function(P){ if(P.kind==='place') return openPlace(P.id); const r=_ar.apply(this,arguments); if(P.kind==='fruit') holdFruit(lastGround.type); return r; }; }
+function openPlace(key){ const f=placeFront(key); if(f){ GUARD.ang=Math.atan2(f.o.position.x-GUARD.x,f.o.position.z-GUARD.z); } gesture&&gesture('wave',.6); buzz(12); SND.pop&&SND.pop();
+  if(key==='portal'){ PLACE.focus='portal'; for(let i=0;i<8;i++) fx('star',{x:f.o.position.x,y:1.6,z:f.o.position.z},{vx:rand(-.8,.8),vy:rand(.4,1.2),vz:rand(-.8,.8),size:.3}); openPanel('adv'); placeView(true); return; }
+  const P=PLACE.list.find(p=>p.key===key); if(!P) return; PLACE.focus=key;
+  if(key==='sign'){ P.D.open(); return; } P.D.open(); placeView(true); }
+function placeView(on){ $('#panel').classList.toggle('world',!!on); }
+{ const _cp=closePanel; closePanel=function(){ PLACE.focus=null; placeView(false); return _cp.apply(this,arguments); }; }
+{ const _cf=closeFly; closeFly=function(){ if(PLACE.focus==='sign') PLACE.focus=null; return _cf.apply(this,arguments); }; }
+// tap a place to walk there
+{ const _ht=handleTap; handleTap=function(cx,cy){ if(!(CARE||HANDS||CINE||(PHOTO&&PHOTO.on)||DECO.on)){ const r=renderer.domElement.getBoundingClientRect(); ndc.set((cx-r.left)/r.width*2-1,-((cy-r.top)/r.height)*2+1); ray.setFromCamera(ndc,camera);
+      let best=null,bd=1e9; for(const P of PLACE.list){ const h=ray.intersectObject(P.obj,true); if(h.length&&h[0].distance<bd){ bd=h[0].distance; best=P.key; } }
+      const ai=DECO.items.find(o=>o.kind==='arch'); if(ai){ const h=ray.intersectObject(ai.obj,true); if(h.length&&h[0].distance<bd){ bd=h[0].distance; best='portal'; } }
+      if(best){ const ents_h=ray.intersectObjects(ents.children,true); if(!ents_h.length||ents_h[0].distance>bd){ goTo('place',best); return; } } }
+    return _ht.apply(this,arguments); }; }
+// the camera frames the place on the left while its board is open on the right
+{ const _pc=placeCamera; placeCamera=function(dt){ if(PLACE.focus&&PLACE.focus!=='sign'&&UI.panel&&!(CINE||HANDS||CARE)){ const f=placeFront(PLACE.focus); if(f){ const o=f.o.position; const k=Math.min(1,dt*2.6); const d0=PLACE.focus==='stall'||PLACE.focus==='lovetree'||PLACE.focus==='portal'?8.5:6.5; const off=d0*.36;
+        const tx=o.x+Math.cos(CAM.az)*off, tz=o.z-Math.sin(CAM.az)*off; CAM.tx=lerp(CAM.tx,tx,k); CAM.tz=lerp(CAM.tz,tz,k); CAM.cd=lerp(CAM.cd||Math.min(CAM.dist,12),d0,k); CAM.cpol=lerp(CAM.cpol||CAM.pol,1.12,k); CAM.cy=lerp(CAM.cy==null?CAM.ty:CAM.cy,1.3,k); const d=CAM.cd;
+        camera.position.set(CAM.tx+Math.sin(CAM.az)*Math.sin(CAM.cpol)*d,CAM.cy+Math.cos(CAM.cpol)*d,CAM.tz+Math.cos(CAM.az)*Math.sin(CAM.cpol)*d); camera.lookAt(CAM.tx,CAM.cy,CAM.tz); CAM.back=1; if(camera.near!==.1){ camera.near=.1; camera.updateProjectionMatrix(); } return; } }
+    return _pc.apply(this,arguments); }; }
+/* ---------- carrying fruit ---------- */
+let lastGround={type:null};
+{ const _ar2=arrive; arrive=function(P){ if(P.kind==='fruit'){ const f=S.ground.find(x=>x.id===P.id); lastGround={type:f?f.type:null}; } return _ar2.apply(this,arguments); }; }
+function holdFruit(type){ if(!type||!(S.inv[type]>0)) return; dropHold(true); GA.hold=type; UI.armed=type; const m=fruitMesh(type,.2); m.userData.isHold=1; guardianMesh.add(m); GA.holdMesh=m; buzz(15); $('#ui').classList.add('holding'); renderHUD(); }
+function dropHold(silent){ if(GA.holdMesh&&GA.holdMesh.parent) GA.holdMesh.parent.remove(GA.holdMesh); GA.holdMesh=null; if(GA.hold&&UI.armed===GA.hold) UI.armed=null; GA.hold=null; $('#ui').classList.remove('holding'); if(!silent) renderHUD(); }
+{ const _ga=giveArmed; giveArmed=function(e){ const held=GA.hold; const r=_ga.apply(this,arguments); if(held){ dropHold(); buzz(20); const m=MESH.echo.get(e.id); for(let i=0;i<4;i++) fx('heart',{x:e.pos.x,y:(m?m.parts.height:1),z:e.pos.z},{vx:rand(-.5,.5),vy:rand(.6,1.1),vz:rand(-.5,.5),size:.25}); } return r; }; }
+function holdTick(){ const m=GA.holdMesh; if(!m||!guardianMesh) return; if(m.parent!==guardianMesh) guardianMesh.add(m); if(!guardianMesh.userData.h){ const b=new THREE.Box3().setFromObject(guardianMesh); guardianMesh.userData.h=(b.max.y-b.min.y)/(guardianMesh.scale.y||1); }
+  const h=guardianMesh.userData.h||1.6; m.position.set(0,h*.6+Math.sin(PLACE.t*4)*.03,.42); m.rotation.y+=.02; if(UI.armed!==GA.hold) dropHold(); }
+/* ---------- shaking a tree from the path ---------- */
+const SHAKES=[];
+function quickShake(t){ const m=MESH.tree.get(t.id); SND.whoosh&&SND.whoosh(); buzz([10,30,10]); gesture&&gesture('pet',.6); const p=WORLD.plots[t.plot]; for(let i=0;i<6;i++) fx('spark',{x:p.x+rand(-1,1),y:rand(1.6,2.8),z:p.z+rand(-1,1)},{color:'#7fc66a',vy:-.4,size:.25});
+  if(m) SHAKES.push({m,t:0});
+  if(t.fruits>0){ const n=Math.min(t.fruits,1+Math.floor(Math.random()*3)); for(let i=0;i<n;i++) dropFruit(t); syncEntities(); floatAt(n>1?`${n} fruit tumble down!`:'A fruit drops!',p.x,2.6,p.z,'#ffe08a'); }
+  else floatAt('Leaves rustle',p.x,2.4,p.z); }
+function shakesTick(dt){ for(const S2 of [...SHAKES]){ S2.t+=dt; S2.m.rotation.z=Math.sin(S2.t*30)*.06*Math.max(0,1-S2.t/.7); if(S2.t>.7){ S2.m.rotation.z=0; SHAKES.splice(SHAKES.indexOf(S2),1); } } }
+/* ---------- whistle ---------- */
+function whistle(){ SND.note&&SND.note('whistle'); SND.pop&&SND.pop(); buzz(25); gesture&&gesture('wave',.8); fx('note',{x:GUARD.x,y:2,z:GUARD.z}); let n=0;
+  for(const e of gardenEchoes()){ if(e.lesson||!onFeet(e)) continue; const rt=rtOf(e); if(['sleep','cocoon','mate','swim'].includes(rt.state)) continue; const a=Math.random()*Math.PI*2, d=1.4+Math.random()*1.2; rt.state='walk'; rt.tx=GUARD.x+Math.cos(a)*d; rt.tz=GUARD.z+Math.sin(a)*d; rt.timer=8; rt.run=1.6; n++; setTimeout(()=>{ try{ fx('q',{x:e.pos.x,y:1.3,z:e.pos.z},{size:.3}); }catch(err){} },300+Math.random()*500); }
+  if(!n) floatAt('No one around to hear',GUARD.x,2.2,GUARD.z); }
+/* ---------- the action button ---------- */
+function nearAction(){ if(CARE||HANDS||CINE||MG||DECO.on||FISHING||UI.panel||(PHOTO&&PHOTO.on)) return null; const gx=GUARD.x, gz=GUARD.z, dd=(x,z)=>Math.hypot(x-gx,z-gz); let best=null;
+  const consider=(d,lim,A)=>{ if(d<=lim&&(!best||d-(A.pri||0)<best.d-(best.pri||0))){ A.d=d; best=A; } };
+  if(GA.hold){ for(const e of gardenEchoes()){ if(e.lesson||rtOf(e).cocoon>0) continue; consider(dd(e.pos.x,e.pos.z),3.2,{lab:'Feed',ic:'🍎',sub:e.name,pri:2,go:()=>arrive({kind:'echo',id:e.id})}); } if(!best) return {lab:'Put away',ic:'🧺',go:()=>{ dropHold(); toast('Put in your bag','info'); }}; return best; }
+  for(const f of S.ground){ if(f.garden!==S.garden) continue; consider(dd(f.x,f.z),1.7,{lab:'Pick up',ic:'✋',sub:ITEMS[f.type].name,pri:.4,go:()=>{ lastGround={type:f.type}; arrive({kind:'fruit',id:f.id}); }}); }
+  for(const e of gardenEchoes()){ if(e.lesson||rtOf(e).cocoon>0) continue; consider(dd(e.pos.x,e.pos.z),2.1,{lab:'Pet',ic:'🤚',sub:e.name,pri:.3,go:()=>arrive({kind:'echo',id:e.id})}); }
+  for(const g of S.eggs){ if(g.garden!==S.garden) continue; consider(dd(g.x,g.z),1.8,{lab:'Warm',ic:'🥚',sub:'Egg',go:()=>arrive({kind:'egg',id:g.id})}); }
+  WORLD.plots.forEach((p,i)=>{ const t=S.trees.find(t=>t.garden===S.garden&&t.plot===i); if(t) consider(dd(p.x,p.z),2.6,{lab:'Shake',ic:'🌳',sub:t.fruits?`${t.fruits} fruit`:'',go:()=>quickShake(t)}); else consider(dd(p.x,p.z),2.2,{lab:'Plant',ic:'🌱',go:()=>arrive({kind:'plot',id:i})}); });
+  for(const y of S.toys){ if(y.garden!==S.garden||y.tmp) continue; consider(dd(y.x,y.z),1.6,{lab:'Look',ic:'🧸',sub:TOYS[y.type]?TOYS[y.type].name:'',go:()=>arrive({kind:'toy',id:y.id})}); }
+  if(WORLD.fire) consider(dd(WORLD.fire.x,WORLD.fire.z),2.6,{lab:'Cook',ic:'🔥',go:()=>arrive({kind:'fire',id:0})});
+  for(const P of PLACE.list){ const o=P.obj.position; consider(dd(o.x,o.z),P.D.r+2.2,{lab:P.D.act,ic:P.D.ic,sub:P.D.name,pri:.5,go:()=>openPlace(P.key)}); }
+  const ai=DECO.items.find(o=>o.kind==='arch'); if(ai){ const o=ai.obj.position; consider(dd(o.x,o.z),3.4,{lab:'Adventure',ic:'✨',sub:'Archway',pri:.5,go:()=>openPlace('portal'),portal:1}); }
+  if(SCHOOL&&SCHOOL.mesh) consider(dd(SCHOOL.x,SCHOOL.z),2.4,{lab:'School',ic:'🏫',sub:'Kindergarten',pri:.3,go:()=>openPanel('school')});
+  const P=WORLD.pond; if(P&&typeof bestRod==='function'&&bestRod()){ const de=Math.abs(dd(P.x,P.z)-P.r); consider(de,1.8,{lab:'Fish',ic:'🎣',go:()=>startFishing()}); }
+  return best||{lab:'Whistle',ic:'🎵',go:whistle}; }
+function actBtn(){ let b=$('#actBtn'); if(!b){ b=document.createElement('button'); b.id='actBtn'; b.innerHTML='<span class="ai"></span><b></b><em></em>'; $('#ui').appendChild(b);
+    b.addEventListener('pointerdown',ev=>{ ev.preventDefault(); ev.stopPropagation(); const A=PLACE.act; if(!A) return; b.classList.add('press'); setTimeout(()=>b.classList.remove('press'),160); PEND=null; try{ A.go(); }catch(err){ console.warn(err); } setTimeout(actRefresh,60); }); }
+  return b; }
+function actRefresh(){ const A=nearAction(); PLACE.act=A; PLACE.near=A&&A.portal?'portal':null; const b=actBtn(); if(!A||classicUI()){ b.hidden=true; return; } b.hidden=false; const key=A.lab+'|'+(A.sub||'');
+  if(b.dataset.k!==key){ b.dataset.k=key; b.querySelector('.ai').textContent=A.ic; b.querySelector('b').textContent=A.lab; b.querySelector('em').textContent=A.sub||''; b.classList.remove('pop'); void b.offsetWidth; b.classList.add('pop'); b.classList.toggle('idle',A.lab==='Whistle'); } }
+/* ---------- a calmer screen ---------- */
+const classicUI=()=>!!(S&&S.settings&&S.settings.classicUI);
+const CALM={t:0};
+['pointerdown','keydown','wheel'].forEach(ev=>window.addEventListener(ev,()=>{ CALM.t=0; $('#ui')&&$('#ui').classList.remove('calm'); },true));
+function calmTick(dt){ const ui=$('#ui'); if(!ui) return; const busy=classicUI()||UI.panel||UI.popup||UI.fly||MG||CARE||HANDS||DECO.on||FISHING||!$('#modal').hidden; if(busy){ CALM.t=0; ui.classList.remove('calm'); return; } CALM.t+=dt; if(CALM.t>7) ui.classList.add('calm'); }
+{ const _bd=buildDock; buildDock=function(){ const r=_bd.apply(this,arguments); const d=$('#dock'); if(d&&!d.querySelector('[data-more]')){ d.insertAdjacentHTML('beforeend',`<button class="dk dk-more" data-more aria-label="More"><span>⋯</span>More</button>`); } d.classList.toggle('classic',classicUI()); return r; }; }
+document.addEventListener('click',ev=>{ const m=ev.target.closest('[data-more]'); if(m){ ev.stopPropagation(); $('#dock').classList.toggle('all'); SND.ui&&SND.ui(); return; } if(ev.target.closest('#dock [data-dock]')) setTimeout(()=>$('#dock').classList.remove('all'),50); },true);
+/* ---------- Sparks fly to the counter ---------- */
+const ORB={last:null};
+function orbTick(){ if(!S) return; if(ORB.last==null||MG){ ORB.last=S.sparks; return; } const gain=S.sparks-ORB.last; ORB.last=S.sparks; if(gain<=0||!guardianMesh) return;
+  const tgt=$('#sparksVal'); if(!tgt) return; const tr=tgt.getBoundingClientRect(); const v=new THREE.Vector3(GUARD.x,1.4,GUARD.z).project(camera); const r=renderer.domElement.getBoundingClientRect(); const sx=r.left+(v.x*.5+.5)*r.width, sy=r.top+(-v.y*.5+.5)*r.height; const n=Math.min(8,2+Math.floor(gain/40));
+  for(let i=0;i<n;i++){ const o=document.createElement('i'); o.className='sorb'; o.style.left=sx+'px'; o.style.top=sy+'px'; document.body.appendChild(o); const dx=tr.left+tr.width/2-sx, dy=tr.top+tr.height/2-sy, jx=rand(-40,40), jy=rand(-50,-10);
+    o.animate([{transform:'translate(0,0) scale(.6)',opacity:0},{transform:`translate(${jx}px,${jy}px) scale(1)`,opacity:1,offset:.3},{transform:`translate(${dx}px,${dy}px) scale(.5)`,opacity:.9}],{duration:750+i*70,easing:'cubic-bezier(.4,0,.6,1)'}).onfinish=()=>{ o.remove(); if(i===n-1){ tgt.parentElement.classList.remove('bump'); void tgt.offsetWidth; tgt.parentElement.classList.add('bump'); } }; } }
+/* ---------- one tick for all of it ---------- */
+{ const _bt=bubblesTick; let acc=0; bubblesTick=function(dt){ const r=_bt.apply(this,arguments); try{ placesTick(dt); holdTick(); shakesTick(dt); calmTick(dt); acc+=dt; if(acc>.18){ acc=0; actRefresh(); orbTick(); } }catch(e){ console.warn('k',e); } return r; }; }
+{ const _sg=switchGarden; switchGarden=function(){ dropHold(true); return _sg.apply(this,arguments); }; }
+{ const _om=openMini; openMini=function(){ dropHold(true); $('#actBtn')&&($('#actBtn').hidden=true); return _om.apply(this,arguments); }; }
+COMFORT_OPTS.push(['classicUI','Classic menus','Always show the full menu bar and top bar, and hide the action button.']);
+{ const _ac=applyComfort; applyComfort=function(){ const r=_ac.apply(this,arguments); try{ const d=$('#dock'); if(d){ if(!d.querySelector('[data-more]')) buildDock(); else d.classList.toggle('classic',classicUI()); } }catch(e){} return r; }; }
+CHANGELOG['0.8.3']=[
+  ['🏡','Places, not menus','The garden now has a market stall with a friendly shopkeeper, a storage chest, a love tree and a signpost to the games. Walk up to one, or tap it, to shop, open your things, see your family or play.'],
+  ['✨','The archway is a portal','The archway glows. Step up to it to go on an Adventure.'],
+  ['🔘','One action button','A big button bottom-right changes with what\'s nearby: Pet, Pick up, Shake, Feed, Plant, Cook, Fish, Shop and more. With nothing nearby, it whistles and your Echos come running.'],
+  ['🍎','Hands-on feeding','Shake a tree and fruit tumbles down. Pick a fruit up, carry it over and feed it to an Echo.'],
+  ['💕','Love tree','A heart hangs on the love tree for every Echo that\'s in love.'],
+  ['🧘','A calmer screen','The top bar fades after a few seconds and comes back when you touch the screen. The menu bar is shorter, with the rest under ⋯ More. Sparks fly into your counter when you earn them.'],
+  ['⚙️','Prefer the old way?','Turn on "Classic menus" in Settings to keep the full menu bar, keep the top bar showing and hide the action button.']];
+/* =========================================================
+   v0.8.4 — the stall shows its goods, Echos act out their needs,
+   and the camera leans in for the big moments of love.
+   ========================================================= */
+/* ---------- real goods on the market stall ---------- */
+function priceTag(txt,col){ const c=document.createElement('canvas'); c.width=128; c.height=56; const x=c.getContext('2d'); x.fillStyle='#fff6e2'; x.strokeStyle='#7a4e2a'; x.lineWidth=5; x.beginPath(); x.roundRect?x.roundRect(4,4,120,48,12):x.rect(4,4,120,48); x.fill(); x.stroke();
+  x.fillStyle=col||'#7a4e2a'; x.font='bold 30px sans-serif'; x.textAlign='center'; x.textBaseline='middle'; x.fillText(txt,64,30); const t=new THREE.CanvasTexture(c); const s=new THREE.Sprite(new THREE.SpriteMaterial({map:t,transparent:true,depthWrite:false})); s.scale.set(.42,.18,1); return s; }
+function iconSprite(id){ const tex=new THREE.TextureLoader().load(iconURL(id)); const s=new THREE.Sprite(new THREE.SpriteMaterial({map:tex,transparent:true})); s.scale.set(.5,.5,1); return s; }
+function stallGoods(){ const goods=[]; try{ marketFruit().forEach(k=>{ if(ITEMS[k]) goods.push({k,how:'fruit'}); }); }catch(e){}
+  try{ const st=rotStock(); st.slice(0,3).forEach((s,i)=>goods.push({k:s.id,how:'rot',i,left:s.left})); }catch(e){} return goods; }
+function stockShelf(){ const P=PLACE.list.find(p=>p.key==='stall'); if(!P) return; const sh=P.obj.userData.shelf; if(!sh) return; const goods=stallGoods(); const sig=JSON.stringify(goods.map(g=>[g.k,g.left]));
+  if(sh.userData.sig===sig) return; sh.userData.sig=sig; while(sh.children.length) sh.remove(sh.children[0]);
+  goods.filter(g=>g.how==='fruit').forEach((g,i)=>{ const x=-.8+i*.8; const grp=new THREE.Group(); grp.position.set(x,1.24,.25); for(let k=0;k<4;k++){ const f=fruitMesh(g.k,.13); f.position.set((k%2-.5)*.24,k>1?.1:0,(k>1?0:.06)); grp.add(f); } const tag=priceTag('✦'+ITEMS[g.k].price); tag.position.set(0,.05,.3); grp.add(tag); grp.userData.buy=g; sh.add(grp); });
+  goods.filter(g=>g.how==='rot').forEach((g,i)=>{ const x=-.8+i*.8; const grp=new THREE.Group(); grp.position.set(x,1.98,.42); const s=iconSprite(g.k); if(g.left===0) s.material.opacity=.35; grp.add(s); const tag=priceTag(g.left===0?'Sold':'✦'+ITEMS[g.k].price,g.left===0?'#a0a0a0':null); tag.position.set(0,-.32,.05); tag.scale.set(.36,.15,1); grp.add(tag);
+    const rc={C:'#c8ccd6',U:'#4fdc8b',R:'#4fa8ff',E:'#c06bff'}[ITEMS[g.k].rar||'C']; const glow=new THREE.Sprite(new THREE.SpriteMaterial({map:glowTex(),color:rc,transparent:true,opacity:.5,blending:THREE.AdditiveBlending,depthWrite:false})); glow.scale.setScalar(.75); glow.position.z=-.02; grp.add(glow); grp.userData.buy=g; sh.add(grp); }); }
+function stallBuy(g){ const it=ITEMS[g.k]; if(!it) return; if(g.how==='rot'&&g.left===0) return toast('Sold out. New stock soon','warn'); const P=PLACE.list.find(p=>p.key==='stall');
+  const keeperTalk=()=>{ if(P) fx('heart',{x:P.obj.position.x,y:2.4,z:P.obj.position.z},{vy:.6,size:.25}); };
+  confirmModal(`Buy ${it.name}?`,it.desc||'',`Buy ✦ ${it.price}`,()=>{ const before=S.sparks; if(g.how==='rot'){ const st=rotStock(); const idx=st.findIndex(s=>s.id===g.k); if(idx>=0) rotBuy(st,idx,'sparks'); } else buy(g.k,'sparks'); if(S.sparks<before){ keeperTalk(); buzz(15); if(it.cat==='fruit') setTimeout(()=>holdFruit(g.k),200); stockShelf(); } }); }
+{ const _ht=handleTap; handleTap=function(cx,cy){ if(!(CARE||HANDS||CINE||(PHOTO&&PHOTO.on)||DECO.on)){ const P=PLACE.list.find(p=>p.key==='stall'); const sh=P&&P.obj.userData.shelf;
+      if(sh&&sh.children.length){ const r=renderer.domElement.getBoundingClientRect(); ndc.set((cx-r.left)/r.width*2-1,-((cy-r.top)/r.height)*2+1); ray.setFromCamera(ndc,camera); const h=ray.intersectObject(sh,true);
+        if(h.length){ let o=h[0].object; while(o&&!o.userData.buy) o=o.parent; if(o){ const g=o.userData.buy; const near=Math.hypot(GUARD.x-P.obj.position.x,GUARD.z-P.obj.position.z)<P.D.r+3.2; if(near) stallBuy(g); else { goTo('place','stall'); PLACE.buyNext=g; } return; } } } }
+    return _ht.apply(this,arguments); }; }
+{ const _op=openPlace; openPlace=function(key){ if(key==='stall'&&PLACE.buyNext){ const g=PLACE.buyNext; PLACE.buyNext=null; const f=placeFront('stall'); if(f) GUARD.ang=Math.atan2(f.o.position.x-GUARD.x,f.o.position.z-GUARD.z); return stallBuy(g); } return _op.apply(this,arguments); }; }
+/* ---------- Echos act out what they need ---------- */
+const NEED_CD=new Map();
+function needReady(e,k,cd){ const key=e.id+k, t=NEED_CD.get(key)||-1e9; if(TIME-t<cd) return false; NEED_CD.set(key,TIME); return true; }
+{ const _de=decide; decide=function(e,rt){ try{ if((typeof lifeFree2==='function'&&lifeFree2(e,rt))||rt.state==='idle'){ const n=e.needs; if(mobility(e)!=='newborn'&&!e.lesson){
+      if(n.hunger<30&&!(typeof groundFruit==='function'&&groundFruit(e))&&Math.random()<.4&&needReady(e,'h',45)){
+        if(GA.hold&&Math.hypot(GUARD.x-e.pos.x,GUARD.z-e.pos.z)<9){ lifeStart(e,rt,'hungry',{mode:'beg',dur:10}); return; }
+        const tr=S.trees.filter(t=>t.garden===S.garden&&t.fruits>0).map(t=>({t,p:WORLD.plots[t.plot]})).filter(o=>o.p).sort((a,b)=>Math.hypot(a.p.x-e.pos.x,a.p.z-e.pos.z)-Math.hypot(b.p.x-e.pos.x,b.p.z-e.pos.z))[0];
+        const spot=tr?tr.p:(()=>{ const s=PLACE.list.find(p=>p.key==='stall'); return s?{x:s.obj.position.x,z:s.obj.position.z}:null; })();
+        if(spot){ const a=Math.atan2(e.pos.x-spot.x,e.pos.z-spot.z); lifeStart(e,rt,'hungry',{mode:tr?'tree':'stall',tx:spot.x+Math.sin(a)*1.7,tz:spot.z+Math.cos(a)*1.7,look:spot,dur:10}); rt.tx=rt.sk.tx; rt.tz=rt.sk.tz; return; } }
+      if(n.energy<24&&dayLight>.3&&Math.random()<.35&&needReady(e,'s',50)){ lifeStart(e,rt,'droop',{dur:rand(5,7)}); return; }
+      if(n.happy<35&&Math.random()<.3&&needReady(e,'l',60)){ lifeStart(e,rt,'lonely',{dur:14}); return; } } } }catch(err){ console.warn('needs',err); }
+    return _de.apply(this,arguments); }; }
+{ const _rs=runSkill; runSkill=function(e,rt,dt){ const K=rt.sk; if(!K||K.k!=='life'||!['hungry','droop','lonely'].includes(K.life)) return _rs.apply(this,arguments);
+    K.t+=dt; rt.timer=5; const n=e.needs, L=K.life; const done=()=>{ rt.state='idle'; rt.timer=1.5; rt.sk=null; }; const toG=()=>{ const a=Math.atan2(e.pos.x-GUARD.x,e.pos.z-GUARD.z); rt.tx=GUARD.x+Math.sin(a)*1.3; rt.tz=GUARD.z+Math.cos(a)*1.3; };
+    if(L==='hungry'){ if(n.hunger>50) return done(); if(K.mode==='beg'){ if(!GA.hold&&K.t>2) return done(); toG(); K.at=stepTo(e,rt,dt)||Math.hypot(GUARD.x-e.pos.x,GUARD.z-e.pos.z)<1.6; rt.ang=Math.atan2(GUARD.x-e.pos.x,GUARD.z-e.pos.z); }
+      else if(!K.at){ if(stepTo(e,rt,dt)||K.t>12){ K.at=1; K.t2=0; } } else { rt.ang=Math.atan2(K.look.x-e.pos.x,K.look.z-e.pos.z); K.r=(K.r||0)-dt; if(K.r<=0){ K.r=2.4; const m=MESH.echo.get(e.id); fx('q',{x:e.pos.x,y:(m?m.parts.height:1)+.3,z:e.pos.z},{size:.28,vy:.4}); SND.blip&&SND.blip(); } }
+      if(K.t>K.dur) done(); return; }
+    if(L==='droop'){ K.zz=(K.zz||0)-dt; if(K.zz<=0){ K.zz=1.6; fx('z',{x:e.pos.x,y:.9,z:e.pos.z},{vy:.6,life:2}); } if(K.t>K.dur||n.energy>50) done(); return; }
+    if(L==='lonely'){ if(n.happy>45||(CARE&&CARE.id===e.id)) return done(); toG(); const d=Math.hypot(GUARD.x-e.pos.x,GUARD.z-e.pos.z); if(d>1.6) stepTo(e,rt,dt,.8); else { K.at=1; rt.ang=Math.atan2(GUARD.x-e.pos.x,GUARD.z-e.pos.z); }
+      if(K.at){ K.h=(K.h||0)-dt; if(K.h<=0){ K.h=2.6; const m=MESH.echo.get(e.id); fx('q',{x:e.pos.x,y:(m?m.parts.height:1)+.3,z:e.pos.z},{size:.26,vy:.4}); } } if(K.t>K.dur){ eventEmotion(e,'sad',2); done(); } return; } }; }
+{ const _ae=animateEchoes; animateEchoes=function(dt){ const r=_ae.apply(this,arguments); const t=TIME;
+    for(const e of gardenEchoes()){ const rt=rtOf(e); const K=rt.sk; if(rt.state!=='sk_life'||!K||!['hungry','droop','lonely'].includes(K.life)) continue; const m=MESH.echo.get(e.id); if(!m) continue; const p=m.parts, pose=p.pose;
+      if(K.life==='hungry'&&(K.at||K.mode==='beg')){ if(K.mode==='beg'){ p.arms[0].rotation.z=-2.5; p.arms[1].rotation.z=2.5; pose.position.y+=Math.abs(Math.sin(t*5))*.06; p.head.rotation.x=-.3; }
+        else { const rub=Math.sin(t*6)*.25; p.arms[0].rotation.x=-1+rub; p.arms[1].rotation.x=-1-rub; p.arms[0].rotation.z=.5; p.arms[1].rotation.z=-.5; p.head.rotation.x=-.45; pose.rotation.z=Math.sin(t*1.5)*.05; } if(typeof setFace==='function'&&Math.random()<.02) setFace(p,'sad',false); }
+      else if(K.life==='droop'){ const nod=Math.max(0,Math.sin(t*1.1)); p.head.rotation.x=.15+nod*.4; pose.position.y-=.03+nod*.02; pose.rotation.z=Math.sin(t*.8)*.06; p.arms[0].rotation.z=.15; p.arms[1].rotation.z=-.15; if(typeof setFace==='function'&&Math.random()<.03) setFace(p,'sleepy',false); }
+      else if(K.life==='lonely'){ if(K.at){ p.head.rotation.x=-.3; pose.position.y+=Math.max(0,Math.sin(t*4))*.035; p.arms[0].rotation.z=-.6; p.arms[1].rotation.z=.6; } else { p.head.rotation.x=.3; pose.rotation.z=Math.sin(t*2)*.04; } if(typeof setFace==='function'&&Math.random()<.02) setFace(p,'sad',false); } }
+    return r; }; }
+/* ---------- the camera leans in for love ---------- */
+const quietMoment=()=>!(UI.panel||UI.popup||CARE||HANDS||CINE||MG||DECO.on||FISHING||UI.fly||!$('#modal').hidden||(PHOTO&&PHOTO.on));
+{ const _lr=loveRing; loveRing=function(x,z){ const R=_lr.apply(this,arguments); try{ if(quietMoment()&&!(S.settings&&S.settings.noCine)) cineStart({kind:'love',pos:{x,z,y:.7,d:4.6},dur:7.5}); }catch(e){} return R; }; }
+{ const _fl=fallInLove; fallInLove=function(e,boost){ const r=_fl.apply(this,arguments); try{ if(quietMoment()&&S.seenLove>0&&!(S.settings&&S.settings.noCine)){ const m=MESH.echo.get(e.id); cineStart({kind:'love1',pos:{x:e.pos.x,z:e.pos.z,y:(m?m.parts.height:1)*.55,d:2.8},dur:2.4}); } }catch(err){} return r; }; }
+/* ---------- keep the shelf stocked ---------- */
+{ const _bt=bubblesTick; let acc=5; bubblesTick=function(dt){ const r=_bt.apply(this,arguments); acc+=dt; if(acc>3){ acc=0; try{ stockShelf(); }catch(e){} } return r; }; }
+{ const _bp=buildPlaces; buildPlaces=function(){ const r=_bp.apply(this,arguments); try{ stockShelf(); }catch(e){} return r; }; }
+CHANGELOG['0.8.4']=[
+  ['🛒','Goods on the stall','The market stall now shows what\'s for sale: today\'s fruit in the crates and the featured items on the top shelf, each with a price tag. Tap something on the stall to buy it. Fruit you buy goes straight into your hands to feed an Echo.'],
+  ['🍎','Echos show what they need','A hungry Echo goes and stands under a fruit tree or by the stall, rubbing its tummy, and begs if you\'re carrying fruit. A tired one nods off where it stands. A lonely one comes to find you and waits for some attention.'],
+  ['🎬','Big moments up close','The camera leans in when an Echo falls in love and while two Echos court in their ring of flowers, just as it already does for hatching and evolving.']];
+/* =========================================================
    AUDIO — procedural music, ambience and creature voices
    (reverb bus, chord pads, bells, spatial voices)
    ========================================================= */
@@ -9175,7 +9410,7 @@ function updateBanner(){ if(document.getElementById('updBar')) return; const d=d
 /* =========================================================
    DIAGNOSTICS — performance readout, error capture, problem report
    ========================================================= */
-const GAME_VERSION='0.8.2';
+const GAME_VERSION='0.8.4';
 const DIAG={errors:[],trail:[],fps:[],show:false,acc:0,n:0,el:null,minFps:999};
 window.addEventListener('error',ev=>{ DIAG.errors.push(`${new Date().toLocaleTimeString()} ${ev.message} @${(ev.filename||'').split('/').pop()}:${ev.lineno}`); if(DIAG.errors.length>15) DIAG.errors.shift(); });
 window.addEventListener('unhandledrejection',ev=>{ DIAG.errors.push(`${new Date().toLocaleTimeString()} promise: ${ev.reason&&ev.reason.message||ev.reason}`); if(DIAG.errors.length>15) DIAG.errors.shift(); });
