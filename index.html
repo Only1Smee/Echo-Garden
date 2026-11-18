@@ -11,7 +11,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
-<title>Echo Garden v0.8.4</title>
+<title>Echo Garden v0.8.6</title>
 <style>
 [hidden]{display:none!important}
 
@@ -935,7 +935,7 @@ h1,h2,h3,.ph h2,.dk span,.pill b{font-family:var(--f-display);font-weight:900;le
 #actBtn.idle{background:radial-gradient(circle at 35% 30%,#d8eaff,#8fb4e8 60%,#5a7fc0);color:#14223a;width:58px;height:58px;bottom:calc(115px + env(safe-area-inset-bottom,0px));right:max(21px,env(safe-area-inset-right,0px));opacity:.85}
 #app.lefty #actBtn{right:auto;left:max(14px,env(safe-area-inset-left,0px))}
 #ui.fishing #actBtn,#ui.deco #actBtn,#ui.panel-open #actBtn,#ui.pop-open #actBtn{opacity:0;pointer-events:none}
-#ui.holding #armBanner,#ui.holding #foodBar{display:none!important}
+#ui.holding #foodBar{display:none!important}
 /* calm: the top bar fades away until you touch the screen */
 #ui .hud-top,#ui #essHud,#ui #slotRail,#ui #nextStep,#ui #quest,#ui #dock,#ui #camReset,#ui #foodBtn{transition:opacity .8s ease}
 #ui.calm .hud-top,#ui.calm #essHud,#ui.calm #slotRail,#ui.calm #nextStep,#ui.calm #quest,#ui.calm #camReset{opacity:0;pointer-events:none}
@@ -948,6 +948,11 @@ h1,h2,h3,.ph h2,.dk span,.pill b{font-family:var(--f-display);font-weight:900;le
 #panel.world .ph{border-bottom:1px dashed rgba(255,220,170,.25)}
 .sorb{position:fixed;width:12px;height:12px;margin:-6px 0 0 -6px;border-radius:50%;background:radial-gradient(circle,#fffbe0,#ffd34a 55%,rgba(255,180,40,0));box-shadow:0 0 10px #ffd34a;pointer-events:none;z-index:60}
 .pill.cur.bump{animation:bump .3s ease} @keyframes bump{50%{transform:scale(1.12)}}
+
+/* v0.8.6 joystick */
+#joy{position:fixed;width:112px;height:112px;margin:-56px 0 0 -56px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.10),rgba(255,255,255,.04) 70%);border:2px solid rgba(255,244,224,.35);box-shadow:0 4px 16px rgba(0,0,0,.25);pointer-events:none;z-index:8;opacity:0;transition:opacity .15s}
+#joy.on{opacity:1} #joy i{position:absolute;left:50%;top:50%;width:52px;height:52px;margin:-26px 0 0 -26px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff6dc,#f3c765 65%,#c8862a);box-shadow:0 3px 10px rgba(0,0,0,.4)}
+#joy.run{border-color:#ffd34a;box-shadow:0 0 18px rgba(255,211,74,.45)}
 </style>
 <div id="app">
   <canvas id="gl"></canvas>
@@ -8997,7 +9002,7 @@ function placeFree(x,z,r){ if(Math.hypot(x,z)>RAD-r-.4) return false; const P=WO
   if(SCHOOL&&Math.hypot(SCHOOL.x-x,SCHOOL.z-z)<r+1.4) return false; if(Math.hypot(x,z-3)<2.2) return false; return true; }
 function placeSpot(x,z,r){ if(placeFree(x,z,r)) return {x,z}; for(let d=.6;d<8;d+=.6) for(let a=0;a<12;a++){ const t=a/12*Math.PI*2; const px=x+Math.cos(t)*d, pz=z+Math.sin(t)*d; if(placeFree(px,pz,r)) return {x:px,z:pz}; } return {x,z}; }
 function buildPlaces(id){ PLACE.list=[]; const L=layOf(id);
-  for(const [key,D] of Object.entries(PLACE_DEF)){ let p=L[key]; if(!p){ const s=placeSpot(D.def[0],D.def[1],D.r); p={x:s.x,z:s.z,rot:Math.atan2(-s.x,-s.z)}; }
+  for(const [key,D] of Object.entries(PLACE_DEF)){ let p=L[key]; if(!p){ const s=placeSpot(D.def[0],D.def[1],D.r); p={x:s.x,z:s.z,rot:D.rot!=null?D.rot:Math.atan2(-s.x,-s.z)}; }
     const g=new THREE.Group(); g.position.set(p.x,0,p.z); g.rotation.y=p.rot||0; ({stall:buildStall,chest:buildChest,lovetree:buildLoveTree,sign:buildSign})[key](g); g.traverse(o=>{ if(o.isMesh){ o.castShadow=true; o.receiveShadow=true; } });
     world.add(g); addObs(p.x,p.z,D.r*.85,'post'); const it={kind:'place',key,obj:g,r:D.r,name:D.name,paint:true}; DECO.items.push(it); PLACE.list.push({key,obj:g,D}); paintApply(g,paintKey(it)); } }
 { const _bg=buildGarden; buildGarden=function(id){ const r=_bg.apply(this,arguments); try{ buildPlaces(id||S.garden); portalArch(); }catch(e){ console.warn('places',e); } return r; }; }
@@ -9058,16 +9063,16 @@ function whistle(){ SND.note&&SND.note('whistle'); SND.pop&&SND.pop(); buzz(25);
 /* ---------- the action button ---------- */
 function nearAction(){ if(CARE||HANDS||CINE||MG||DECO.on||FISHING||UI.panel||(PHOTO&&PHOTO.on)) return null; const gx=GUARD.x, gz=GUARD.z, dd=(x,z)=>Math.hypot(x-gx,z-gz); let best=null;
   const consider=(d,lim,A)=>{ if(d<=lim&&(!best||d-(A.pri||0)<best.d-(best.pri||0))){ A.d=d; best=A; } };
-  if(GA.hold){ for(const e of gardenEchoes()){ if(e.lesson||rtOf(e).cocoon>0) continue; consider(dd(e.pos.x,e.pos.z),3.2,{lab:'Feed',ic:'🍎',sub:e.name,pri:2,go:()=>arrive({kind:'echo',id:e.id})}); } if(!best) return {lab:'Put away',ic:'🧺',go:()=>{ dropHold(); toast('Put in your bag','info'); }}; return best; }
-  for(const f of S.ground){ if(f.garden!==S.garden) continue; consider(dd(f.x,f.z),1.7,{lab:'Pick up',ic:'✋',sub:ITEMS[f.type].name,pri:.4,go:()=>{ lastGround={type:f.type}; arrive({kind:'fruit',id:f.id}); }}); }
-  for(const e of gardenEchoes()){ if(e.lesson||rtOf(e).cocoon>0) continue; consider(dd(e.pos.x,e.pos.z),2.1,{lab:'Pet',ic:'🤚',sub:e.name,pri:.3,go:()=>arrive({kind:'echo',id:e.id})}); }
-  for(const g of S.eggs){ if(g.garden!==S.garden) continue; consider(dd(g.x,g.z),1.8,{lab:'Warm',ic:'🥚',sub:'Egg',go:()=>arrive({kind:'egg',id:g.id})}); }
-  WORLD.plots.forEach((p,i)=>{ const t=S.trees.find(t=>t.garden===S.garden&&t.plot===i); if(t) consider(dd(p.x,p.z),2.6,{lab:'Shake',ic:'🌳',sub:t.fruits?`${t.fruits} fruit`:'',go:()=>quickShake(t)}); else consider(dd(p.x,p.z),2.2,{lab:'Plant',ic:'🌱',go:()=>arrive({kind:'plot',id:i})}); });
-  for(const y of S.toys){ if(y.garden!==S.garden||y.tmp) continue; consider(dd(y.x,y.z),1.6,{lab:'Look',ic:'🧸',sub:TOYS[y.type]?TOYS[y.type].name:'',go:()=>arrive({kind:'toy',id:y.id})}); }
-  if(WORLD.fire) consider(dd(WORLD.fire.x,WORLD.fire.z),2.6,{lab:'Cook',ic:'🔥',go:()=>arrive({kind:'fire',id:0})});
-  for(const P of PLACE.list){ const o=P.obj.position; consider(dd(o.x,o.z),P.D.r+2.2,{lab:P.D.act,ic:P.D.ic,sub:P.D.name,pri:.5,go:()=>openPlace(P.key)}); }
-  const ai=DECO.items.find(o=>o.kind==='arch'); if(ai){ const o=ai.obj.position; consider(dd(o.x,o.z),3.4,{lab:'Adventure',ic:'✨',sub:'Archway',pri:.5,go:()=>openPlace('portal'),portal:1}); }
-  if(SCHOOL&&SCHOOL.mesh) consider(dd(SCHOOL.x,SCHOOL.z),2.4,{lab:'School',ic:'🏫',sub:'Kindergarten',pri:.3,go:()=>openPanel('school')});
+  if(GA.hold){ for(const e of gardenEchoes()){ if(e.lesson||rtOf(e).cocoon>0) continue; consider(dd(e.pos.x,e.pos.z),3.2,{px:e.pos.x,pz:e.pos.z,lab:'Feed',ic:'🍎',sub:e.name,pri:2,go:()=>arrive({kind:'echo',id:e.id})}); } if(!best) return {lab:'Put away',ic:'🧺',go:()=>{ dropHold(); toast('Put in your bag','info'); }}; return best; }
+  for(const f of S.ground){ if(f.garden!==S.garden) continue; consider(dd(f.x,f.z),1.7,{px:f.x,pz:f.z,lab:'Pick up',ic:'✋',sub:ITEMS[f.type].name,pri:.4,go:()=>{ lastGround={type:f.type}; arrive({kind:'fruit',id:f.id}); }}); }
+  for(const e of gardenEchoes()){ if(e.lesson||rtOf(e).cocoon>0) continue; consider(dd(e.pos.x,e.pos.z),2.1,{px:e.pos.x,pz:e.pos.z,lab:'Pet',ic:'🤚',sub:e.name,pri:.3,go:()=>arrive({kind:'echo',id:e.id})}); }
+  for(const g of S.eggs){ if(g.garden!==S.garden) continue; consider(dd(g.x,g.z),1.8,{px:g.x,pz:g.z,lab:'Warm',ic:'🥚',sub:'Egg',go:()=>arrive({kind:'egg',id:g.id})}); }
+  WORLD.plots.forEach((p,i)=>{ const t=S.trees.find(t=>t.garden===S.garden&&t.plot===i); if(t) consider(dd(p.x,p.z),2.6,{px:p.x,pz:p.z,lab:'Shake',ic:'🌳',sub:t.fruits?`${t.fruits} fruit`:'',go:()=>quickShake(t)}); else consider(dd(p.x,p.z),2.2,{px:p.x,pz:p.z,lab:'Plant',ic:'🌱',go:()=>arrive({kind:'plot',id:i})}); });
+  for(const y of S.toys){ if(y.garden!==S.garden||y.tmp) continue; consider(dd(y.x,y.z),1.6,{px:y.x,pz:y.z,lab:'Look',ic:'🧸',sub:TOYS[y.type]?TOYS[y.type].name:'',go:()=>arrive({kind:'toy',id:y.id})}); }
+  if(WORLD.fire) consider(dd(WORLD.fire.x,WORLD.fire.z),2.6,{px:WORLD.fire.x,pz:WORLD.fire.z,lab:'Cook',ic:'🔥',go:()=>arrive({kind:'fire',id:0})});
+  for(const P of PLACE.list){ const o=P.obj.position; consider(dd(o.x,o.z),P.D.r+2.2,{px:o.x,pz:o.z,lab:P.D.act,ic:P.D.ic,sub:P.D.name,pri:.5,go:()=>openPlace(P.key)}); }
+  const ai=DECO.items.find(o=>o.kind==='arch'); if(ai){ const o=ai.obj.position; consider(dd(o.x,o.z),3.4,{px:o.x,pz:o.z,lab:'Adventure',ic:'✨',sub:'Archway',pri:.5,go:()=>openPlace('portal'),portal:1}); }
+  if(SCHOOL&&SCHOOL.mesh) consider(dd(SCHOOL.x,SCHOOL.z),2.4,{px:SCHOOL.x,pz:SCHOOL.z,lab:'School',ic:'🏫',sub:'Kindergarten',pri:.3,go:()=>openPanel('school')});
   const P=WORLD.pond; if(P&&typeof bestRod==='function'&&bestRod()){ const de=Math.abs(dd(P.x,P.z)-P.r); consider(de,1.8,{lab:'Fish',ic:'🎣',go:()=>startFishing()}); }
   return best||{lab:'Whistle',ic:'🎵',go:whistle}; }
 function actBtn(){ let b=$('#actBtn'); if(!b){ b=document.createElement('button'); b.id='actBtn'; b.innerHTML='<span class="ai"></span><b></b><em></em>'; $('#ui').appendChild(b);
@@ -9163,6 +9168,89 @@ CHANGELOG['0.8.4']=[
   ['🛒','Goods on the stall','The market stall now shows what\'s for sale: today\'s fruit in the crates and the featured items on the top shelf, each with a price tag. Tap something on the stall to buy it. Fruit you buy goes straight into your hands to feed an Echo.'],
   ['🍎','Echos show what they need','A hungry Echo goes and stands under a fruit tree or by the stall, rubbing its tummy, and begs if you\'re carrying fruit. A tired one nods off where it stands. A lonely one comes to find you and waits for some attention.'],
   ['🎬','Big moments up close','The camera leans in when an Echo falls in love and while two Echos court in their ring of flowers, just as it already does for hatching and evolving.']];
+/* =========================================================
+   v0.8.5 — tap is the one way to do things
+   The action button clashed with tap-to-walk and doubled up the
+   whistle, so it's gone. Tapping things in the garden does it all:
+   tap a tree to shake it, a fruit to pick it up, an Echo while
+   holding fruit to feed it, and the stall, chest, love tree,
+   signpost or archway to use them.
+   ========================================================= */
+actRefresh=function(){ PLACE.act=null; const b=$('#actBtn'); if(b) b.hidden=true; };
+// holding fruit shows the usual "tap an Echo" banner, whose ✕ puts it back in the bag
+{ const i=COMFORT_OPTS.findIndex(o=>o[0]==='classicUI'); if(i>=0) COMFORT_OPTS[i]=['classicUI','Classic menus','Always show the full menu bar and the top bar.']; }
+CHANGELOG['0.8.5']=[
+  ['👆','Just tap','The action button is gone because it didn\'t fit with tap-to-walk and doubled up the whistle. Tap things in the garden instead: a tree to shake it, a fruit to pick it up, an Echo while you\'re holding fruit to feed it, and the stall, chest, love tree, signpost or archway to use them.'],
+  ['🍎','Carrying fruit','While you\'re holding fruit, the banner at the top says who to give it to. Tap ✕ on it to put the fruit back in your bag.'],
+  ['📯','One whistle','The whistle on the left is the only one now.']];
+/* =========================================================
+   v0.8.6 — joystick and action button
+   Touch the bottom-left of the screen and a stick appears under
+   your thumb. The camera follows your guardian. A context action
+   button bottom-right shows only when something is in reach, with
+   a marker over what it will act on. Tap to walk is still there as
+   a setting. The market stall moves to the back of the garden.
+   ========================================================= */
+const joyMode=()=>!(S&&S.settings&&S.settings.tapWalk);
+const JOY={id:null,ox:0,oy:0,x:0,y:0,mag:0,active:false,keys:new Set(),was:false,camT:0};
+function joyBlocked(){ return CARE||HANDS||CINE||DECO.on||MG||FISHING||(PHOTO&&PHOTO.on)||UI.panel||!$('#modal').hidden; }
+function joyZone(x,y){ const W=innerWidth,H=innerHeight; const lefty=$('#app')&&$('#app').classList.contains('lefty'); return y>H*.36&&(lefty?x>W*.58:x<W*.42); }
+function joyEl(){ let b=$('#joy'); if(!b){ b=document.createElement('div'); b.id='joy'; b.innerHTML='<i></i>'; $('#ui').appendChild(b); } return b; }
+function joyShow(){ const b=joyEl(); b.style.left=JOY.ox+'px'; b.style.top=JOY.oy+'px'; b.classList.add('on'); joyKnob(); }
+function joyKnob(){ const k=$('#joy i'); if(!k) return; const R=46; k.style.transform=`translate(${JOY.x*R}px,${JOY.y*R}px)`; $('#joy').classList.toggle('run',JOY.mag>.85); }
+document.addEventListener('pointerdown',ev=>{ if(!joyMode()||JOY.id!=null||joyBlocked()) return; if(ev.target!==renderer.domElement) return; if(!joyZone(ev.clientX,ev.clientY)) return;
+  ev.stopImmediatePropagation(); ev.preventDefault(); JOY.id=ev.pointerId; JOY.ox=ev.clientX; JOY.oy=ev.clientY; JOY.x=JOY.y=JOY.mag=0; JOY.active=true; joyShow(); try{ SND.init&&SND.init(); }catch(e){} PEND=null; CAM.auto=false; CAM.reset=0; },true);
+document.addEventListener('pointermove',ev=>{ if(ev.pointerId!==JOY.id) return; ev.stopImmediatePropagation(); const R=46; let dx=(ev.clientX-JOY.ox)/R, dy=(ev.clientY-JOY.oy)/R; const m=Math.hypot(dx,dy); if(m>1){ dx/=m; dy/=m; }
+  // the base drifts along if you push past the edge, so the stick never gets stuck
+  if(m>1.6){ JOY.ox+=(ev.clientX-JOY.ox)*(1-1.6/m); JOY.oy+=(ev.clientY-JOY.oy)*(1-1.6/m); const b=$('#joy'); if(b){ b.style.left=JOY.ox+'px'; b.style.top=JOY.oy+'px'; } }
+  JOY.x=dx; JOY.y=dy; JOY.mag=Math.min(1,m); joyKnob(); },true);
+const joyEnd=ev=>{ if(ev.pointerId!==JOY.id) return; ev.stopImmediatePropagation(); JOY.id=null; JOY.active=false; JOY.x=JOY.y=JOY.mag=0; const b=$('#joy'); if(b) b.classList.remove('on','run'); };
+document.addEventListener('pointerup',joyEnd,true); document.addEventListener('pointercancel',joyEnd,true);
+// keyboard: WASD or arrow keys
+const JKEY={KeyW:[0,-1],ArrowUp:[0,-1],KeyS:[0,1],ArrowDown:[0,1],KeyA:[-1,0],ArrowLeft:[-1,0],KeyD:[1,0],ArrowRight:[1,0]};
+window.addEventListener('keydown',ev=>{ if(JKEY[ev.code]&&!/INPUT|TEXTAREA/.test(document.activeElement&&document.activeElement.tagName||'')){ JOY.keys.add(ev.code); if(ev.code.startsWith('Arrow')) ev.preventDefault(); } if((ev.code==='Space'||ev.code==='KeyE')&&PLACE.act&&joyMode()&&!joyBlocked()){ ev.preventDefault(); actPress(); } });
+window.addEventListener('keyup',ev=>JOY.keys.delete(ev.code)); window.addEventListener('blur',()=>JOY.keys.clear());
+function joyVec(){ if(JOY.active) return {x:JOY.x,y:JOY.y,m:JOY.mag}; if(!JOY.keys.size) return null; let x=0,y=0; for(const k of JOY.keys){ x+=JKEY[k][0]; y+=JKEY[k][1]; } const m=Math.hypot(x,y); if(!m) return null; return {x:x/m,y:y/m,m:1}; }
+/* ---------- moving the guardian ---------- */
+{ const _ag=animateGuardian; animateGuardian=function(dt){ try{ const v=joyMode()&&!joyBlocked()?joyVec():null;
+      if(v&&v.m>.14){ const az=CAM.az; const fx_=-Math.sin(az), fz=-Math.cos(az), rx=Math.cos(az), rz=-Math.sin(az); let wx=rx*v.x+fx_*(-v.y), wz=rz*v.x+fz*(-v.y); const l=Math.hypot(wx,wz)||1; wx/=l; wz/=l;
+        const dist=v.m>.85?5.2:.9+v.m*2.6; GUARD.tx=GUARD.x+wx*dist; GUARD.tz=GUARD.z+wz*dist; PEND=null; JOY.was=true; JOY.camT=2.5; if(GA.fid&&GA.fid.type==='sit') GA.fid=null; }
+      else if(JOY.was){ JOY.was=false; GUARD.tx=GUARD.x; GUARD.tz=GUARD.z; } }catch(e){ console.warn('joy',e); }
+    return _ag.apply(this,arguments); }; }
+/* ---------- the camera follows ---------- */
+{ const _pc=placeCamera; placeCamera=function(dt){ try{ if(joyMode()&&!(CINE||HANDS||CARE||PLACE.focus)){ JOY.camT=Math.max(0,JOY.camT-dt); const moving=GA.v>.3;
+      if(moving||JOY.camT>0){ const k=Math.min(1,dt*2.4); CAM.px=lerp(CAM.px,GUARD.x,k); CAM.pz=lerp(CAM.pz,GUARD.z,k); CAM.free=false; CAM.vpx=CAM.vpz=0;
+        const v=joyVec(); if(v&&v.m>.3&&ptrs.size<=1){ let want=GUARD.ang+Math.PI, da=want-CAM.az; da=Math.atan2(Math.sin(da),Math.cos(da)); if(Math.abs(da)<2.2) CAM.az+=da*Math.min(1,dt*.9*v.m); }
+        if(JOY.firstZoom!==1&&CAM.dist>17){ CAM.dist=lerp(CAM.dist,15,Math.min(1,dt*1.5)); if(CAM.dist<15.3) JOY.firstZoom=1; } } } }catch(e){}
+    return _pc.apply(this,arguments); }; }
+/* ---------- tapping empty ground doesn't walk in joystick mode ---------- */
+{ const _ht=handleTap; handleTap=function(cx,cy){ const tx=GUARD.tx, tz=GUARD.tz, mv=UI.moveToy; const r=_ht.apply(this,arguments);
+    if(joyMode()&&!mv&&!PEND&&(GUARD.tx!==tx||GUARD.tz!==tz)){ const moved=Math.hypot(GUARD.tx-GUARD.x,GUARD.tz-GUARD.z); if(moved>.2){ GUARD.tx=tx; GUARD.tz=tz; } } return r; }; }
+/* ---------- the action button and its marker ---------- */
+function actPress(){ const A=PLACE.act; if(!A) return; const b=$('#actBtn'); if(b){ b.classList.add('press'); setTimeout(()=>b.classList.remove('press'),160); } PEND=null; buzz(12); try{ A.go(); }catch(err){ console.warn(err); } setTimeout(actRefresh,60); }
+function actMarker(){ if(PLACE.mk) return PLACE.mk; const c=document.createElement('canvas'); c.width=c.height=64; const x=c.getContext('2d'); x.fillStyle='#ffe08a'; x.strokeStyle='#5a3a10'; x.lineWidth=5; x.beginPath(); x.moveTo(12,18); x.lineTo(52,18); x.lineTo(32,48); x.closePath(); x.stroke(); x.fill();
+  const s=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(c),transparent:true,depthTest:false,depthWrite:false})); s.scale.set(.42,.42,1); s.renderOrder=999; s.visible=false; ents.add(s); PLACE.mk=s; return s; }
+function markerY(A){ if(A.lab==='Pet'||A.lab==='Feed'){ const e=gardenEchoes().find(e=>e.name===A.sub); const m=e&&MESH.echo.get(e.id); return (m?m.parts.height:1)+.55; }
+  return {Shop:3.5,Family:4.9,Adventure:4.1,Games:3,Open:1.5,Shake:4,School:3.6,Cook:1.5,Plant:1,'Pick up':.9,Warm:1.2,Look:1.4}[A.lab]||2; }
+actRefresh=function(){ const b=actBtn(); if(!joyMode()){ PLACE.act=null; b.hidden=true; if(PLACE.mk) PLACE.mk.visible=false; return; }
+  let A=nearAction(); if(A&&A.lab==='Whistle') A=null; PLACE.act=A; PLACE.near=A&&A.portal?'portal':null; if(!A){ b.hidden=true; if(PLACE.mk) PLACE.mk.visible=false; b.dataset.k=''; return; }
+  b.hidden=false; const key=A.lab+'|'+(A.sub||''); if(b.dataset.k!==key){ b.dataset.k=key; b.querySelector('.ai').textContent=A.ic; b.querySelector('b').textContent=A.lab; b.querySelector('em').textContent=A.sub||''; b.classList.remove('pop'); void b.offsetWidth; b.classList.add('pop'); b.classList.remove('idle'); }
+  const mk=actMarker(); if(A.px!=null){ mk.visible=true; mk.userData.tx=A.px; mk.userData.tz=A.pz; mk.userData.ty=markerY(A); if(!mk.userData.init){ mk.position.set(A.px,mk.userData.ty,A.pz); mk.userData.init=1; } } else mk.visible=false; };
+// the button itself: replace the old handler with one that uses actPress
+{ const old=$('#actBtn'); if(old) old.remove(); const b=document.createElement('button'); b.id='actBtn'; b.hidden=true; b.innerHTML='<span class="ai"></span><b></b><em></em>';
+  b.addEventListener('pointerdown',ev=>{ ev.preventDefault(); ev.stopPropagation(); actPress(); }); const put=()=>{ const ui=$('#ui'); if(ui) ui.appendChild(b); else setTimeout(put,200); }; put(); }
+{ const _bt=bubblesTick; bubblesTick=function(dt){ const r=_bt.apply(this,arguments); try{ const mk=PLACE.mk; if(mk&&mk.visible){ const u=mk.userData, k=Math.min(1,dt*10); mk.position.x=lerp(mk.position.x,u.tx,k); mk.position.z=lerp(mk.position.z,u.tz,k); mk.position.y=u.ty+Math.abs(Math.sin(PLACE.t*4))*.18; if(mk.parent!==ents) ents.add(mk); } }catch(e){} return r; }; }
+{ const _cw=clearWorld; clearWorld=function(){ const r=_cw.apply(this,arguments); PLACE.mk=null; return r; }; }
+/* ---------- the stall moves to the back of the garden, facing in ---------- */
+PLACE_DEF.stall.def=[-9.2,-7.7]; PLACE_DEF.stall.r=1.4; PLACE_DEF.sign.def=[-11.6,-4.4];
+/* ---------- setting ---------- */
+COMFORT_OPTS.push(['tapWalk','Tap to walk','Walk by tapping the ground instead of using the joystick. Hides the action button.']);
+CHANGELOG['0.8.6']=[
+  ['🕹️','Joystick','Touch the bottom-left of the screen and a stick appears under your thumb. Push to walk, push further to run. The camera follows your guardian and swings round behind it as you go. On a keyboard, use WASD or the arrow keys.'],
+  ['🔘','Action button','A button bottom-right appears when something is in reach: Pet, Feed, Pick up, Shake, Plant, Cook, Fish, Shop, Family, Games, Adventure and more. A yellow arrow floats over whatever it will act on. On a keyboard, press Space or E.'],
+  ['👆','Tapping still works','Tap an Echo, a tree or a place and your guardian walks over. Tapping empty ground no longer moves you, so it doesn\'t fight the stick.'],
+  ['🛒','Stall moved','The market stall and the games signpost now stand together in the back corner of the garden by the archway, facing the middle, so the middle stays clear. If you moved them in Decorate, they stay where you put them.'],
+  ['⚙️','Prefer tapping?','Turn on "Tap to walk" in Settings to go back to tap-to-walk without the joystick or action button.']];
 /* =========================================================
    AUDIO — procedural music, ambience and creature voices
    (reverb bus, chord pads, bells, spatial voices)
@@ -9410,7 +9498,7 @@ function updateBanner(){ if(document.getElementById('updBar')) return; const d=d
 /* =========================================================
    DIAGNOSTICS — performance readout, error capture, problem report
    ========================================================= */
-const GAME_VERSION='0.8.4';
+const GAME_VERSION='0.8.6';
 const DIAG={errors:[],trail:[],fps:[],show:false,acc:0,n:0,el:null,minFps:999};
 window.addEventListener('error',ev=>{ DIAG.errors.push(`${new Date().toLocaleTimeString()} ${ev.message} @${(ev.filename||'').split('/').pop()}:${ev.lineno}`); if(DIAG.errors.length>15) DIAG.errors.shift(); });
 window.addEventListener('unhandledrejection',ev=>{ DIAG.errors.push(`${new Date().toLocaleTimeString()} promise: ${ev.reason&&ev.reason.message||ev.reason}`); if(DIAG.errors.length>15) DIAG.errors.shift(); });
